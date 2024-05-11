@@ -45,11 +45,34 @@ public class BuildTowardsTargetGoal extends Goal {
         if(this.playerTarget == null){
             return false;
         }
+
         if(this.mob.getPosX() == this.playerTarget.getPosX() && this.mob.getPosZ() == this.playerTarget.getPosZ()) {
             if (!this.mob.world.getBlockState(new BlockPos(this.mob.getPosX(), this.mob.getPosY() + 2, this.mob.getPosZ())).isAir()) {
                 return false;
             }
         }
+
+        this.findCustomPath();
+        if(this.pathToNextBlockPos != null){
+            if(!this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).isAir()){
+                double nextPosY = this.nextBlockPos.getY();
+                double mobY = this.mob.getPosY();
+
+                if(!this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isAir()){
+                    return false;
+                }
+                if(nextPosY > mobY){
+                    if(!this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).isAir()){
+                        return false;
+                    }
+                }else if(nextPosY < mobY){
+                    if(!this.mob.world.getBlockState(this.nextBlockPos.add(0, 2, 0)).isAir()){
+                        return false;
+                    }
+                }
+            }
+        }
+
         GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
         this.pathToTarget = groundPathNavigator.getPathToPos(this.playerTarget.getPosition(), 0);
         return this.pathToTarget != null && !this.pathToTarget.reachesTarget();
@@ -60,17 +83,6 @@ public class BuildTowardsTargetGoal extends Goal {
         if(this.mob.getNavigator().noPath()){
             this.pathToNextBlockPosActive = false;
             this.findCustomPath();
-            /*if(this.playerTarget != null) {
-                this.findCustomPath();
-                GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
-
-                this.pathToNextBlockPos = groundPathNavigator.getPathToPos(this.nextBlockPos.add(0,1,0), 0);
-                System.out.println("this.nextBlockPos " + this.nextBlockPos);
-                if(!this.pathToNextBlockPosActive) {
-                    this.mob.getNavigator().setPath(this.pathToNextBlockPos, this.speedModifier);
-                    this.pathToNextBlockPosActive = true;
-                }
-            }*/
         }
         if(this.isJumping && this.tickCounter == this.endJumpTick){
             this.placeBlock(new BlockPos(this.mob.getPosX(), this.mob.getPosY() - 1, this.mob.getPosZ()));
@@ -96,8 +108,9 @@ public class BuildTowardsTargetGoal extends Goal {
                 else {
                     this.faceTarget();
                     BlockPos blockPos = new BlockPos(this.nextBlockPos.add(0, -1, 0));
-                    this.placeBlock(blockPos);
-
+                    if(this.mob.world.getBlockState(blockPos).isAir()) {
+                        this.placeBlock(blockPos);
+                    }
                 }
             }
         }
@@ -132,13 +145,11 @@ public class BuildTowardsTargetGoal extends Goal {
     }
 
     private void placeBlock(BlockPos blockPos){
-        System.out.println("placing block");
         this.mob.world.setBlockState(blockPos, Blocks.COBBLESTONE.getDefaultState());
         this.mob.swingArm(this.mob.getActiveHand());
 
         GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
         this.pathToNextBlockPos = groundPathNavigator.getPathToPos(new BlockPos(this.nextBlockPos.add(0, 1, 0)), 0);
-        System.out.println("this.nextBlockPos " + this.nextBlockPos);
         if(!this.pathToNextBlockPosActive) {
             this.mob.getNavigator().setPath(this.pathToNextBlockPos, this.speedModifier);
             this.pathToNextBlockPosActive = true;
@@ -157,6 +168,27 @@ public class BuildTowardsTargetGoal extends Goal {
             }
             GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
             this.pathToTarget = groundPathNavigator.getPathToPos(this.playerTarget.getPosition(), 0);
+
+            if(this.pathToNextBlockPos != null){
+                if(!this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).isAir()){
+                    double nextPosY = this.nextBlockPos.getY();
+                    double mobY = this.mob.getPosY();
+
+                    if(!this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isAir()){
+                        return false;
+                    }
+
+                    if(nextPosY > mobY){
+                        if(!this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).isAir()){
+                            return false;
+                        }
+                    }else if(nextPosY < mobY){
+                        if(!this.mob.world.getBlockState(this.nextBlockPos.add(0, 2, 0)).isAir()){
+                            return false;
+                        }
+                    }
+                }
+            }
 
             if(this.pathToTarget != null) {
                 return !this.pathToTarget.reachesTarget();
