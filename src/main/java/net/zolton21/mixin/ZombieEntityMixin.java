@@ -9,6 +9,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.zolton21.sevendaystosurvive.ai.goals.BuildTowardsTargetGoal;
+import net.zolton21.sevendaystosurvive.ai.goals.DiggingGoal;
 import net.zolton21.sevendaystosurvive.ai.goals.MoveToTargetLastKnowLocationGoal;
 import net.zolton21.sevendaystosurvive.helper.IZombieGoalFunctions;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,9 +33,9 @@ public class ZombieEntityMixin extends MonsterEntity implements IZombieGoalFunct
 
     @Inject(method = "applyEntityAI()V", at = @At("TAIL"))
     public void applyCustomAI(CallbackInfo ci){
-        this.goalSelector.addGoal(3, new MoveToTargetLastKnowLocationGoal(this, 1.0));
-        //this.goalSelector.addGoal(3, new (this, 1.0));
+        this.goalSelector.addGoal(3, new DiggingGoal(this, 1.0));
         this.goalSelector.addGoal(4, new BuildTowardsTargetGoal(this, 1.0));
+        this.goalSelector.addGoal(5, new MoveToTargetLastKnowLocationGoal(this, 1.0));
 
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, PlayerEntity.class, false));
     }

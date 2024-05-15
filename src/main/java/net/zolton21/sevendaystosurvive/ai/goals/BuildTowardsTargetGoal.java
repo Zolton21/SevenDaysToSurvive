@@ -15,9 +15,9 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
 
 import java.util.EnumSet;
-
 
 public class BuildTowardsTargetGoal extends Goal {
     protected EntityPredicate targetEntitySelector;
@@ -157,7 +157,7 @@ public class BuildTowardsTargetGoal extends Goal {
     }
 
     public boolean shouldContinueExecuting() {
-        if(this.tickCounter % 30 == 0) {
+        if(this.tickCounter % 40 == 0) {
             this.findReachableTarget();
         }
         if (this.playerTarget != null) {
@@ -166,8 +166,6 @@ public class BuildTowardsTargetGoal extends Goal {
                     return false;
                 }
             }
-            GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
-            this.pathToTarget = groundPathNavigator.getPathToPos(this.playerTarget.getPosition(), 0);
 
             if(this.pathToNextBlockPos != null){
                 if(!this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).isAir()){
@@ -190,10 +188,15 @@ public class BuildTowardsTargetGoal extends Goal {
                 }
             }
 
-            if(this.pathToTarget != null) {
-                return !this.pathToTarget.reachesTarget();
+            if(this.isStandingOnBlock()) {
+                GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
+                this.pathToTarget = groundPathNavigator.getPathToPos(this.playerTarget.getPosition(), 0);
+                if (this.pathToTarget != null) {
+                    if (this.pathToTarget.reachesTarget()) {
+                        return false;
+                    }
+                }
             }
-
             return true;
         }else {
             return false;
@@ -219,7 +222,6 @@ public class BuildTowardsTargetGoal extends Goal {
         if(this.mob != null && this.playerTarget != null){
             if(this.mob.getPosX() == this.playerTarget.getPosX() && this.mob.getPosZ() == this.playerTarget.getPosZ()){
                 if(this.mob.getPosY() < this.playerTarget.getPosY()){
-                    //block upper mob
                     this.nextBlockPos = new BlockPos(this.mob.getPosX(), this.mob.getPosY() + 1, this.mob.getPosZ());
                 }
             }else{
@@ -297,13 +299,12 @@ public class BuildTowardsTargetGoal extends Goal {
     private void findReachableTarget(){
         this.playerTarget = this.mob.world.getClosestPlayer(this.targetEntitySelector, this.mob, this.mob.getPosX(), this.mob.getPosY(), this.mob.getPosZ());
         if(this.playerTarget == null) {
-            double x1 = this.mob.getPosX() - 17;
-            double x2 = this.mob.getPosX() + 17;
-            double y1 = this.mob.getPosY() - 17;
-            double y2 = this.mob.getPosY() + 17;
-            double z1 = this.mob.getPosZ() - 17;
-            double z2 = this.mob.getPosZ() + 17;
-            AxisAlignedBB axisAlignedBB = new AxisAlignedBB(x1, y1, z1, x2, y2, z2);
+            AxisAlignedBB axisAlignedBB = new AxisAlignedBB(this.mob.getPosX() - 50,
+                    this.mob.getPosY() - 50,
+                    this.mob.getPosZ() - 50,
+                    this.mob.getPosX() + 50,
+                    this.mob.getPosY() + 50,
+                    this.mob.getPosZ() + 50);
             if(this.mob.world.getClosestEntityWithinAABB(PlayerEntity.class, this.targetEntitySelector, null, this.mob.getPosX(), this.mob.getPosY(), this.mob.getPosZ(), axisAlignedBB) != null) {
                 if (!this.mob.world.getClosestEntityWithinAABB(PlayerEntity.class, this.targetEntitySelector, null, this.mob.getPosX(), this.mob.getPosY(), this.mob.getPosZ(), axisAlignedBB).isSpectator() && !this.mob.world.getClosestEntityWithinAABB(PlayerEntity.class, this.targetEntitySelector, null, this.mob.getPosX(), this.mob.getPosY(), this.mob.getPosZ(), axisAlignedBB).isCreative() && this.mob.world.getClosestEntityWithinAABB(PlayerEntity.class, this.targetEntitySelector, null, this.mob.getPosX(), this.mob.getPosY(), this.mob.getPosZ(), axisAlignedBB).isAlive()) {
                     this.playerTarget = this.mob.world.getClosestEntityWithinAABB(PlayerEntity.class, this.targetEntitySelector, null, this.mob.getPosX(), this.mob.getPosY(), this.mob.getPosZ(), axisAlignedBB);
