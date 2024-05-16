@@ -15,7 +15,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
 
 import java.util.EnumSet;
 
@@ -24,7 +23,6 @@ public class BuildTowardsTargetGoal extends Goal {
     private LivingEntity playerTarget;
     protected final double speedModifier;
     private CreatureEntity mob;
-    private Path pathToTarget;
     private Path pathToNextBlockPos;
     private BlockPos nextBlockPos;
     private boolean pathToNextBlockPosActive;
@@ -74,8 +72,8 @@ public class BuildTowardsTargetGoal extends Goal {
         }
 
         GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
-        this.pathToTarget = groundPathNavigator.getPathToPos(this.playerTarget.getPosition(), 0);
-        return this.pathToTarget != null && !this.pathToTarget.reachesTarget();
+        Path pathToTarget = groundPathNavigator.getPathToPos(this.playerTarget.getPosition(), 0);
+        return pathToTarget != null && !pathToTarget.reachesTarget();
     }
 
     public void tick(){
@@ -89,7 +87,7 @@ public class BuildTowardsTargetGoal extends Goal {
             this.isJumping = false;
         }
 
-        if (this.tickCounter % 40 == 0) {
+        if (this.tickCounter % 60 == 0) {
             if(this.playerTarget != null && this.isStandingOnBlock()) {
                 if (this.mob.getPosition().getX() == this.nextBlockPos.getX() && this.mob.getPosition().getY() == this.nextBlockPos.getY() - 2 && this.mob.getPosition().getZ() == this.nextBlockPos.getZ()) {
                     boolean canPlaceBlock = true;
@@ -189,11 +187,16 @@ public class BuildTowardsTargetGoal extends Goal {
             }
 
             if(this.isStandingOnBlock()) {
-                GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
-                this.pathToTarget = groundPathNavigator.getPathToPos(this.playerTarget.getPosition(), 0);
-                if (this.pathToTarget != null) {
-                    if (this.pathToTarget.reachesTarget()) {
-                        return false;
+                if(this.mob.getNavigator().getPath() != null) {
+                    GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
+                    Path pathToTarget = groundPathNavigator.getPathToPos(this.playerTarget.getPosition(), 0);
+                    Path path = this.mob.getNavigator().getPath();
+                    if (pathToTarget != null && path != null) {
+                        if (pathToTarget.getTarget() != path.getTarget()) {
+                            if (pathToTarget.reachesTarget()) {
+                                return false;
+                            }
+                        }
                     }
                 }
             }
@@ -299,7 +302,8 @@ public class BuildTowardsTargetGoal extends Goal {
     private void findReachableTarget(){
         this.playerTarget = this.mob.world.getClosestPlayer(this.targetEntitySelector, this.mob, this.mob.getPosX(), this.mob.getPosY(), this.mob.getPosZ());
         if(this.playerTarget == null) {
-            AxisAlignedBB axisAlignedBB = new AxisAlignedBB(this.mob.getPosX() - 50,
+            AxisAlignedBB axisAlignedBB = new AxisAlignedBB(
+                    this.mob.getPosX() - 50,
                     this.mob.getPosY() - 50,
                     this.mob.getPosZ() - 50,
                     this.mob.getPosX() + 50,

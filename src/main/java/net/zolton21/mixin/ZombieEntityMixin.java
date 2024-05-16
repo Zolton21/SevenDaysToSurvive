@@ -40,6 +40,7 @@ public class ZombieEntityMixin extends MonsterEntity implements IZombieGoalFunct
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, PlayerEntity.class, false));
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Inject(method = "func_234342_eQ_()Lnet/minecraft/entity/ai/attributes/AttributeModifierMap$MutableAttribute;", at = @At("HEAD"), cancellable = true)
     private static void applyModifiedAttributes(CallbackInfoReturnable cir) {
         cir.setReturnValue(MonsterEntity.func_234295_eP_().createMutableAttribute(Attributes.FOLLOW_RANGE, 70.0).createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.23000000417232513).createMutableAttribute(Attributes.ATTACK_DAMAGE, 3.0).createMutableAttribute(Attributes.ARMOR, 2.0).createMutableAttribute(Attributes.ZOMBIE_SPAWN_REINFORCEMENTS));

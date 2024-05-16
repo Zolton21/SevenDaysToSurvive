@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1+', changing: true
-        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
@@ -14,12 +14,15 @@ apply plugin: 'eclipse'
 apply plugin: "maven-publish"
 apply plugin: 'org.spongepowered.mixin'
 
-
 version = '1.16.5-1.0'
 group = 'net.zolton21.sevendaystosurvive'
 archivesBaseName = 'sevendaystosurvive'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+
+mixin {
+    add sourceSets.main, "sevendaystosurvive.refmap.json"
+}
 
 minecraft {
     mappings channel: "snapshot", version: "20210309-1.16.5"
@@ -29,9 +32,9 @@ minecraft {
     runs {
         client {
             workingDirectory project.file('run')
+            arg "-mixin.config=sevendaystosurvive.mixins.json"
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
-            arg "-mixin.config=sevendaystosurvive.mixin.json"
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
             mods {
@@ -43,6 +46,7 @@ minecraft {
 
         server {
             workingDirectory project.file('run')
+            arg "-mixin.config=sevendaystosurvive.mixins.json"
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
             property 'mixin.env.remapRefMap', 'true'
@@ -58,8 +62,6 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
             args '--mod', 'sevendaystosurvive', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
             mods {
                 sevendaystosurvive {
@@ -74,8 +76,7 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.29'
-    annotationProcessor "org.spongepowered:mixin:0.8.4:processor"
-    implementation "org.spongepowered:mixin:0.8.4"
+    annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 }
 
 jar {
@@ -88,13 +89,9 @@ jar {
             "Implementation-Version": "${version}",
             "Implementation-Vendor" :"sevendaystosurvivesareus",
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
-            "TweakOrder": 0,
-            "MixinConfig" : "sevendaystosurvive.mixin.json"
+            "MixinConfig" : "sevendaystosurvive.mixins.json"
         ])
     }
-
-    rename 'mixin-refmap.json', 'sevendaystosurvive.mixin-refmap.json'
 
 }
 

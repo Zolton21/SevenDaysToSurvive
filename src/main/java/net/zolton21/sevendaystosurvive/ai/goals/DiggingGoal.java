@@ -91,13 +91,23 @@ public class DiggingGoal extends Goal {
                 }
             }
 
+            //_________________
             if(this.isStandingOnBlock()) {
-                GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
-                this.pathToTarget = groundPathNavigator.getPathToPos(this.playerTarget.getPosition(), 0);
-
+                if(this.mob.getNavigator().getPath() != null) {
+                    GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
+                    Path pathToTarget = groundPathNavigator.getPathToPos(this.playerTarget.getPosition(), 0);
+                    Path path = this.mob.getNavigator().getPath();
+                    if (pathToTarget != null && path != null) {
+                        if (pathToTarget.getTarget() != path.getTarget()) {
+                            if (pathToTarget.reachesTarget()) {
+                                return false;
+                            }
+                        }
+                    }
+                }
             }
-
-            if(this.pathToTarget != null && !this.pathToTarget.reachesTarget()){
+            //________________
+            if(this.pathToTarget != null){
                 //this.findCustomPath();
                 if(this.mob.getNavigator().noPath()){
                     this.findCustomPath();
