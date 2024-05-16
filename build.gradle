@@ -1,7 +1,7 @@
 buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net' }
-        maven { url = 'https://repo.spongepowered.org/maven' }
+        maven { url='https://repo.spongepowered.org/repository/maven-public' }
         mavenCentral()
     }
     dependencies {
@@ -19,10 +19,6 @@ group = 'net.zolton21.sevendaystosurvive'
 archivesBaseName = 'sevendaystosurvive'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
-
-mixin {
-    add sourceSets.main, "sevendaystosurvive.refmap.json"
-}
 
 minecraft {
     mappings channel: "snapshot", version: "20210309-1.16.5"
@@ -62,6 +58,9 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
+            arg "-mixin.config=sevendaystosurvive.mixins.json"
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
             args '--mod', 'sevendaystosurvive', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
             mods {
                 sevendaystosurvive {
@@ -72,24 +71,28 @@ minecraft {
     }
 }
 
+mixin {
+    add sourceSets.main, "sevendaystosurvive.refmap.json"
+}
+
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.29'
-    annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
+    annotationProcessor 'org.spongepowered:mixin:0.8.2:processor'
 }
 
 jar {
     manifest {
         attributes([
-            "Specification-Title": "sevendaystosurvive",
-            "Specification-Vendor": "sevendaystosurvivesareus",
-            "Specification-Version": "1", // We are version 1 of ourselves
-            "Implementation-Title": project.name,
-            "Implementation-Version": "${version}",
-            "Implementation-Vendor" :"sevendaystosurvivesareus",
+            "Specification-Title"     : "sevendaystosurvive",
+            "Specification-Vendor"    : "sevendaystosurvivesareus",
+            "Specification-Version"   : "1", // We are version 1 of ourselves
+            "Implementation-Title"    : project.name,
+            "Implementation-Version"  : "${version}",
+            "Implementation-Vendor"   : "sevendaystosurvivesareus",
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "MixinConfig" : "sevendaystosurvive.mixins.json"
+            "MixinConfig"             : "sevendaystosurvive.mixins.json"
         ])
     }
 

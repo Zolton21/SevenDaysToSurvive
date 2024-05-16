@@ -24,6 +24,7 @@ public class SevenDaysToSurvive{
 
     private void setup(final FMLCommonSetupEvent event)
     {
+        LOGGER.info("7 Days To Survive successfully added");
     }
 
 
