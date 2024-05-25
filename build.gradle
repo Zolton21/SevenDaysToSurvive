@@ -73,13 +73,14 @@ minecraft {
 
 mixin {
     add sourceSets.main, "sevendaystosurvive.refmap.json"
+    config 'sevendaystosurvive.mixins.json'
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.29'
-    annotationProcessor 'org.spongepowered:mixin:0.8.2:processor'
+    annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 }
 
 jar {
