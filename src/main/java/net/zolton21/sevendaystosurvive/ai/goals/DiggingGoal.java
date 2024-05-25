@@ -28,7 +28,6 @@ public class DiggingGoal extends Goal {
     private int breakBlockTick;
     private BlockPos breakBlockBlockPos;
     private int blockBreakTime;
-    private int breakBlockTaskUpdateCD;
 
     public DiggingGoal(CreatureEntity creature, double speed) {
         this.mob = creature;
@@ -144,10 +143,6 @@ public class DiggingGoal extends Goal {
                     }
                 }
             }
-
-            /*if(this.tickCounter < this.breakBlockTaskUpdateCD){
-                return true;
-            }*/
         }
         return false;
     }
@@ -157,7 +152,6 @@ public class DiggingGoal extends Goal {
         System.out.println("current blockpos: " + this.mob.getPosition());
         System.out.println("nextBlockPos: " + this.nextBlockPos);
         this.tickCounter = 0;
-        this.breakBlockTaskUpdateCD = 0;
         this.isBreakingBlock = false;
 
         this.findCustomPath();
@@ -177,18 +171,23 @@ public class DiggingGoal extends Goal {
 
     public void tick(){
         this.tickCounter++;
+
         if(this.isBreakingBlock){
-            this.mob.world.sendBlockBreakProgress(this.mob.getEntityId(), this.breakBlockBlockPos, (int)((float)(this.blockBreakTime - (this.breakBlockTick - this.tickCounter)) / (float) this.blockBreakTime * 10.0F));
-            this.mob.getNavigator().setSpeed(0);
-            this.faceTarget(this.breakBlockBlockPos);
-            if((this.breakBlockTick - this.tickCounter) % 5 == 0){
-                this.mob.swingArm(this.mob.getActiveHand());
-            }
-            if(this.tickCounter == this.breakBlockTick) {
-                this.breakBlock(this.breakBlockBlockPos);
+            if(this.mob.world.getBlockState(this.breakBlockBlockPos).isAir()){
                 this.mob.getNavigator().setSpeed(this.speedModifier);
-                this.breakBlockTaskUpdateCD = this.tickCounter + 80;
                 this.isBreakingBlock = false;
+            }else {
+                this.mob.world.sendBlockBreakProgress(this.mob.getEntityId(), this.breakBlockBlockPos, (int) ((float) (this.blockBreakTime - (this.breakBlockTick - this.tickCounter)) / (float) this.blockBreakTime * 10.0F));
+                this.mob.getNavigator().setSpeed(0);
+                this.faceTarget(this.breakBlockBlockPos);
+                if ((this.breakBlockTick - this.tickCounter) % 5 == 0) {
+                    this.mob.swingArm(this.mob.getActiveHand());
+                }
+                if (this.tickCounter == this.breakBlockTick) {
+                    this.breakBlock(this.breakBlockBlockPos);
+                    this.mob.getNavigator().setSpeed(this.speedModifier);
+                    this.isBreakingBlock = false;
+                }
             }
         }
 
@@ -238,6 +237,11 @@ public class DiggingGoal extends Goal {
                 }
             }
         }
+    }
+
+    public void moveTowardsTarget(BlockPos blockPos) {
+        //System.out.println("moveTowards run");
+        this.mob.getNavigator().tryMoveToXYZ(blockPos.getX(), blockPos.getY(), blockPos.getZ(), this.speedModifier);
     }
 
     private void startBreakingBlock(int currentTick, BlockPos blockPos){
