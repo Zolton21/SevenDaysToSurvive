@@ -5,12 +5,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.monster.MonsterEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.pathfinding.GroundPathNavigator;
 import net.minecraft.pathfinding.Path;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.zolton21.sevendaystosurvive.helper.IZombieCustomTarget;
 
 import java.util.EnumSet;
 
@@ -34,25 +33,30 @@ public class SearchAndGoToPlayerGoal extends Goal {
     }
 
     public boolean shouldExecute() {
-        if(this.isStandingOnBlock()) {
-            this.findReachableTarget();
-            if (this.playerTarget != null && this.playerTarget.isAlive()) {
-                this.playerTargetPos = this.playerTarget.getPosition();
-                this.findCustomPath();
-                GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
-                this.pathToNextBlockPos = groundPathNavigator.getPathToPos(this.nextBlockPos, 0);
-                if (this.pathToNextBlockPos != null && this.pathToNextBlockPos.reachesTarget()) {
-                    if (this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).isAir()) {
-                        return false;
+        if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
+            if (this.isStandingOnBlock()) {
+                ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
+                this.playerTarget = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget();
+
+                if (this.playerTarget != null && this.playerTarget.isAlive()) {
+                    this.playerTargetPos = this.playerTarget.getPosition();
+                    ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findCustomPath();
+                    this.nextBlockPos = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos();
+                    GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
+                    this.pathToNextBlockPos = groundPathNavigator.getPathToPos(this.nextBlockPos, 0);
+                    if (this.pathToNextBlockPos != null && this.pathToNextBlockPos.reachesTarget()) {
+                        if (this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).isAir()) {
+                            return false;
+                        }
+                        if (!this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isAir()) {
+                            return false;
+                        }
+                        if (!this.mob.world.getBlockState(this.nextBlockPos).isAir()) {
+                            return false;
+                        }
                     }
-                    if (!this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isAir()) {
-                        return false;
-                    }
-                    if (!this.mob.world.getBlockState(this.nextBlockPos).isAir()) {
-                        return false;
-                    }
+                    return true;
                 }
-                return true;
             }
         }
         return false;
@@ -78,17 +82,19 @@ public class SearchAndGoToPlayerGoal extends Goal {
 
     public void tick() {
         this.tickCounter++;
-        if(this.playerTargetPos != null) {
-            this.moveTowardsTarget(this.playerTargetPos);
-        }
         if (this.tickCounter % 200 == 0) {
-            this.findReachableTarget();
+            ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
+            this.playerTarget = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget();
             if (this.playerTarget != null) {
                 this.playerTargetPos = this.playerTarget.getPosition();
-                this.findCustomPath();
+                ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findCustomPath();
+                this.nextBlockPos = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos();
                 GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
                 this.pathToNextBlockPos = groundPathNavigator.getPathToPos(this.nextBlockPos, 0);
             }
+        }
+        if(this.playerTargetPos != null) {
+            this.moveTowardsTarget(this.playerTargetPos);
         }
     }
 
@@ -107,90 +113,6 @@ public class SearchAndGoToPlayerGoal extends Goal {
     public void resetTask(){
         System.out.println("resetTask SearchAndGoToPlayerGoal");
         this.mob.getNavigator().clearPath();
-    }
-
-    private void findCustomPath(){
-        if(this.mob != null && this.playerTarget != null){
-            if((int)this.mob.getPosX() == (int)this.playerTarget.getPosX() && (int)this.mob.getPosZ() == (int)this.playerTarget.getPosZ()){
-                if (this.mob.getPosY() > this.playerTarget.getPosY()) {
-                    this.nextBlockPos = new BlockPos(this.mob.getPosX(), this.mob.getPosY() - 1, this.mob.getPosZ());
-                } else if (this.mob.getPosY() < this.playerTarget.getPosY()) {
-                    this.nextBlockPos = new BlockPos(this.mob.getPosX(), this.mob.getPosY() + 1, this.mob.getPosZ());
-                }
-            }else{
-                double y = this.mob.getPosY();
-                /*
-                if(this.mob.getPosY() < this.playerTarget.getPosY()){
-                    y = y + 1;
-                } else if (this.mob.getPosY() > this.playerTarget.getPosY()) {
-                    y = y - 1;
-                }
-                 */
-                Direction.Axis axis = this.setAxis();
-                Direction.AxisDirection axisDirection = this.setAxisDirection(axis);
-
-                if(axis == Direction.Axis.X){
-                    if(Math.abs(Math.abs(this.mob.getPosX()) - Math.abs(this.playerTarget.getPosX())) < Math.abs(Math.abs(this.mob.getPosY()) - Math.abs(this.playerTarget.getPosY()))){
-                        this.nextBlockPos = new BlockPos(this.mob.getPosX(), y + 1, this.mob.getPosZ());
-                    }else {
-                        //____________________
-                        if((int)Math.abs(Math.abs(this.mob.getPosX()) - Math.abs(this.playerTarget.getPosX())) == (int)Math.abs(Math.abs(this.mob.getPosY()) - Math.abs(this.playerTarget.getPosY()))){
-                            if (this.mob.getPosY() < this.playerTarget.getPosY()) {
-                                y = y + 1;
-                            } else if (this.mob.getPosY() > this.playerTarget.getPosY()) {
-                                y = y - 1;
-                            }
-                        }
-                        //____________________
-                        if (axisDirection == Direction.AxisDirection.POSITIVE) {
-                            this.nextBlockPos = new BlockPos(this.mob.getPosX() + 1, y, this.mob.getPosZ());
-                        } else {
-                            this.nextBlockPos = new BlockPos(this.mob.getPosX() - 1, y, this.mob.getPosZ());
-                        }
-                    }
-                }else{
-                    if(Math.abs(Math.abs(this.mob.getPosZ()) - Math.abs(this.playerTarget.getPosZ())) < Math.abs(Math.abs(this.mob.getPosY()) - Math.abs(this.playerTarget.getPosY()))){
-                        this.nextBlockPos = new BlockPos(this.mob.getPosX(), y + 1, this.mob.getPosZ());
-                    } else {
-                        if (axisDirection == Direction.AxisDirection.POSITIVE) {
-                            //____________________
-                            if((int)Math.abs(Math.abs(this.mob.getPosZ()) - Math.abs(this.playerTarget.getPosZ())) == (int)Math.abs(Math.abs(this.mob.getPosY()) - Math.abs(this.playerTarget.getPosY()))){
-                                if (this.mob.getPosY() < this.playerTarget.getPosY()) {
-                                    y = y + 1;
-                                } else if (this.mob.getPosY() > this.playerTarget.getPosY()) {
-                                    y = y - 1;
-                                }
-                            }
-                            //____________________
-                            this.nextBlockPos = new BlockPos(this.mob.getPosX(), y, this.mob.getPosZ() + 1);
-                        } else {
-                            this.nextBlockPos = new BlockPos(this.mob.getPosX(), y, this.mob.getPosZ() - 1);
-                        }
-                    }
-                }
-            }
-
-        }
-        //SevenDaysToSurvive.LOGGER.info("Searching new custom path. New nextBlockPos: " + this.nextBlockPos);
-    }
-
-    private void findReachableTarget(){
-        this.playerTarget = this.mob.world.getClosestPlayer(this.targetEntitySelector, this.mob, this.mob.getPosX(), this.mob.getPosY(), this.mob.getPosZ());
-        if(this.playerTarget == null) {
-            AxisAlignedBB axisAlignedBB = new AxisAlignedBB(
-                    this.mob.getPosX() - 50,
-                    this.mob.getPosY() - 50,
-                    this.mob.getPosZ() - 50,
-                    this.mob.getPosX() + 50,
-                    this.mob.getPosY() + 50,
-                    this.mob.getPosZ() + 50);
-            if(this.mob.world.getClosestEntityWithinAABB(PlayerEntity.class, this.targetEntitySelector, null, this.mob.getPosX(), this.mob.getPosY(), this.mob.getPosZ(), axisAlignedBB) != null) {
-                if (!this.mob.world.getClosestEntityWithinAABB(PlayerEntity.class, this.targetEntitySelector, null, this.mob.getPosX(), this.mob.getPosY(), this.mob.getPosZ(), axisAlignedBB).isSpectator() && !this.mob.world.getClosestEntityWithinAABB(PlayerEntity.class, this.targetEntitySelector, null, this.mob.getPosX(), this.mob.getPosY(), this.mob.getPosZ(), axisAlignedBB).isCreative() && this.mob.world.getClosestEntityWithinAABB(PlayerEntity.class, this.targetEntitySelector, null, this.mob.getPosX(), this.mob.getPosY(), this.mob.getPosZ(), axisAlignedBB).isAlive()) {
-                    this.playerTarget = this.mob.world.getClosestEntityWithinAABB(PlayerEntity.class, this.targetEntitySelector, null, this.mob.getPosX(), this.mob.getPosY(), this.mob.getPosZ(), axisAlignedBB);
-                }
-            }
-        }
-
     }
 
     private Direction.Axis setAxis(){
