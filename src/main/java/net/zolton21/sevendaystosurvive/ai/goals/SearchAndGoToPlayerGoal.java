@@ -20,7 +20,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
     protected final double speedModifier;
     private MonsterEntity mob;
     private BlockPos nextBlockPos;
-    private int tickCounter;
+    private long tickCounter;
     private Path pathToNextBlockPos;
     private BlockPos playerTargetPos;
 
@@ -33,6 +33,13 @@ public class SearchAndGoToPlayerGoal extends Goal {
     }
 
     public boolean shouldExecute() {
+        if(this.mob.getAttackTarget() != null) {
+            if(this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0) != null) {
+                if (this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0).reachesTarget()) {
+                    return false;
+                }
+            }
+        }
         if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
             if (this.isStandingOnBlock()) {
                 ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
@@ -40,18 +47,22 @@ public class SearchAndGoToPlayerGoal extends Goal {
 
                 if (this.playerTarget != null && this.playerTarget.isAlive()) {
                     this.playerTargetPos = this.playerTarget.getPosition();
-                    ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findCustomPath();
-                    this.nextBlockPos = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos();
+                    ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$findCustomPath();
+                    this.nextBlockPos = ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getNextBlockPos();
                     GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
                     this.pathToNextBlockPos = groundPathNavigator.getPathToPos(this.nextBlockPos, 0);
-                    if (this.pathToNextBlockPos != null && this.pathToNextBlockPos.reachesTarget()) {
-                        if (this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).isAir()) {
-                            return false;
-                        }
-                        if (!this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isAir()) {
-                            return false;
-                        }
-                        if (!this.mob.world.getBlockState(this.nextBlockPos).isAir()) {
+                    if (this.pathToNextBlockPos != null){
+                        if (this.pathToNextBlockPos.reachesTarget()) {
+                            if (!this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).getMaterial().isSolid()) {
+                                return false;
+                            }
+                            if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
+                                return false;
+                            }
+                            if (this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
+                                return false;
+                            }
+                        } else {
                             return false;
                         }
                     }
@@ -63,15 +74,22 @@ public class SearchAndGoToPlayerGoal extends Goal {
     }
 
     public boolean shouldContinueExecuting() {
+        if(this.mob.getAttackTarget() != null) {
+            if(this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0) != null) {
+                if (this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0).reachesTarget()) {
+                    return false;
+                }
+            }
+        }
         if(this.playerTarget != null && this.playerTarget.isAlive()) {
             if (this.playerTarget != null && this.pathToNextBlockPos != null && this.pathToNextBlockPos.reachesTarget()) {
-                if (this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).isAir()) {
+                if (!this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).getMaterial().isSolid()) {
                     return false;
                 }
-                if (!this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isAir()) {
+                if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
                     return false;
                 }
-                if (!this.mob.world.getBlockState(this.nextBlockPos).isAir()) {
+                if (this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
                     return false;
                 }
             }
@@ -99,9 +117,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
     }
 
     public void startExecuting(){
-        System.out.println("startExecuting SearchAndGoToPlayerGoal");
-        System.out.println("current blockpos: " + this.mob.getPosition());
-        System.out.println("nextBlockPos: " + this.nextBlockPos);
+        ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$customGoalStarted();
         this.tickCounter = 0;
     }
 
@@ -111,8 +127,10 @@ public class SearchAndGoToPlayerGoal extends Goal {
     }
 
     public void resetTask(){
-        System.out.println("resetTask SearchAndGoToPlayerGoal");
+        //System.out.println("resetTask SearchAndGoToPlayerGoal");
         this.mob.getNavigator().clearPath();
+        ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$customGoalFinished();
+        ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
     }
 
     private Direction.Axis setAxis(){
@@ -147,6 +165,6 @@ public class SearchAndGoToPlayerGoal extends Goal {
 
     private boolean isStandingOnBlock(){
         BlockPos pos = new BlockPos(this.mob.getPosX(), this.mob.getPosY() - 1, this.mob.getPosZ());
-        return !this.mob.world.getBlockState(pos).isAir();
+        return this.mob.world.getBlockState(pos).getMaterial().isSolid();
     }
 }

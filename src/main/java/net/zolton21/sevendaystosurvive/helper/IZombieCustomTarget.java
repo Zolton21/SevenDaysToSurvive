@@ -11,7 +11,7 @@ public interface IZombieCustomTarget {
 
     void sevenDaysToSurvive$findReachableTarget();
 
-    //void setSevenDaysToSurvive$modGoalTarget(LivingEntity entity);
+    void sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
 
     LivingEntity sevenDaysToSurvive$getModGoalTarget();
 

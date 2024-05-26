@@ -22,7 +22,7 @@ public class MoveToTargetLastKnowLocationGoal extends Goal {
     protected final CreatureEntity mob;
     protected final double speedModifier;
     private BlockPos targetLastPos;
-    private int taskCounter;
+    private long taskCounter;
     private Path path;
     @Nullable
     private List<ChunkPos> chunkPosList;
