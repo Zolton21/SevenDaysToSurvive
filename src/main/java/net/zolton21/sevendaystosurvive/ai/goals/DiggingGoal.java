@@ -50,11 +50,11 @@ public class DiggingGoal extends Goal {
 
                 if ((int) this.mob.getPosX() == this.nextBlockPos.getX() && (int) this.mob.getPosZ() == this.nextBlockPos.getZ()) {
                     if (this.mob.getPosY() < this.nextBlockPos.getY()) {
-                        if (!this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isAir()) {
+                        if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isSolid()) {
                             return true;
                         }
                     } else if (this.mob.getPosY() > this.nextBlockPos.getY()) {
-                        if (!this.mob.world.getBlockState(this.nextBlockPos).isAir()) {
+                        if (this.mob.world.getBlockState(this.nextBlockPos).isSolid()) {
                             return true;
                         }
                     }
@@ -67,19 +67,19 @@ public class DiggingGoal extends Goal {
                             double nextPosY = this.nextBlockPos.getY();
                             double mobY = this.mob.getPosY();
                             if (nextPosY == mobY) {
-                                if (!this.mob.world.getBlockState(this.nextBlockPos).isAir() || !this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isAir()) {
+                                if (this.mob.world.getBlockState(this.nextBlockPos).isSolid() || this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isSolid()) {
                                     return true;
                                 }
                             } else if (nextPosY > mobY) {
-                                if (!this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isAir() || !this.mob.world.getBlockState(this.nextBlockPos.add(0, 2, 0)).isAir()) {
+                                if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isSolid() || this.mob.world.getBlockState(this.nextBlockPos.add(0, 2, 0)).isSolid()) {
                                     return true;
                                 } else if (Math.abs(Math.abs(this.mob.getPosX()) - Math.abs(this.nextBlockPos.getX())) < 2 || Math.abs(Math.abs(this.mob.getPosZ()) - Math.abs(this.nextBlockPos.getZ())) < 2) {
-                                    if (!this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).isAir()) {
+                                    if (this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).isSolid()) {
                                         return true;
                                     }
                                 }
                             } else if (nextPosY < mobY) {
-                                if (!this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).isAir() || !this.mob.world.getBlockState(this.nextBlockPos).isAir() || !this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isAir()) {
+                                if (this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).isSolid() || this.mob.world.getBlockState(this.nextBlockPos).isSolid() || this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isSolid()) {
                                     return true;
                                 }
                             }
@@ -103,11 +103,11 @@ public class DiggingGoal extends Goal {
         if(this.playerTarget != null) {
             if ((int)this.mob.getPosX() == this.nextBlockPos.getX() && (int)this.mob.getPosZ() == this.nextBlockPos.getZ()) {
                 if(this.mob.getPosY() < this.nextBlockPos.getY()) {
-                    if (!this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isAir()) {
+                    if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isSolid()) {
                         return true;
                     }
                 } else if (this.mob.getPosY() > this.nextBlockPos.getY()) {
-                    if (!this.mob.world.getBlockState(this.nextBlockPos).isAir()) {
+                    if (this.mob.world.getBlockState(this.nextBlockPos).isSolid()) {
                         return true;
                     }
                 }
@@ -118,19 +118,19 @@ public class DiggingGoal extends Goal {
                     double nextPosY = this.nextBlockPos.getY();
                     double mobY = this.mob.getPosY();
                     if (nextPosY == mobY) {
-                        if (!this.mob.world.getBlockState(this.nextBlockPos).isAir() || !this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isAir()) {
+                        if (this.mob.world.getBlockState(this.nextBlockPos).isSolid() || this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isSolid()) {
                             return true;
                         }
                     } else if (nextPosY > mobY) {
-                        if (!this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isAir() || !this.mob.world.getBlockState(this.nextBlockPos.add(0, 2, 0)).isAir()) {
+                        if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isSolid() || this.mob.world.getBlockState(this.nextBlockPos.add(0, 2, 0)).isSolid()) {
                             return true;
                         } else if (Math.abs(Math.abs(this.mob.getPosX()) - Math.abs(this.nextBlockPos.getX())) < 2 || Math.abs(Math.abs(this.mob.getPosZ()) - Math.abs(this.nextBlockPos.getZ())) < 2) {
-                            if (!this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).isAir()) {
+                            if (this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).isSolid()) {
                                 return true;
                             }
                         }
                     } else if (nextPosY < mobY) {
-                        if (!this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).isAir() || !this.mob.world.getBlockState(this.nextBlockPos).isAir() || !this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isAir()) {
+                        if (this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).isSolid() || this.mob.world.getBlockState(this.nextBlockPos).isSolid() || this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isSolid()) {
                             return true;
                         }
                     }
@@ -181,7 +181,7 @@ public class DiggingGoal extends Goal {
         this.tickCounter++;
 
         if(this.isBreakingBlock){
-            if(this.mob.world.getBlockState(this.breakBlockBlockPos).isAir()){
+            if(!this.mob.world.getBlockState(this.breakBlockBlockPos).isSolid()){
                 this.mob.getNavigator().setSpeed(this.speedModifier);
                 this.isBreakingBlock = false;
             }else {
@@ -203,35 +203,35 @@ public class DiggingGoal extends Goal {
             if(this.playerTarget != null && this.isStandingOnBlock()){
                 if(this.nextBlockPos.getX() == (int)this.mob.getPosX() && this.nextBlockPos.getZ() == (int)this.mob.getPosZ()){
                     if(this.mob.getPosY() > this.nextBlockPos.getY()){
-                        if(!this.mob.world.getBlockState(this.nextBlockPos).isAir()){
+                        if(this.mob.world.getBlockState(this.nextBlockPos).isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.nextBlockPos);
                         }
                     } else if (this.mob.getPosY() < this.nextBlockPos.getY()) {
-                        if(!this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isAir()){
+                        if(this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.nextBlockPos.add(0, 1, 0));
                         }
                     }
                 }else {
                     if(this.nextBlockPos.getY() == this.mob.getPosY()){
-                        if(!this.mob.world.getBlockState(this.nextBlockPos).isAir()){
+                        if(this.mob.world.getBlockState(this.nextBlockPos).isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.nextBlockPos);
-                        }else if(!this.mob.world.getBlockState(this.nextBlockPos.add(0,1,0)).isAir()){
+                        }else if(this.mob.world.getBlockState(this.nextBlockPos.add(0,1,0)).isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.nextBlockPos.add(0,1,0));
                         }
                     }else if(this.nextBlockPos.getY() < this.mob.getPosY()){
-                        if(!this.mob.world.getBlockState(this.nextBlockPos).isAir()){
+                        if(this.mob.world.getBlockState(this.nextBlockPos).isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.nextBlockPos);
-                        }else if(!this.mob.world.getBlockState(this.nextBlockPos.add(0,1,0)).isAir()){
+                        }else if(this.mob.world.getBlockState(this.nextBlockPos.add(0,1,0)).isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.nextBlockPos.add(0,1,0));
-                        }else if(!this.mob.world.getBlockState(this.nextBlockPos.add(0,2,0)).isAir()){
+                        }else if(this.mob.world.getBlockState(this.nextBlockPos.add(0,2,0)).isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.nextBlockPos.add(0,2,0));
                         }
                     }else if(this.nextBlockPos.getY() > this.mob.getPosY()){
-                        if(!this.mob.world.getBlockState(this.nextBlockPos).isAir()){
+                        if(this.mob.world.getBlockState(this.nextBlockPos).isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.nextBlockPos);
-                        }else if(!this.mob.world.getBlockState(this.nextBlockPos.add(0,1,0)).isAir()){
+                        }else if(this.mob.world.getBlockState(this.nextBlockPos.add(0,1,0)).isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.nextBlockPos.add(0,1,0));
-                        }else if(!this.mob.world.getBlockState(this.mob.getPosition().add(0,2,0)).isAir()){
+                        }else if(this.mob.world.getBlockState(this.mob.getPosition().add(0,2,0)).isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.mob.getPosition().add(0,2,0));
                         }
                     }
@@ -275,7 +275,7 @@ public class DiggingGoal extends Goal {
 
     private boolean isStandingOnBlock(){
         BlockPos pos = new BlockPos(this.mob.getPosX(), this.mob.getPosY() - 1, this.mob.getPosZ());
-        return !this.mob.world.getBlockState(pos).isAir();
+        return this.mob.world.getBlockState(pos).isSolid();
     }
 
     private Direction.Axis setAxis(){

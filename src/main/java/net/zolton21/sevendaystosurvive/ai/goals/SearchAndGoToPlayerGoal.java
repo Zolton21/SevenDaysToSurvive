@@ -45,13 +45,13 @@ public class SearchAndGoToPlayerGoal extends Goal {
                     GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
                     this.pathToNextBlockPos = groundPathNavigator.getPathToPos(this.nextBlockPos, 0);
                     if (this.pathToNextBlockPos != null && this.pathToNextBlockPos.reachesTarget()) {
-                        if (this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).isAir()) {
+                        if (this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).isSolid()) {
                             return false;
                         }
-                        if (!this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isAir()) {
+                        if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isSolid()) {
                             return false;
                         }
-                        if (!this.mob.world.getBlockState(this.nextBlockPos).isAir()) {
+                        if (this.mob.world.getBlockState(this.nextBlockPos).isSolid()) {
                             return false;
                         }
                     }
@@ -65,13 +65,13 @@ public class SearchAndGoToPlayerGoal extends Goal {
     public boolean shouldContinueExecuting() {
         if(this.playerTarget != null && this.playerTarget.isAlive()) {
             if (this.playerTarget != null && this.pathToNextBlockPos != null && this.pathToNextBlockPos.reachesTarget()) {
-                if (this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).isAir()) {
+                if (this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).isSolid()) {
                     return false;
                 }
-                if (!this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isAir()) {
+                if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isSolid()) {
                     return false;
                 }
-                if (!this.mob.world.getBlockState(this.nextBlockPos).isAir()) {
+                if (this.mob.world.getBlockState(this.nextBlockPos).isSolid()) {
                     return false;
                 }
             }
@@ -147,6 +147,6 @@ public class SearchAndGoToPlayerGoal extends Goal {
 
     private boolean isStandingOnBlock(){
         BlockPos pos = new BlockPos(this.mob.getPosX(), this.mob.getPosY() - 1, this.mob.getPosZ());
-        return !this.mob.world.getBlockState(pos).isAir();
+        return this.mob.world.getBlockState(pos).isSolid();
     }
 }

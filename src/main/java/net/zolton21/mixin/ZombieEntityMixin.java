@@ -4,6 +4,7 @@ import net.minecraft.entity.EntityPredicate;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -39,8 +40,9 @@ public class ZombieEntityMixin extends MonsterEntity implements IZombieCustomTar
         this.sevenDaysToSurvive$executingCustomGoal = false;
     }
 
-    @Inject(method = "applyEntityAI()V", at = @At("HEAD"))
+    @Inject(method = "applyEntityAI()V", at = @At("TAIL"))
     public void applyCustomAI(CallbackInfo ci){
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal(this, PlayerEntity.class, false));
         this.goalSelector.addGoal(3, new DiggingGoal(this, 1.0));
         this.goalSelector.addGoal(4, new BuildTowardsTargetGoal(this, 1.0));
         this.goalSelector.addGoal(5, new SearchAndGoToPlayerGoal(this, 1.0));
