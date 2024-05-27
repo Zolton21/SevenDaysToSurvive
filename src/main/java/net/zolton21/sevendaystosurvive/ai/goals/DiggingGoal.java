@@ -14,6 +14,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
+import net.zolton21.sevendaystosurvive.SevenDaysToSurvive;
 import net.zolton21.sevendaystosurvive.helper.IZombieCustomTarget;
 
 import java.util.EnumSet;
@@ -48,21 +49,22 @@ public class DiggingGoal extends Goal {
         if(this.mob.getAttackTarget() != null) {
             if(this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0) != null) {
                 if (this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0).reachesTarget()) {
+                  //System.out.println("should execute return false 1");
                     return false;
                 }
             }
         }
-        if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
-            if (this.isStandingOnBlock()) {
-                ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
-                this.playerTarget = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget();
-                if (this.playerTarget == null) {
-                    return false;
-                }
-
-                ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findCustomPath();
-                this.nextBlockPos = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos();
-
+        //if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
+        if (this.isStandingOnBlock()) {
+            //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
+            this.playerTarget = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget();
+            if (this.playerTarget == null) {
+               //System.out.println("should execute return false 2");
+                return false;
+            }
+            ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findCustomPath();
+            if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
+                this.nextBlockPos = ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getNextBlockPos();
                 if ((long) this.mob.getPosX() == this.nextBlockPos.getX() && (long) this.mob.getPosZ() == this.nextBlockPos.getZ()) {
                     if (this.mob.getPosY() < this.nextBlockPos.getY()) {
                         if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
@@ -74,11 +76,14 @@ public class DiggingGoal extends Goal {
                         }
                     }
                 } else {
+                   //System.out.println("ELSE");
                     GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
                     Path pathToTarget = groundPathNavigator.getPathToPos(this.playerTarget.getPosition(), 0);
                     this.pathToNextBlockPos = groundPathNavigator.getPathToPos(this.nextBlockPos, 0);
                     if (pathToTarget != null && !pathToTarget.reachesTarget()) {
+                       //System.out.println("IF1");
                         if (this.pathToNextBlockPos != null) {
+                           //System.out.println("IF2");
                             double nextPosY = this.nextBlockPos.getY();
                             double mobY = this.mob.getPosY();
                             if (nextPosY == mobY) {
@@ -86,14 +91,16 @@ public class DiggingGoal extends Goal {
                                     return true;
                                 }
                             } else if (nextPosY > mobY) {
-                                /*//System.out.println("if2");
+                               //System.out.println("IF3");
                                 //System.out.println(this.mob.getPosition());
                                 //System.out.println(this.nextBlockPos);
-                                //System.out.println(this.mob.world.getBlockState(this.nextBlockPos));*/
-                                if(this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()){
+                                //System.out.println(this.mob.world.getBlockState(this.nextBlockPos));
+                                if (this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
                                     return true;
                                 }
-                                if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid() || this.mob.world.getBlockState(this.nextBlockPos.add(0, 2, 0)).getMaterial().isSolid()) {
+                                if (this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).getMaterial().isSolid()) {
+                                    return true;
+                                } else if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
                                     return true;
                                 } else if (Math.abs(Math.abs(this.mob.getPosX()) - Math.abs(this.nextBlockPos.getX())) < 2 || Math.abs(Math.abs(this.mob.getPosZ()) - Math.abs(this.nextBlockPos.getZ())) < 2) {
                                     if (this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).getMaterial().isSolid()) {
@@ -110,19 +117,24 @@ public class DiggingGoal extends Goal {
                 }
             }
         }
-        return false;
+        //}
+       /*System.out.println("should execute return false 3");
+      //System.out.println("current " + this.mob.getPosition());
+      //System.out.println("next " + this.nextBlockPos);*/
+       return false;
     }
 
     public boolean shouldContinueExecuting() {
         if(this.mob.getAttackTarget() != null) {
             if(this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0) != null) {
                 if (this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0).reachesTarget()) {
+                  //System.out.println("should continue executing return false 1");
                     return false;
                 }
             }
         }
         if(this.tickCounter % 200 == 0){
-            ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
+            //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
             this.playerTarget = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget();
             if(this.playerTarget != null) {
                 ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findCustomPath();
@@ -154,7 +166,9 @@ public class DiggingGoal extends Goal {
                         if(this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()){
                             return true;
                         }
-                        if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid() || this.mob.world.getBlockState(this.nextBlockPos.add(0, 2, 0)).getMaterial().isSolid()) {
+                        if(this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).getMaterial().isSolid()){
+                            return true;
+                        }else if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
                             return true;
                         } else if (Math.abs(Math.abs(this.mob.getPosX()) - Math.abs(this.nextBlockPos.getX())) < 2 || Math.abs(Math.abs(this.mob.getPosZ()) - Math.abs(this.nextBlockPos.getZ())) < 2) {
                             if (this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).getMaterial().isSolid()) {
@@ -177,6 +191,7 @@ public class DiggingGoal extends Goal {
                     if (pathToTarget != null && path != null) {
                         if (pathToTarget.getTarget() != path.getTarget()) {
                             if (pathToTarget.reachesTarget()) {
+                              //System.out.println("should continue executing return false 2");
                                 return false;
                             }
                         }
@@ -187,10 +202,13 @@ public class DiggingGoal extends Goal {
                 return true;
             }
         }
+      //System.out.println("should continue executing return false 3");
         return false;
     }
 
     public void startExecuting(){
+      //System.out.println("start executing DiggingGoal");
+      //System.out.println("current blockpos: " + this.mob.getPosition() + "; nextBlockPos: " + this.nextBlockPos);
         //System.out.println("start executing DiggingGoal");
         //System.out.println("current blockpos: " + this.mob.getPosition());
         //System.out.println("nextBlockPos: " + this.nextBlockPos);
@@ -207,6 +225,7 @@ public class DiggingGoal extends Goal {
     }
 
     public void resetTask(){
+      //System.out.println("stop executing DiggingGoal");
         this.mob.getNavigator().clearPath();
         if(this.breakBlockBlockPos != null) {
             this.mob.world.sendBlockBreakProgress(this.mob.getEntityId(), this.breakBlockBlockPos, -1);

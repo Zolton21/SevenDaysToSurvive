@@ -16,6 +16,7 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
+import net.zolton21.sevendaystosurvive.SevenDaysToSurvive;
 import net.zolton21.sevendaystosurvive.helper.IZombieCustomTarget;
 
 import java.util.EnumSet;
@@ -49,29 +50,36 @@ public class BuildTowardsTargetGoal extends Goal {
         if(this.mob.getAttackTarget() != null) {
             if(this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0) != null) {
                 if (this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0).reachesTarget()) {
+                   //SevendaysToSurvive.LOGGER.info("should execute return false 1");
                     return false;
                 }
             }
         }
-        if (((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
-            if (this.isStandingOnBlock()) {
-                ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$findReachableTarget();
-                this.playerTarget = ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getModGoalTarget();
-                if (this.playerTarget == null) {
-                    return false;
-                }
-                ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$findCustomPath();
+        //if (((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
+        if (this.isStandingOnBlock()) {
+            ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$findReachableTarget();
+            this.playerTarget = ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getModGoalTarget();
+            if (this.playerTarget == null) {
+                //SevendaysToSurvive.LOGGER.info("should execute return false 2");
+                return false;
+            }
+            ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$findCustomPath();
+            if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
                 this.nextBlockPos = ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getNextBlockPos();
+
                 if (this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).getMaterial().isSolid()) {
+                    //SevendaysToSurvive.LOGGER.info("should execute return false 3");
                     return false;
                 }
                 if ((long) this.mob.getPosX() == this.nextBlockPos.getX() && (long) this.mob.getPosZ() == this.nextBlockPos.getZ()) {
                     if (this.nextBlockPos.getY() > this.mob.getPosY()) {
                         if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
+                            //SevendaysToSurvive.LOGGER.info("should execute return false 4");
                             return false;
                         }
                     } else if (this.nextBlockPos.getY() < this.mob.getPosY()) {
                         if (this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
+                            //SevendaysToSurvive.LOGGER.info("should execute return false 5");
                             return false;
                         }
                     }
@@ -86,14 +94,17 @@ public class BuildTowardsTargetGoal extends Goal {
                             double nextPosY = this.nextBlockPos.getY();
                             double mobY = this.mob.getPosY();
                             if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
+                                //SevendaysToSurvive.LOGGER.info("should execute return false 6");
                                 return false;
                             }
                             if (nextPosY > mobY) {
                                 if (this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).getMaterial().isSolid()) {
+                                    //SevendaysToSurvive.LOGGER.info("should execute return false 7");
                                     return false;
                                 }
                             } else if (nextPosY < mobY) {
                                 if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 2, 0)).getMaterial().isSolid()) {
+                                    //SevendaysToSurvive.LOGGER.info("should execute return false 8");
                                     return false;
                                 }
                             }
@@ -103,6 +114,8 @@ public class BuildTowardsTargetGoal extends Goal {
                 }
             }
         }
+        //}
+       //SevendaysToSurvive.LOGGER.info("should execute return false 9");
         return false;
     }
 
@@ -110,13 +123,14 @@ public class BuildTowardsTargetGoal extends Goal {
         if(this.mob.getAttackTarget() != null) {
             if(this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0) != null) {
                 if (this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0).reachesTarget()) {
+                   //SevendaysToSurvive.LOGGER.info("should continue executing return false 1");
                     return false;
                 }
             }
         }
         if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
             if(this.tickCounter % 200 == 0){
-                ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
+                //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
                 this.playerTarget = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget();
                 if(this.playerTarget != null) {
                     ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findCustomPath();
@@ -126,6 +140,7 @@ public class BuildTowardsTargetGoal extends Goal {
             if (this.playerTarget != null) {
                 if(!this.isJumping) {
                     if (this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).getMaterial().isSolid()) {
+                       //SevendaysToSurvive.LOGGER.info("should continue executing return false 2");
                         return false;
                     }
                 }
@@ -134,33 +149,41 @@ public class BuildTowardsTargetGoal extends Goal {
                     if (this.nextBlockPos.getY() > this.mob.getPosY()) {
                         if (!this.isJumping) {
                             if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
+                               //SevendaysToSurvive.LOGGER.info("should continue executing return false 3");
                                 return false;
                             }
                         }
                     } else if (this.nextBlockPos.getY() < this.mob.getPosY()) {
                         if (this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
-                            return false;
+                            if(!this.isJumping) {
+                               //SevendaysToSurvive.LOGGER.info("should continue executing return false 4");
+                                return false;
+                            }
                         }
                     }
                 } else {
                     GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
+                    Path pathToTarget = groundPathNavigator.getPathToPos(this.playerTarget.getPosition(), 0);
                     this.pathToNextBlockPos = groundPathNavigator.getPathToPos(this.nextBlockPos, 0);
-                    if (this.pathToNextBlockPos != null) {
-                        if (this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).getMaterial().isSolid()) {
-                            double nextPosY = this.nextBlockPos.getY();
-                            double mobY = this.mob.getPosY();
-
-                            if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
-                                return false;
-                            }
-
-                            if (nextPosY > mobY) {
-                                if (this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).getMaterial().isSolid()) {
+                    if (pathToTarget != null && !pathToTarget.reachesTarget()) {
+                        if (this.pathToNextBlockPos != null) {
+                            if (this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).getMaterial().isSolid()) {
+                                double nextPosY = this.nextBlockPos.getY();
+                                double mobY = this.mob.getPosY();
+                                if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
+                                   //SevendaysToSurvive.LOGGER.info("should continue executing return false 5");
                                     return false;
                                 }
-                            } else if (nextPosY < mobY) {
-                                if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 2, 0)).getMaterial().isSolid()) {
-                                    return false;
+                                if (nextPosY > mobY) {
+                                    if (this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).getMaterial().isSolid()) {
+                                       //SevendaysToSurvive.LOGGER.info("should continue executing return false 6");
+                                        return false;
+                                    }
+                                } else if (nextPosY < mobY) {
+                                    if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 2, 0)).getMaterial().isSolid()) {
+                                       //SevendaysToSurvive.LOGGER.info("should continue executing return false 7");
+                                        return false;
+                                    }
                                 }
                             }
                         }
@@ -175,6 +198,7 @@ public class BuildTowardsTargetGoal extends Goal {
                         if (pathToTarget != null && path != null) {
                             if (pathToTarget.getTarget() != path.getTarget()) {
                                 if (pathToTarget.reachesTarget()) {
+                                   //SevendaysToSurvive.LOGGER.info("should continue executing return false 8");
                                     return false;
                                 }
                             }
@@ -185,6 +209,7 @@ public class BuildTowardsTargetGoal extends Goal {
                 return true;
             }
         }
+       //SevendaysToSurvive.LOGGER.info("should continue executing return false 9");
         return false;
     }
 
@@ -271,6 +296,7 @@ public class BuildTowardsTargetGoal extends Goal {
     }
 
     private void mobJump(long currentTick){
+
         this.isJumping = true;
         double x = this.mob.getPosX();
         double y = this.mob.getPosY() + 3;
@@ -313,9 +339,11 @@ public class BuildTowardsTargetGoal extends Goal {
     }
 
     public void startExecuting() {
-        //System.out.println("start executing BuildForwardGoal");
-        //System.out.println("current blockpos: " + this.mob.getPosition());
-        //System.out.println("nextBlockPos: " + this.nextBlockPos);
+        /*System.out.println("start executing BuildForwardGoal");
+       //System.out.println("current blockpos: " + this.mob.getPosition());
+       //System.out.println("nextBlockPos: " + this.nextBlockPos);*/
+       //SevendaysToSurvive.LOGGER.info("start executing BuildForwardGoal");
+       //SevendaysToSurvive.LOGGER.info("current blockpos: " + this.mob.getPosition() + "; nextBlockPos: " + this.nextBlockPos);
         ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$customGoalStarted();
         this.tickCounter = 0;
         this.isJumping = false;
@@ -345,7 +373,8 @@ public class BuildTowardsTargetGoal extends Goal {
         this.mob.getNavigator().clearPath();
         ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$customGoalFinished();
         ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
+       //SevendaysToSurvive.LOGGER.info("stop executing BuildForwardGoal");
         //System.out.println("stop executing BuildForwardGoal");
     }
-    
+
 }

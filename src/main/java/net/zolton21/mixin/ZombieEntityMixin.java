@@ -52,12 +52,12 @@ public abstract class ZombieEntityMixin extends MonsterEntity implements IZombie
         this.goalSelector.addGoal(3, new DiggingGoal(this, 1.0));
         this.goalSelector.addGoal(4, new BuildTowardsTargetGoal(this, 1.0));
         this.goalSelector.addGoal(5, new SearchAndGoToPlayerGoal(this, 1.0));
-        this.targetSelector.addGoal(6, new NearestAttackableTargetGoal(this, PlayerEntity.class, false));
+        //this.targetSelector.addGoal(6, new NearestAttackableTargetGoal(this, PlayerEntity.class, false));
     }
 
     @Inject(method = "tick()V", at = @At("HEAD"))
     public void tickInject(CallbackInfo ci) {
-        if (this.getAttackTarget() == null){
+        if (this.getAttackTarget() == null) {
             if (!this.sevenDaysToSurvive$executingCustomGoal) {
                 this.sevenDaysToSurvive$findReachableTarget();
                 if (this.sevenDaysToSurvive$modGoalTarget != null) {
@@ -80,6 +80,10 @@ public abstract class ZombieEntityMixin extends MonsterEntity implements IZombie
                         this.setAttackTarget(this.sevenDaysToSurvive$modGoalTarget);
                     }
                 }
+            }
+        }else if(this.ticksExisted % 400 == 0){
+            if(this.getDistance(this.sevenDaysToSurvive$modGoalTarget) > 50){
+                this.sevenDaysToSurvive$modGoalTarget = null;
             }
         }
     }
