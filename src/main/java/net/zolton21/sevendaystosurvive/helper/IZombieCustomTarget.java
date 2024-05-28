@@ -1,6 +1,7 @@
 package net.zolton21.sevendaystosurvive.helper;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.math.BlockPos;
 
 public interface IZombieCustomTarget {
@@ -18,4 +19,8 @@ public interface IZombieCustomTarget {
     void sevenDaysToSurvive$customGoalStarted();
 
     void sevenDaysToSurvive$customGoalFinished();
+
+    void sevenDaysToSurvive$setLastExecutingGoal(Goal goal);
+
+    Goal getSevenDaysToSurvive$lastExecutingGoal();
 }

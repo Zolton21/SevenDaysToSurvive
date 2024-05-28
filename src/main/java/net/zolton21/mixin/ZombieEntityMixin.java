@@ -1,11 +1,10 @@
 package net.zolton21.mixin;
 
-import net.minecraft.entity.CreatureAttribute;
 import net.minecraft.entity.EntityPredicate;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,13 +14,11 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.zolton21.sevendaystosurvive.SevenDaysToSurvive;
 import net.zolton21.sevendaystosurvive.ai.goals.BuildTowardsTargetGoal;
 import net.zolton21.sevendaystosurvive.ai.goals.DiggingGoal;
 import net.zolton21.sevendaystosurvive.ai.goals.SearchAndGoToPlayerGoal;
 import net.zolton21.sevendaystosurvive.helper.IZombieCustomTarget;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -38,6 +35,8 @@ public abstract class ZombieEntityMixin extends MonsterEntity implements IZombie
     private BlockPos sevenDaysToSurvive$nextBlockPos;
     @Unique
     private EntityPredicate sevenDaysToSurvive$targetEntitySelector;
+    @Unique
+    private Goal sevenDaysToSurvive$lastExecutingGoal;
 
 
     protected ZombieEntityMixin(EntityType<? extends MonsterEntity> p_i48553_1_, World p_i48553_2_) {
@@ -240,6 +239,13 @@ public abstract class ZombieEntityMixin extends MonsterEntity implements IZombie
         this.sevenDaysToSurvive$nextBlockPos = null;
     }
 
+    public void sevenDaysToSurvive$setLastExecutingGoal(Goal goal){
+        this.sevenDaysToSurvive$lastExecutingGoal = goal;
+    }
+
+    public Goal getSevenDaysToSurvive$lastExecutingGoal(){
+        return this.sevenDaysToSurvive$lastExecutingGoal;
+    }
     //@Shadow public abstract CreatureAttribute getCreatureAttribute();
 
     //@Shadow public abstract void livingTick();

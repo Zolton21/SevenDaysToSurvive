@@ -11,6 +11,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.world.ForgeChunkManager;
 import net.zolton21.sevendaystosurvive.SevenDaysToSurvive;
+import net.zolton21.sevendaystosurvive.helper.IZombieCustomTarget;
 import net.zolton21.sevendaystosurvive.helper.IZombieGoalFunctions;
 
 import javax.annotation.Nullable;
@@ -82,5 +83,6 @@ public class MoveToTargetLastKnowLocationGoal extends Goal {
                 ForgeChunkManager.forceChunk((ServerWorld) this.mob.world, SevenDaysToSurvive.MOD_ID, this.mob, cPos.x, cPos.z, false, true);
             }
         }
+        ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$setLastExecutingGoal(this);
     }
 }

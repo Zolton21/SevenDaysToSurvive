@@ -24,7 +24,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
     private BlockPos nextBlockPos;
     private long tickCounter;
     private Path pathToNextBlockPos;
-    //private BlockPos playerTargetPos;
+    private BlockPos playerTargetPos;
 
 
     public SearchAndGoToPlayerGoal(MonsterEntity creature, double speed) {
@@ -50,7 +50,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
                 this.playerTarget = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget();
 
                 if (this.playerTarget != null && this.playerTarget.isAlive()) {
-                    //this.playerTargetPos = this.playerTarget.getPosition();
+                    this.playerTargetPos = this.playerTarget.getPosition();
                     ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$findCustomPath();
                     this.nextBlockPos = ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getNextBlockPos();
                     GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
@@ -134,7 +134,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
             //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
             this.playerTarget = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget();
             if (this.playerTarget != null) {
-                //this.playerTargetPos = this.playerTarget.getPosition();
+                this.playerTargetPos = this.playerTarget.getPosition();
                 ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findCustomPath();
                 this.nextBlockPos = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos();
                 GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
@@ -142,7 +142,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
             }
         }
         if(this.playerTarget != null) {
-            this.moveTowardsTarget();
+            this.moveTowardsPlayer();
         }
     }
 
@@ -155,10 +155,17 @@ public class SearchAndGoToPlayerGoal extends Goal {
         this.tickCounter = 0;
     }
 
-    public void moveTowardsTarget() {
+    public void moveTowardsPlayer() {
         //System.out.println("moveTowards run");
-        //this.mob.getNavigator().tryMoveToXYZ(blockPos.getX(), blockPos.getY(), blockPos.getZ(), this.speedModifier);
-        this.mob.getNavigator().tryMoveToEntityLiving(this.playerTarget, this.speedModifier);
+        if(this.playerTargetPos != null) {
+            BlockPos blockPos = this.playerTargetPos;
+            Goal lastGoal = ((IZombieCustomTarget) this.mob).getSevenDaysToSurvive$lastExecutingGoal();
+            if (lastGoal instanceof DiggingGoal && this.tickCounter > 400) {
+                this.mob.getNavigator().tryMoveToEntityLiving(this.playerTarget, this.speedModifier);
+            } else {
+                this.mob.getNavigator().tryMoveToXYZ(blockPos.getX(), blockPos.getY(), blockPos.getZ(), this.speedModifier);
+            }
+        }
     }
 
     public void resetTask(){
@@ -166,6 +173,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
         //System.out.println("resetTask SearchAndGoToPlayerGoal");
         this.mob.getNavigator().clearPath();
         ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$customGoalFinished();
+        ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$setLastExecutingGoal(this);
         //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
     }
 

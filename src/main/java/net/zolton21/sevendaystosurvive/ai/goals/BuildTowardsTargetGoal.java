@@ -374,6 +374,8 @@ public class BuildTowardsTargetGoal extends Goal {
         this.mob.setHeldItem(Hand.MAIN_HAND, this.heldItem);
         this.mob.getNavigator().clearPath();
         ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$customGoalFinished();
+        ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$setLastExecutingGoal(this);
+
         //SevenDaysToSurvive.LOGGER.info("stop executing BuildForwardGoal");
         //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
        //SevendaysToSurvive.LOGGER.info("stop executing BuildForwardGoal");

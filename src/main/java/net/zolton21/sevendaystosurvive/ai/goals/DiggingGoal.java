@@ -255,6 +255,7 @@ public class DiggingGoal extends Goal {
             this.mob.world.sendBlockBreakProgress(this.mob.getEntityId(), this.breakBlockBlockPos, -1);
         }
         ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$customGoalFinished();
+        ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$setLastExecutingGoal(this);
         //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
         //System.out.println("stop executing DiggingGoal");
     }
