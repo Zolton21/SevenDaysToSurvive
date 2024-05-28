@@ -7,6 +7,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.monster.MonsterEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.pathfinding.GroundPathNavigator;
@@ -47,7 +48,7 @@ public class BuildTowardsTargetGoal extends Goal {
     }
 
     public boolean shouldExecute() {
-        if(this.mob.getAttackTarget() != null) {
+        if(this.mob.getAttackTarget() != null && this.mob.getAttackTarget() instanceof PlayerEntity) {
             if(this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0) != null) {
                 if (this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0).reachesTarget()) {
                    //SevendaysToSurvive.LOGGER.info("should execute return false 1");
@@ -120,7 +121,7 @@ public class BuildTowardsTargetGoal extends Goal {
     }
 
     public boolean shouldContinueExecuting() {
-        if(this.mob.getAttackTarget() != null) {
+        if(this.mob.getAttackTarget() != null && this.mob.getAttackTarget() instanceof PlayerEntity) {
             if(this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0) != null) {
                 if (this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0).reachesTarget()) {
                    //SevendaysToSurvive.LOGGER.info("should continue executing return false 1");
@@ -339,6 +340,7 @@ public class BuildTowardsTargetGoal extends Goal {
     }
 
     public void startExecuting() {
+        //SevenDaysToSurvive.LOGGER.info("start executing BuildForwardGoal");
         /*System.out.println("start executing BuildForwardGoal");
        //System.out.println("current blockpos: " + this.mob.getPosition());
        //System.out.println("nextBlockPos: " + this.nextBlockPos);*/
@@ -372,7 +374,8 @@ public class BuildTowardsTargetGoal extends Goal {
         this.mob.setHeldItem(Hand.MAIN_HAND, this.heldItem);
         this.mob.getNavigator().clearPath();
         ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$customGoalFinished();
-        ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
+        //SevenDaysToSurvive.LOGGER.info("stop executing BuildForwardGoal");
+        //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
        //SevendaysToSurvive.LOGGER.info("stop executing BuildForwardGoal");
         //System.out.println("stop executing BuildForwardGoal");
     }
