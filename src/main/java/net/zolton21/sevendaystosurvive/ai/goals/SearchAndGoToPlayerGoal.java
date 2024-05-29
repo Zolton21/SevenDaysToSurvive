@@ -158,7 +158,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
             BlockPos blockPos = this.playerTargetPos;
             //Goal lastGoal = ((IZombieCustomTarget) this.mob).getSevenDaysToSurvive$lastExecutingGoal();
             if (this.tickCounter > 300) {
-                if(this.playerTarget != null) {
+                if(this.playerTarget != null && this.playerTarget.isAlive()) {
                     this.mob.getNavigator().tryMoveToEntityLiving(this.playerTarget, this.speedModifier);
                 }
             } else {
