@@ -92,7 +92,6 @@ public class SearchAndGoToPlayerGoal extends Goal {
             if(this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0) != null) {
                 if (this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0).reachesTarget()) {
                    //SevendaysToSurvive.LOGGER.info("should continue executing return false 1");
-                    //System.out.println("should continue executing return false 1");
                     return false;
                 }
             }
@@ -102,21 +101,17 @@ public class SearchAndGoToPlayerGoal extends Goal {
                 if (this.pathToNextBlockPos.reachesTarget()) {
                     if (!this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).getMaterial().isSolid()) {
                        //SevendaysToSurvive.LOGGER.info("should continue executing return false 2");
-                        //System.out.println("should continue executing return false 2");
                         return false;
                     }
                     if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
                        //SevendaysToSurvive.LOGGER.info("should continue executing return false 3");
-                        //System.out.println("should continue executing return false 3");
                         return false;
                     }
                     if (this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
-                        //System.out.println("should continue executing return false 4");
                        //SevendaysToSurvive.LOGGER.info("should continue executing return false 4");
                         return false;
                     }
                 } else {
-                    //System.out.println("should continue executing return false 5");
                    //SevendaysToSurvive.LOGGER.info("should continue executing return false 5");
                     return false;
                 }
@@ -124,7 +119,6 @@ public class SearchAndGoToPlayerGoal extends Goal {
             return true;
         }
        //SevendaysToSurvive.LOGGER.info("should continue executing return false 6");
-        //System.out.println("should continue executing return false 6");
         return false;
     }
 
@@ -144,6 +138,9 @@ public class SearchAndGoToPlayerGoal extends Goal {
         if(this.playerTarget != null) {
             this.moveTowardsPlayer();
         }
+        if(this.tickCounter > 400){
+            this.tickCounter = 0;
+        }
     }
 
     public void startExecuting(){
@@ -159,8 +156,8 @@ public class SearchAndGoToPlayerGoal extends Goal {
         //System.out.println("moveTowards run");
         if(this.playerTargetPos != null) {
             BlockPos blockPos = this.playerTargetPos;
-            Goal lastGoal = ((IZombieCustomTarget) this.mob).getSevenDaysToSurvive$lastExecutingGoal();
-            if (lastGoal instanceof DiggingGoal && this.tickCounter > 400) {
+            //Goal lastGoal = ((IZombieCustomTarget) this.mob).getSevenDaysToSurvive$lastExecutingGoal();
+            if (this.tickCounter > 300) {
                 this.mob.getNavigator().tryMoveToEntityLiving(this.playerTarget, this.speedModifier);
             } else {
                 this.mob.getNavigator().tryMoveToXYZ(blockPos.getX(), blockPos.getY(), blockPos.getZ(), this.speedModifier);

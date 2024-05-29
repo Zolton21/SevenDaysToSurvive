@@ -49,7 +49,6 @@ public abstract class ZombieEntityMixin extends MonsterEntity implements IZombie
         this.goalSelector.addGoal(3, new DiggingGoal(this, 1.0));
         this.goalSelector.addGoal(4, new BuildTowardsTargetGoal(this, 1.0));
         this.goalSelector.addGoal(5, new SearchAndGoToPlayerGoal(this, 1.0));
-        //this.targetSelector.addGoal(6, new NearestAttackableTargetGoal(this, PlayerEntity.class, false));
     }
 
     @Inject(method = "tick()V", at = @At("HEAD"))

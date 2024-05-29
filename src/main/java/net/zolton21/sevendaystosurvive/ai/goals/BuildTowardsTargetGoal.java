@@ -1,6 +1,7 @@
 package net.zolton21.sevendaystosurvive.ai.goals;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.EntityPredicate;
 import net.minecraft.entity.LivingEntity;
@@ -113,6 +114,15 @@ public class BuildTowardsTargetGoal extends Goal {
                     }
                     return true;
                 }
+                if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
+                    if (Math.abs(this.nextBlockPos.getY() - this.mob.getPosY()) < 3) {
+                        if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.mob.getPosX())) < 3 || Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.mob.getPosZ())) < 3) {
+                            if (this.mob.world.getBlockState(this.nextBlockPos).getMaterial() == Material.LAVA || this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial() == Material.LAVA) {
+                                return true;
+                            }
+                        }
+                    }
+                }
             }
         }
         //}
@@ -129,6 +139,11 @@ public class BuildTowardsTargetGoal extends Goal {
                 }
             }
         }
+        //___________________
+        if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget() == null) {
+            return false;
+        }
+        //___________________
         if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
             if(this.tickCounter % 200 == 0){
                 //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
@@ -206,8 +221,16 @@ public class BuildTowardsTargetGoal extends Goal {
                         }
                     }
                 }
-
                 return true;
+            }
+        }
+        if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
+            if (Math.abs(this.nextBlockPos.getY() - this.mob.getPosY()) < 3) {
+                if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.mob.getPosX())) < 3 || Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.mob.getPosZ())) < 3) {
+                    if (this.mob.world.getBlockState(this.nextBlockPos).getMaterial() == Material.LAVA || this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial() == Material.LAVA) {
+                        return true;
+                    }
+                }
             }
         }
        //SevendaysToSurvive.LOGGER.info("should continue executing return false 9");
@@ -241,37 +264,47 @@ public class BuildTowardsTargetGoal extends Goal {
 
         if (!this.isPlacingBlock && this.tickCounter % 20 == 0) {
             if (this.playerTarget != null) {
-                if (!this.isStandingOnBlock()){
-                    if(Math.abs(this.nextBlockPos.getY()) - Math.abs(this.mob.getPosY()) < 2) {
-                        if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.nextBlockPos.getX())) < 3 ||
-                                Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.nextBlockPos.getZ())) < 3) {
-                        this.startPlacingBlock(this.tickCounter, this.mob.getPosition().add(0, -1, 0), false);
-                        }
+                if (this.mob.world.getBlockState(this.nextBlockPos).getMaterial() == Material.LAVA) {
+                    if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.mob.getPosX())) < 3 || Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.mob.getPosZ())) < 3) {
+                        this.startPlacingBlock(this.tickCounter, this.nextBlockPos, false);
                     }
-                } else{
-                    if(this.mob.world.getBlockState(this.mob.getPosition()).getMaterial().isSolid()){
-                        this.mobJump(this.tickCounter);
+                }else if(this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial() == Material.LAVA){
+                    if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.mob.getPosX())) < 3 || Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.mob.getPosZ())) < 3) {
+                        this.startPlacingBlock(this.tickCounter, this.nextBlockPos.add(0, 1, 0), false);
                     }
-                    if (this.mob.getPosition().getX() == this.nextBlockPos.getX() && this.mob.getPosition().getY() < this.nextBlockPos.getY() && this.mob.getPosition().getZ() == this.nextBlockPos.getZ()) {
-                        boolean canPlaceBlock = true;
-                        BlockPos blockPos;
-                        for (long i = 0; i < 3; i++) {
-                            blockPos = new BlockPos(this.mob.getPosX(), this.mob.getPosY() + i, this.mob.getPosZ());
-                            if (this.mob.world.getBlockState(blockPos).getMaterial().isSolid()) {
-                                canPlaceBlock = false;
-                                break;
-                            }
-                        }
-                        if (canPlaceBlock) {
-                            this.mobJump(this.tickCounter);
-                        }
-                    } else {
-                        if (Math.abs(Math.abs(this.nextBlockPos.getY()) - Math.abs(this.mob.getPosY())) < 2) {
+                }else {
+                    if (!this.isStandingOnBlock()) {
+                        if (Math.abs(this.nextBlockPos.getY()) - Math.abs(this.mob.getPosY()) < 2) {
                             if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.nextBlockPos.getX())) < 3 ||
                                     Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.nextBlockPos.getZ())) < 3) {
-                                BlockPos blockPos = new BlockPos(this.nextBlockPos.add(0, -1, 0));
-                                if (!this.mob.world.getBlockState(blockPos).getMaterial().isSolid()) {
-                                    this.startPlacingBlock(this.tickCounter ,blockPos, true);
+                                this.startPlacingBlock(this.tickCounter, this.mob.getPosition().add(0, -1, 0), false);
+                            }
+                        }
+                    } else {
+                        if (this.mob.world.getBlockState(this.mob.getPosition()).getMaterial().isSolid()) {
+                            this.mobJump(this.tickCounter);
+                        }
+                        if (this.mob.getPosition().getX() == this.nextBlockPos.getX() && this.mob.getPosition().getY() < this.nextBlockPos.getY() && this.mob.getPosition().getZ() == this.nextBlockPos.getZ()) {
+                            boolean canPlaceBlock = true;
+                            BlockPos blockPos;
+                            for (long i = 0; i < 3; i++) {
+                                blockPos = new BlockPos(this.mob.getPosX(), this.mob.getPosY() + i, this.mob.getPosZ());
+                                if (this.mob.world.getBlockState(blockPos).getMaterial().isSolid()) {
+                                    canPlaceBlock = false;
+                                    break;
+                                }
+                            }
+                            if (canPlaceBlock) {
+                                this.mobJump(this.tickCounter);
+                            }
+                        } else {
+                            if (Math.abs(Math.abs(this.nextBlockPos.getY()) - Math.abs(this.mob.getPosY())) < 2) {
+                                if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.nextBlockPos.getX())) < 3 ||
+                                        Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.nextBlockPos.getZ())) < 3) {
+                                    BlockPos blockPos = new BlockPos(this.nextBlockPos.add(0, -1, 0));
+                                    if (!this.mob.world.getBlockState(blockPos).getMaterial().isSolid()) {
+                                        this.startPlacingBlock(this.tickCounter, blockPos, true);
+                                    }
                                 }
                             }
                         }
@@ -341,7 +374,7 @@ public class BuildTowardsTargetGoal extends Goal {
 
     public void startExecuting() {
         //SevenDaysToSurvive.LOGGER.info("start executing BuildForwardGoal");
-        /*System.out.println("start executing BuildForwardGoal");
+        //System.out.println("start executing BuildForwardGoal");
        //System.out.println("current blockpos: " + this.mob.getPosition());
        //System.out.println("nextBlockPos: " + this.nextBlockPos);*/
        //SevendaysToSurvive.LOGGER.info("start executing BuildForwardGoal");
