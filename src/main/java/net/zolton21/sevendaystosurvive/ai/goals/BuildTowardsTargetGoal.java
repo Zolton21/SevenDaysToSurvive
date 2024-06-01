@@ -65,7 +65,7 @@ public class BuildTowardsTargetGoal extends Goal {
                 //SevendaysToSurvive.LOGGER.info("should execute return false 2");
                 return false;
             }
-            ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$findCustomPath();
+            ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$runFindCustomPath();
             if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
                 this.nextBlockPos = ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getNextBlockPos();
 
@@ -149,7 +149,7 @@ public class BuildTowardsTargetGoal extends Goal {
                 //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
                 this.playerTarget = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget();
                 if(this.playerTarget != null) {
-                    ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findCustomPath();
+                    ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$runFindCustomPath();
                     this.nextBlockPos = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos();
                 }
             }
@@ -243,7 +243,7 @@ public class BuildTowardsTargetGoal extends Goal {
         if(this.mob.getNavigator().noPath()){
             ////System.out.println("no Path");
             this.pathToNextBlockPosActive = false;
-            ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findCustomPath();
+            ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$runFindCustomPath();
             this.nextBlockPos = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos();
         }
 
@@ -387,7 +387,7 @@ public class BuildTowardsTargetGoal extends Goal {
         this.heldItem = this.mob.getHeldItem(Hand.MAIN_HAND);
         this.mob.setHeldItem(Hand.MAIN_HAND, new ItemStack(Items.COBBLESTONE));
 
-        ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findCustomPath();
+        ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$runFindCustomPath();
         this.nextBlockPos = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos();
 
         if (this.nextBlockPos != null) {

@@ -128,7 +128,11 @@ public abstract class ZombieEntityMixin extends MonsterEntity implements IZombie
         }
     }
 
-    public void sevenDaysToSurvive$findCustomPath(){
+    public void sevenDaysToSurvive$runFindCustomPath(){
+        this.sevenDaysToSurvive$findCustomPath();
+    }
+
+    private void sevenDaysToSurvive$findCustomPath(){
         if(this.sevenDaysToSurvive$modGoalTarget != null){
             if((int)this.getPosX() == (int)this.sevenDaysToSurvive$modGoalTarget.getPosX() && (int)this.getPosZ() == (int)this.sevenDaysToSurvive$modGoalTarget.getPosZ()){
                 if (this.getPosY() > (int)this.sevenDaysToSurvive$modGoalTarget.getPosY()) {

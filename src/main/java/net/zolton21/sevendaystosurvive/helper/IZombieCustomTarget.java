@@ -8,7 +8,7 @@ public interface IZombieCustomTarget {
 
     BlockPos sevenDaysToSurvive$getNextBlockPos();
 
-    void sevenDaysToSurvive$findCustomPath();
+    void sevenDaysToSurvive$runFindCustomPath();
 
     void sevenDaysToSurvive$findReachableTarget();
 

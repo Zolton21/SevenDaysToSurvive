@@ -64,7 +64,7 @@ public class DiggingGoal extends Goal {
                 //System.out.println("should execute return false 2");
                 return false;
             }
-            ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findCustomPath();
+            ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$runFindCustomPath();
             if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
                 this.nextBlockPos = ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getNextBlockPos();
                 if ((long) this.mob.getPosX() == this.nextBlockPos.getX() && (long) this.mob.getPosZ() == this.nextBlockPos.getZ()) {
@@ -180,7 +180,7 @@ public class DiggingGoal extends Goal {
             //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
             this.playerTarget = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget();
             if(this.playerTarget != null) {
-                ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findCustomPath();
+                ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$runFindCustomPath();
                 this.nextBlockPos = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos();
             }
         }
@@ -414,7 +414,12 @@ public class DiggingGoal extends Goal {
 
     private void startBreakingBlock(long currentTick, BlockPos blockPos){
         this.isBreakingBlock = true;
-        this.blockBreakTime = 60 + this.mob.world.getBlockState(blockPos).getHarvestLevel() * 20L;
+        int harvestLevel = this.mob.world.getBlockState(blockPos).getHarvestLevel();
+        if(harvestLevel < 3) {
+            this.blockBreakTime = 60 + harvestLevel * 20L;
+        }else{
+            this.blockBreakTime = 740 + harvestLevel * 20L;
+        }
         //this.mob.world.getBlockState(blockPos).getHarvestLevel();
         this.breakBlockTick = currentTick + this.blockBreakTime;
         this.breakBlockBlockPos = blockPos;

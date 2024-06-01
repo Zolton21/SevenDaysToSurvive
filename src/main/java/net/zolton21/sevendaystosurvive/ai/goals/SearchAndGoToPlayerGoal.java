@@ -51,7 +51,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
 
                 if (this.playerTarget != null && this.playerTarget.isAlive()) {
                     this.playerTargetPos = this.playerTarget.getPosition();
-                    ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$findCustomPath();
+                    ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$runFindCustomPath();
                     this.nextBlockPos = ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getNextBlockPos();
                     GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
                     this.pathToNextBlockPos = groundPathNavigator.getPathToPos(this.nextBlockPos, 0);
@@ -129,7 +129,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
             this.playerTarget = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget();
             if (this.playerTarget != null) {
                 this.playerTargetPos = this.playerTarget.getPosition();
-                ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findCustomPath();
+                ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$runFindCustomPath();
                 this.nextBlockPos = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos();
                 GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
                 this.pathToNextBlockPos = groundPathNavigator.getPathToPos(this.nextBlockPos, 0);
