@@ -190,9 +190,19 @@ public abstract class ZombieEntityMixin extends MonsterEntity implements IZombie
                         }
                     }
                 }
+                if(this.world.getBlockState(this.sevenDaysToSurvive$nextBlockPos).isSolid() && this.world.getBlockState(this.sevenDaysToSurvive$nextBlockPos).getHarvestLevel() == -1){
+                    if(this.world.getBlockState(this.sevenDaysToSurvive$nextBlockPos.add(0, 1, 0)).isSolid()) {
+                        if (this.world.getBlockState(this.sevenDaysToSurvive$nextBlockPos.add(0, 1, 0)).getHarvestLevel() != -1) {
+                            this.sevenDaysToSurvive$nextBlockPos = this.sevenDaysToSurvive$nextBlockPos.add(0, 1, 0);
+                        } else {
+                            this.sevenDaysToSurvive$nextBlockPos = this.getPosition().add(0, 1, 0);
+                        }
+                    }
+                }
             }
 
         }
+        //System.out.println("next blockpos " + this.sevenDaysToSurvive$nextBlockPos);
     }
 
     @Unique
