@@ -10,6 +10,7 @@ import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.pathfinding.GroundPathNavigator;
 import net.minecraft.pathfinding.Path;
+import net.minecraft.pathfinding.SwimmerPathNavigator;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -54,46 +55,48 @@ public abstract class ZombieEntityMixin extends MonsterEntity implements IZombie
     @Inject(method = "tick()V", at = @At("HEAD"))
     public void tickInject(CallbackInfo ci) {
         //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin tick");
-        if (this.getAttackTarget() == null) {
-            //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 1");
-            if (!this.sevenDaysToSurvive$executingCustomGoal) {
-                //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 2");
-                this.sevenDaysToSurvive$findReachableTarget();
-                if (this.sevenDaysToSurvive$modGoalTarget != null) {
-                    //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 3");
-                    GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.getNavigator();
-                    Path path = groundPathNavigator.getPathToPos(this.sevenDaysToSurvive$modGoalTarget.getPosition(), 0);
-                    if (path != null) {
-                        //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 4");
-                        if (path.reachesTarget()) {
-                            //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 5");
-                            this.setAttackTarget(this.sevenDaysToSurvive$modGoalTarget);
+        if(((MonsterEntity) this.getEntity()).getNavigator() instanceof GroundPathNavigator) {
+            if (this.getAttackTarget() == null) {
+                //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 1");
+                if (!this.sevenDaysToSurvive$executingCustomGoal) {
+                    //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 2");
+                    this.sevenDaysToSurvive$findReachableTarget();
+                    if (this.sevenDaysToSurvive$modGoalTarget != null) {
+                        //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 3");
+                        GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.getNavigator();
+                        Path path = groundPathNavigator.getPathToPos(this.sevenDaysToSurvive$modGoalTarget.getPosition(), 0);
+                        if (path != null) {
+                            //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 4");
+                            if (path.reachesTarget()) {
+                                //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 5");
+                                this.setAttackTarget(this.sevenDaysToSurvive$modGoalTarget);
+                            } else {
+                                //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 6");
+                                this.sevenDaysToSurvive$findCustomPath();
+                            }
                         } else {
-                            //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 6");
+                            //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 7");
                             this.sevenDaysToSurvive$findCustomPath();
                         }
-                    } else {
-                        //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 7");
-                        this.sevenDaysToSurvive$findCustomPath();
                     }
-                }
-            } else if (this.sevenDaysToSurvive$modGoalTarget != null) {
-                //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 8");
-                Path path = this.getNavigator().getPathToPos(this.sevenDaysToSurvive$modGoalTarget.getPosition(), 0);
-                if (path != null) {
-                    //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 9");
-                    if (path.reachesTarget()) {
-                        //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 10");
-                        this.setAttackTarget(this.sevenDaysToSurvive$modGoalTarget);
+                } else if (this.sevenDaysToSurvive$modGoalTarget != null) {
+                    //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 8");
+                    Path path = this.getNavigator().getPathToPos(this.sevenDaysToSurvive$modGoalTarget.getPosition(), 0);
+                    if (path != null) {
+                        //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 9");
+                        if (path.reachesTarget()) {
+                            //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 10");
+                            this.setAttackTarget(this.sevenDaysToSurvive$modGoalTarget);
+                        }
                     }
                 }
             }
-        }
-        if(this.ticksExisted % 500 == 0 && this.sevenDaysToSurvive$modGoalTarget != null){
-            //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 11");
-            if(this.getDistance(this.sevenDaysToSurvive$modGoalTarget) > 50){
-                //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 12");
-                this.sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
+            if (this.ticksExisted % 500 == 0 && this.sevenDaysToSurvive$modGoalTarget != null) {
+                //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 11");
+                if (this.getDistance(this.sevenDaysToSurvive$modGoalTarget) > 50) {
+                    //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 12");
+                    this.sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
+                }
             }
         }
     }
