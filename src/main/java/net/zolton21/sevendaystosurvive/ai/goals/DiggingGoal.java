@@ -1,23 +1,12 @@
 package net.zolton21.sevendaystosurvive.ai.goals;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.CreatureEntity;
-import net.minecraft.entity.EntityPredicate;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.loot.LootContext;
-import net.minecraft.pathfinding.GroundPathNavigator;
-import net.minecraft.pathfinding.Path;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.zolton21.sevendaystosurvive.SevenDaysToSurvive;
+import net.minecraft.advancements.critereon.EntityPredicate;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.pathfinder.Path;
 import net.zolton21.sevendaystosurvive.helper.IZombieCustomTarget;
 
 import java.util.EnumSet;
@@ -27,7 +16,7 @@ public class DiggingGoal extends Goal {
     protected EntityPredicate targetEntitySelector;
     private LivingEntity playerTarget;
     protected final double speedModifier;
-    private CreatureEntity mob;
+    private final PathfinderMob mob;
     private Path pathToNextBlockPos;
     private BlockPos nextBlockPos;
     private long tickCounter;
@@ -40,14 +29,14 @@ public class DiggingGoal extends Goal {
     private long placeBlockTick;
     private BlockPos placeBlockBlockPos;
 
-    public DiggingGoal(CreatureEntity creature, double speed) {
+    public DiggingGoal(PathfinderMob creature, double speed) {
         this.mob = creature;
         this.speedModifier = speed;
-        this.setMutexFlags(EnumSet.of(Flag.TARGET));
+        this.setFlags(EnumSet.of(Flag.TARGET));
         this.targetEntitySelector = (new EntityPredicate()).setDistance(this.mob.getAttributeValue(Attributes.FOLLOW_RANGE)).setCustomPredicate(null);
     }
 
-    public boolean shouldExecute() {
+    public boolean canUse() {
         if(this.mob.getAttackTarget() != null && this.mob.getAttackTarget() instanceof PlayerEntity) {
             if(this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0) != null) {
                 if (this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0).reachesTarget()) {

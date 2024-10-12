@@ -1,6 +1,6 @@
 package net.zolton21.sevendaystosurvive.helper;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public interface IZombieGoalFunctions {
 

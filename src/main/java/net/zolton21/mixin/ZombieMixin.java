@@ -3,13 +3,16 @@ package net.zolton21.mixin;
 
 import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.pathfinder.Path;
 import net.zolton21.sevendaystosurvive.ai.goals.BuildTowardsTargetGoal;
 import net.zolton21.sevendaystosurvive.ai.goals.DiggingGoal;
 import net.zolton21.sevendaystosurvive.ai.goals.SearchAndGoToPlayerGoal;
@@ -40,7 +43,7 @@ public abstract class ZombieMixin extends Monster implements IZombieCustomTarget
         this.sevenDaysToSurvive$executingCustomGoal = false;
     }
 
-    @Inject(method = "applyEntityAI()V", at = @At("TAIL"))
+    @Inject(method = "addBehaviourGoals()V", at = @At("TAIL"))
     public void applyCustomAI(CallbackInfo ci){
         this.goalSelector.addGoal(3, new DiggingGoal(this, 1.0));
         this.goalSelector.addGoal(4, new BuildTowardsTargetGoal(this, 1.0));
@@ -50,7 +53,7 @@ public abstract class ZombieMixin extends Monster implements IZombieCustomTarget
     @Inject(method = "tick()V", at = @At("HEAD"))
     public void tickInject(CallbackInfo ci) {
         //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin tick");
-        if(((Monster) this.getEntity()).getNavigator() instanceof GroundPathNavigator) {
+        if(((Monster) this.getEntity()).getNavigator() instanceof GroundPathNavigation) {
             if (this.getAttackTarget() == null) {
                 //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 1");
                 if (!this.sevenDaysToSurvive$executingCustomGoal) {
@@ -58,11 +61,11 @@ public abstract class ZombieMixin extends Monster implements IZombieCustomTarget
                     this.sevenDaysToSurvive$findReachableTarget();
                     if (this.sevenDaysToSurvive$modGoalTarget != null) {
                         //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 3");
-                        GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.getNavigator();
+                        GroundPathNavigation groundPathNavigator = (GroundPathNavigation) this.getNavigator();
                         Path path = groundPathNavigator.getPathToPos(this.sevenDaysToSurvive$modGoalTarget.getPosition(), 0);
                         if (path != null) {
                             //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 4");
-                            if (path.reachesTarget()) {
+                            if (path.canReach()) {
                                 //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 5");
                                 this.setAttackTarget(this.sevenDaysToSurvive$modGoalTarget);
                             } else {
@@ -79,7 +82,7 @@ public abstract class ZombieMixin extends Monster implements IZombieCustomTarget
                     Path path = this.getNavigator().getPathToPos(this.sevenDaysToSurvive$modGoalTarget.getPosition(), 0);
                     if (path != null) {
                         //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 9");
-                        if (path.reachesTarget()) {
+                        if (path.canReach()) {
                             //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 10");
                             this.setAttackTarget(this.sevenDaysToSurvive$modGoalTarget);
                         }
