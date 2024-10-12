@@ -1,7 +1,7 @@
 package net.zolton21.mixin;
 
-import net.minecraft.entity.CreatureEntity;
-import net.minecraft.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(MeleeAttackGoal.class)
 public abstract class MeleeAttackGoalMixin{
 
-    private CreatureEntity attacker;
+    protected final PathfinderMob mob;
     @Unique
     private int sevenDaysToSurvive$tickCounter;
     //private long endJumpTick;
@@ -25,9 +25,9 @@ public abstract class MeleeAttackGoalMixin{
     private long tickCounter;*/
 
 
-    public MeleeAttackGoalMixin(CreatureEntity creatureEntity) {
+    public MeleeAttackGoalMixin(PathfinderMob pMob) {
         super();
-        this.attacker = creatureEntity;
+        this.mob = pMob;
     }
 
 
@@ -36,7 +36,7 @@ public abstract class MeleeAttackGoalMixin{
     @Inject(method = "tick()V", at = @At("TAIL"))
     public void jumpTowardsTarget(CallbackInfo ci){
         if(this.sevenDaysToSurvive$tickCounter % 400 == 0){
-            this.attacker.getJumpController().setJumping();
+            this.mob.getJumpControl().jump();
         }
     }
 
@@ -47,7 +47,7 @@ public abstract class MeleeAttackGoalMixin{
         }
     }
     */
-    @Inject(method = "startExecuting()V", at = @At("TAIL"))
+    @Inject(method = "start()V", at = @At("TAIL"))
     public void startExecutingAdditions(CallbackInfo ci){
         //this.target = this.attacker.getAttackTarget();
         this.sevenDaysToSurvive$tickCounter = 0;
