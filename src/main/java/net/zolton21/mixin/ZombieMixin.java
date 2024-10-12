@@ -12,6 +12,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
 import net.zolton21.sevendaystosurvive.ai.goals.BuildTowardsTargetGoal;
 import net.zolton21.sevendaystosurvive.ai.goals.DiggingGoal;
@@ -111,7 +112,7 @@ public abstract class ZombieMixin extends Monster implements IZombieCustomTarget
         if(this.sevenDaysToSurvive$targetEntitySelector == null) {
             this.sevenDaysToSurvive$targetEntitySelector = (new EntityPredicate()).setDistance(this.getAttributeValue(Attributes.FOLLOW_RANGE)).setCustomPredicate(null);
         }
-        this.sevenDaysToSurvive$modGoalTarget = this.world.getClosestPlayer(this.sevenDaysToSurvive$targetEntitySelector, this, this.getPosX(), this.getPosY(), this.getPosZ());
+        this.sevenDaysToSurvive$modGoalTarget = this.level().getClosestPlayer(this.sevenDaysToSurvive$targetEntitySelector, this, this.getPosX(), this.getPosY(), this.getPosZ());
         if(this.sevenDaysToSurvive$modGoalTarget == null) {
             AxisAlignedBB axisAlignedBB = new AxisAlignedBB(
                     this.getX() - 50,
@@ -195,10 +196,10 @@ public abstract class ZombieMixin extends Monster implements IZombieCustomTarget
                         }
                     }
                 }
-                if(this.world.getBlockState(this.sevenDaysToSurvive$nextBlockPos).isSolid() && this.world.getBlockState(this.sevenDaysToSurvive$nextBlockPos).getHarvestLevel() == -1){
-                    if(this.world.getBlockState(this.sevenDaysToSurvive$nextBlockPos.add(0, 1, 0)).isSolid()) {
-                        if (this.world.getBlockState(this.sevenDaysToSurvive$nextBlockPos.add(0, 1, 0)).getHarvestLevel() != -1) {
-                            this.sevenDaysToSurvive$nextBlockPos = this.sevenDaysToSurvive$nextBlockPos.add(0, 1, 0);
+                if(this.level().getBlockState(this.sevenDaysToSurvive$nextBlockPos).isSolid() && this.level().getBlockState(this.sevenDaysToSurvive$nextBlockPos).getDestroySpeed(level(), this.sevenDaysToSurvive$nextBlockPos) < 0.0F){
+                    if(this.level().getBlockState(this.sevenDaysToSurvive$nextBlockPos.above(1)).isSolid()) {
+                        if (this.level().getBlockState(this.sevenDaysToSurvive$nextBlockPos).getDestroySpeed(level(), this.sevenDaysToSurvive$nextBlockPos) >= 0.0F) {
+                            this.sevenDaysToSurvive$nextBlockPos = this.sevenDaysToSurvive$nextBlockPos.above(1);
                         } else {
                             this.sevenDaysToSurvive$nextBlockPos = this.getPosition().add(0, 1, 0);
                         }
@@ -213,7 +214,7 @@ public abstract class ZombieMixin extends Monster implements IZombieCustomTarget
     @Unique
     private Direction.Axis sevenDaysToSurvive$setAxis(){
         Direction.Axis axis;
-        if(Math.abs(Math.abs(this.getPosX()) - Math.abs((int)this.sevenDaysToSurvive$modGoalTarget.getPosX())) >= Math.abs(Math.abs(this.getPosZ()) - Math.abs((int)this.sevenDaysToSurvive$modGoalTarget.getPosZ()))){
+        if(Math.abs(Math.abs(this.getX()) - Math.abs((int)this.sevenDaysToSurvive$modGoalTarget.getX())) >= Math.abs(Math.abs(this.getZ()) - Math.abs((int)this.sevenDaysToSurvive$modGoalTarget.getZ()))){
             axis = Direction.Axis.X;
         }else {
             axis = Direction.Axis.Z;
@@ -225,13 +226,13 @@ public abstract class ZombieMixin extends Monster implements IZombieCustomTarget
     private Direction.AxisDirection sevenDaysToSurvive$setAxisDirection(Direction.Axis direction){
         Direction.AxisDirection axisDirection;
         if(direction == Direction.Axis.X){
-            if((int)this.sevenDaysToSurvive$modGoalTarget.getPosX() - this.getPosX() > 0){
+            if((int)this.sevenDaysToSurvive$modGoalTarget.getX() - this.getX() > 0){
                 axisDirection = Direction.AxisDirection.POSITIVE;
             }else{
                 axisDirection = Direction.AxisDirection.NEGATIVE;
             }
         }else{
-            if((int)this.sevenDaysToSurvive$modGoalTarget.getPosZ() - this.getPosZ() > 0){
+            if((int)this.sevenDaysToSurvive$modGoalTarget.getZ() - this.getZ() > 0){
                 axisDirection = Direction.AxisDirection.POSITIVE;
             }else{
                 axisDirection = Direction.AxisDirection.NEGATIVE;
