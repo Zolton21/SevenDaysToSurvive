@@ -4,8 +4,12 @@ import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.pathfinder.Path;
 import net.zolton21.sevendaystosurvive.helper.IZombieCustomTarget;
 
@@ -37,9 +41,9 @@ public class DiggingGoal extends Goal {
     }
 
     public boolean canUse() {
-        if(this.mob.getAttackTarget() != null && this.mob.getAttackTarget() instanceof PlayerEntity) {
-            if(this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0) != null) {
-                if (this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0).reachesTarget()) {
+        if(this.mob.getTarget() != null && this.mob.getTarget() instanceof Player) {
+            if(this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0) != null) {
+                if (this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0).canReach()) {
                     //System.out.println("should execute return false 1");
                     return false;
                 }
@@ -58,24 +62,24 @@ public class DiggingGoal extends Goal {
                 this.nextBlockPos = ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getNextBlockPos();
                 if ((long) this.mob.getPosX() == this.nextBlockPos.getX() && (long) this.mob.getPosZ() == this.nextBlockPos.getZ()) {
                     if (this.mob.getPosY() < this.nextBlockPos.getY()) {
-                        if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
+                        if (this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
                             return true;
                         }
                     } else if (this.mob.getPosY() > this.nextBlockPos.getY()) {
-                        if (this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
+                        if (/*this.mob.level().getBlockState(this.nextBlockPos).getMaterial().isSolid()*/!this.mob.level().getBlockState(this.nextBlockPos).getCollisionShape(this.mob.level(), this.nextBlockPos).isEmpty()) {
                             return true;
                         }
                     }
                 } else {
                     //System.out.println("ELSE");
-                    GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
-                    Path pathToTarget = groundPathNavigator.getPathToPos(this.playerTarget.getPosition(), 0);
-                    this.pathToNextBlockPos = groundPathNavigator.getPathToPos(this.nextBlockPos, 0);
-                    if (pathToTarget != null && !pathToTarget.reachesTarget()) {
+                    GroundPathNavigation groundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
+                    Path pathToTarget = groundPathNavigation.createPath(this.playerTarget.blockPosition(), 0);
+                    this.pathToNextBlockPos = groundPathNavigation.createPath(this.nextBlockPos, 0);
+                    if (pathToTarget != null && !pathToTarget.canReach()) {
                         //System.out.println("IF1");
                         if (this.pathToNextBlockPos != null) {
                             //
-                            if(!this.pathToNextBlockPos.reachesTarget()) {
+                            if(!this.pathToNextBlockPos.canReach()) {
                                 //
                                 //System.out.println("IF2");
                                 double nextPosY = this.nextBlockPos.getY();
@@ -88,13 +92,13 @@ public class DiggingGoal extends Goal {
                                     //System.out.println("mob " + this.mob.getPosition());
                                     //System.out.println("nextblockpos " + this.nextBlockPos);
                                     //System.out.println("nextblockpos material " + this.mob.world.getBlockState(this.nextBlockPos));
-                                    if (this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
-                                        if(this.mob.world.getBlockState(this.nextBlockPos).getHarvestLevel() != -1){
+                                    if (this.mob.level().getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
+                                        if(this.mob.level().getBlockState(this.nextBlockPos).getHarvestLevel() != -1){
                                             return true;
                                         }
                                     }
-                                    if(this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()){
-                                        if(this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getHarvestLevel() != -1) {
+                                    if(this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()){
+                                        if(this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getHarvestLevel() != -1) {
                                             return true;
                                         }
                                     }
@@ -103,39 +107,39 @@ public class DiggingGoal extends Goal {
                                     //System.out.println(this.mob.getPosition());
                                     //System.out.println(this.nextBlockPos);
                                     //System.out.println(this.mob.world.getBlockState(this.nextBlockPos));
-                                    if (this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
-                                        if(this.mob.world.getBlockState(this.nextBlockPos).getHarvestLevel() != -1) {
+                                    if (this.mob.level().getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
+                                        if(this.mob.level().getBlockState(this.nextBlockPos).getHarvestLevel() != -1) {
                                             return true;
                                         }
                                     }
-                                    if (this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).getMaterial().isSolid()) {
-                                        if(this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).getHarvestLevel() != -1) {
+                                    if (this.mob.level().getBlockState(this.mob.getPosition().add(0, 2, 0)).getMaterial().isSolid()) {
+                                        if(this.mob.level().getBlockState(this.mob.getPosition().add(0, 2, 0)).getHarvestLevel() != -1) {
                                             return true;
                                         }
-                                    } else if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
-                                        if(this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getHarvestLevel() != -1) {
+                                    } else if (this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
+                                        if(this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getHarvestLevel() != -1) {
                                             return true;
                                         }
                                     } else if (Math.abs(Math.abs(this.mob.getPosX()) - Math.abs(this.nextBlockPos.getX())) < 2 || Math.abs(Math.abs(this.mob.getPosZ()) - Math.abs(this.nextBlockPos.getZ())) < 2) {
-                                        if (this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).getMaterial().isSolid()) {
-                                            if(this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).getHarvestLevel() != -1) {
+                                        if (this.mob.level().getBlockState(this.mob.getPosition().add(0, 2, 0)).getMaterial().isSolid()) {
+                                            if(this.mob.level().getBlockState(this.mob.getPosition().add(0, 2, 0)).getHarvestLevel() != -1) {
                                                 return true;
                                             }
                                         }
                                     }
                                 } else if (nextPosY < mobY) {
-                                    if(this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()){
-                                        if(this.mob.world.getBlockState(this.nextBlockPos).getHarvestLevel() != -1) {
+                                    if(this.mob.level().getBlockState(this.nextBlockPos).getMaterial().isSolid()){
+                                        if(this.mob.level().getBlockState(this.nextBlockPos).getHarvestLevel() != -1) {
                                             return true;
                                         }
                                     }
-                                    if(this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()){
-                                        if(this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getHarvestLevel() != -1) {
+                                    if(this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()){
+                                        if(this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getHarvestLevel() != -1) {
                                             return true;
                                         }
                                     }
-                                    if (this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).getMaterial().isSolid()) {
-                                        if(this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).getHarvestLevel() != -1) {
+                                    if (this.mob.level().getBlockState(this.nextBlockPos.add(0, -1, 0)).getMaterial().isSolid()) {
+                                        if(this.mob.level().getBlockState(this.nextBlockPos.add(0, -1, 0)).getHarvestLevel() != -1) {
                                             return true;
                                         }
                                     }
@@ -156,10 +160,10 @@ public class DiggingGoal extends Goal {
         return false;
     }
 
-    public boolean shouldContinueExecuting() {
-        if(this.mob.getAttackTarget() != null && this.mob.getAttackTarget() instanceof PlayerEntity) {
-            if(this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0) != null) {
-                if (this.mob.getNavigator().getPathToPos(this.mob.getAttackTarget().getPosition(), 0).reachesTarget()) {
+    public boolean canContinueToUse() {
+        if(this.mob.getTarget() != null && this.mob.getTarget() instanceof Player) {
+            if(this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0) != null) {
+                if (this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0).canReach()) {
                   //System.out.println("should continue executing return false 1");
                     return false;
                 }
@@ -176,72 +180,72 @@ public class DiggingGoal extends Goal {
         if(this.playerTarget != null) {
             if ((long)this.mob.getPosX() == this.nextBlockPos.getX() && (long)this.mob.getPosZ() == this.nextBlockPos.getZ()) {
                 if(this.mob.getPosY() < this.nextBlockPos.getY()) {
-                    if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
-                        if(this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getHarvestLevel() != -1) {
+                    if (this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
+                        if(this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getHarvestLevel() != -1) {
                             return true;
                         }
                     }
                 } else if (this.mob.getPosY() > this.nextBlockPos.getY()) {
-                    if (this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
-                        if(this.mob.world.getBlockState(this.nextBlockPos).getHarvestLevel() != -1) {
+                    if (this.mob.level().getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
+                        if(this.mob.level().getBlockState(this.nextBlockPos).getHarvestLevel() != -1) {
                             return true;
                         }
                     }
                 }
             }else {
-                GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
-                this.pathToNextBlockPos = groundPathNavigator.getPathToPos(this.nextBlockPos, 0);
+                GroundPathNavigation groundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
+                this.pathToNextBlockPos = groundPathNavigation.createPath(this.nextBlockPos, 0);
                 if (this.pathToNextBlockPos != null) {
                     //
-                    if(!this.pathToNextBlockPos.reachesTarget()) {
+                    if(!this.pathToNextBlockPos.canReach()) {
                         //
                         double nextPosY = this.nextBlockPos.getY();
                         double mobY = this.mob.getPosY();
                         if (nextPosY == mobY) {
-                            if (this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
-                                if(this.mob.world.getBlockState(this.nextBlockPos).getHarvestLevel() != -1) {
+                            if (this.mob.level().getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
+                                if(this.mob.level().getBlockState(this.nextBlockPos).getHarvestLevel() != -1) {
                                     return true;
                                 }
                             }
-                            if(this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()){
-                                if(this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getHarvestLevel() != -1) {
+                            if(this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()){
+                                if(this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getHarvestLevel() != -1) {
                                     return true;
                                 }
                             }
                         } else if (nextPosY > mobY) {
-                            if (this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
-                                if(this.mob.world.getBlockState(this.nextBlockPos).getHarvestLevel() != -1) {
+                            if (this.mob.level().getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
+                                if(this.mob.level().getBlockState(this.nextBlockPos).getHarvestLevel() != -1) {
                                     return true;
                                 }
                             }
-                            if (this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).getMaterial().isSolid()) {
-                                if(this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).getHarvestLevel() != -1) {
+                            if (this.mob.level().getBlockState(this.mob.getPosition().add(0, 2, 0)).getMaterial().isSolid()) {
+                                if(this.mob.level().getBlockState(this.mob.getPosition().add(0, 2, 0)).getHarvestLevel() != -1) {
                                     return true;
                                 }
-                            } else if (this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
-                                if(this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getHarvestLevel() != -1) {
+                            } else if (this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
+                                if(this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getHarvestLevel() != -1) {
                                     return true;
                                 }
                             } else if (Math.abs(Math.abs(this.mob.getPosX()) - Math.abs(this.nextBlockPos.getX())) < 2 || Math.abs(Math.abs(this.mob.getPosZ()) - Math.abs(this.nextBlockPos.getZ())) < 2) {
-                                if (this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).getMaterial().isSolid()) {
-                                    if (this.mob.world.getBlockState(this.mob.getPosition().add(0, 2, 0)).getHarvestLevel() != -1) {
+                                if (this.mob.level().getBlockState(this.mob.getPosition().add(0, 2, 0)).getMaterial().isSolid()) {
+                                    if (this.mob.level().getBlockState(this.mob.getPosition().add(0, 2, 0)).getHarvestLevel() != -1) {
                                         return true;
                                     }
                                 }
                             }
                         } else if (nextPosY < mobY) {
-                            if (this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).getMaterial().isSolid()) {
-                                if(this.mob.world.getBlockState(this.nextBlockPos.add(0, -1, 0)).getHarvestLevel() != -1) {
+                            if (this.mob.level().getBlockState(this.nextBlockPos.add(0, -1, 0)).getMaterial().isSolid()) {
+                                if(this.mob.level().getBlockState(this.nextBlockPos.add(0, -1, 0)).getHarvestLevel() != -1) {
                                     return true;
                                 }
                             }
-                            if(this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()){
-                                if(this.mob.world.getBlockState(this.nextBlockPos).getHarvestLevel() != -1) {
+                            if(this.mob.level().getBlockState(this.nextBlockPos).getMaterial().isSolid()){
+                                if(this.mob.level().getBlockState(this.nextBlockPos).getHarvestLevel() != -1) {
                                     return true;
                                 }
                             }
-                            if(this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()){
-                                if(this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getHarvestLevel() != -1) {
+                            if(this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()){
+                                if(this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getHarvestLevel() != -1) {
                                     return true;
                                 }
                             }
@@ -254,13 +258,13 @@ public class DiggingGoal extends Goal {
             }
 
             if(this.isStandingOnBlock()) {
-                if(this.mob.getNavigator().getPath() != null) {
-                    GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
-                    Path pathToTarget = groundPathNavigator.getPathToPos(this.playerTarget.getPosition(), 0);
-                    Path path = this.mob.getNavigator().getPath();
+                if(this.mob.getNavigation().getPath() != null) {
+                    GroundPathNavigation groundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
+                    Path pathToTarget = groundPathNavigation.createPath(this.playerTarget.getPosition(), 0);
+                    Path path = this.mob.getNavigation().getPath();
                     if (pathToTarget != null && path != null) {
                         if (pathToTarget.getTarget() != path.getTarget()) {
-                            if (pathToTarget.reachesTarget()) {
+                            if (pathToTarget.canReach()) {
                               //System.out.println("should continue executing return false 2");
                                 return false;
                             }
@@ -276,7 +280,7 @@ public class DiggingGoal extends Goal {
         return false;
     }
 
-    public void startExecuting(){
+    public void start(){
         //SevenDaysToSurvive.LOGGER.info("start executing DiggingGoal");
         //System.out.println("start executing DiggingGoal");
         //System.out.println("current blockpos: " + this.mob.getPosition() + "; nextBlockPos: " + this.nextBlockPos);
@@ -288,18 +292,18 @@ public class DiggingGoal extends Goal {
         this.placeBlockTick = 0;
 
         ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$customGoalStarted();
-        //GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
+        //GroundPathNavigation groundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
 
-        //this.pathToNextBlockPos = groundPathNavigator.getPathToPos(this.nextBlockPos, 0);
-        //this.mob.getNavigator().setPath(this.pathToNextBlockPos, this.speedModifier);
+        //this.pathToNextBlockPos = groundPathNavigation.getPathToPos(this.nextBlockPos, 0);
+        //this.mob.getNavigation().setPath(this.pathToNextBlockPos, this.speedModifier);
     }
 
-    public void resetTask(){
+    public void stop(){
         //SevenDaysToSurvive.LOGGER.info("stop executing DiggingGoal");
         //System.out.println("stop executing DiggingGoal");
-        this.mob.getNavigator().clearPath();
+        this.mob.getNavigation().stop();
         if(this.breakBlockBlockPos != null) {
-            this.mob.world.sendBlockBreakProgress(this.mob.getEntityId(), this.breakBlockBlockPos, -1);
+            this.mob.level().sendBlockBreakProgress(this.mob.getEntityId(), this.breakBlockBlockPos, -1);
         }
         ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$customGoalFinished();
         ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$setLastExecutingGoal(this);
@@ -309,12 +313,12 @@ public class DiggingGoal extends Goal {
 
     public void tick(){
         this.tickCounter++;
-        
+
         if(this.shouldPlaceBlock){
             if(this.placeBlockBlockPos != null) {
                 if (this.placeBlockTick - 3 == this.tickCounter) {
                     this.mob.swingArm(this.mob.getActiveHand());
-                    this.mob.world.setBlockState(this.placeBlockBlockPos, Blocks.COBBLESTONE.getDefaultState());
+                    this.mob.level().setBlockState(this.placeBlockBlockPos, Blocks.COBBLESTONE.getDefaultState());
                 }
                 if(this.offHandHeldItem != null) {
                     if (this.placeBlockTick == this.tickCounter) {
@@ -325,19 +329,19 @@ public class DiggingGoal extends Goal {
             }
         }
         if(this.isBreakingBlock){
-            if(!this.mob.world.getBlockState(this.breakBlockBlockPos).getMaterial().isSolid()){
-                this.mob.getNavigator().setSpeed(this.speedModifier);
+            if(!this.mob.level().getBlockState(this.breakBlockBlockPos).getMaterial().isSolid()){
+                this.mob.getNavigation().setSpeed(this.speedModifier);
                 this.isBreakingBlock = false;
             }else {
-                this.mob.world.sendBlockBreakProgress(this.mob.getEntityId(), this.breakBlockBlockPos, (int) ((float) (this.blockBreakTime - (this.breakBlockTick - this.tickCounter)) / (float) this.blockBreakTime * 10.0F));
-                this.mob.getNavigator().setSpeed(0);
+                this.mob.level().sendBlockBreakProgress(this.mob.getEntityId(), this.breakBlockBlockPos, (int) ((float) (this.blockBreakTime - (this.breakBlockTick - this.tickCounter)) / (float) this.blockBreakTime * 10.0F));
+                this.mob.getNavigation().setSpeed(0);
                 this.faceTarget(this.breakBlockBlockPos);
                 if ((this.breakBlockTick - this.tickCounter) % 5 == 0) {
                     this.mob.swingArm(this.mob.getActiveHand());
                 }
                 if (this.tickCounter == this.breakBlockTick) {
                     this.breakBlock(this.breakBlockBlockPos);
-                    this.mob.getNavigator().setSpeed(this.speedModifier);
+                    this.mob.getNavigation().setSpeed(this.speedModifier);
                     this.isBreakingBlock = false;
                 }
             }
@@ -347,35 +351,35 @@ public class DiggingGoal extends Goal {
             if(this.playerTarget != null && this.isStandingOnBlock()){
                 if(this.nextBlockPos.getX() == (long)this.mob.getPosX() && this.nextBlockPos.getZ() == (long)this.mob.getPosZ()){
                     if(this.mob.getPosY() > this.nextBlockPos.getY()){
-                        if(this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()){
+                        if(this.mob.level().getBlockState(this.nextBlockPos).getMaterial().isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.nextBlockPos);
                         }
                     } else if (this.mob.getPosY() < this.nextBlockPos.getY()) {
-                        if(this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()){
+                        if(this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.nextBlockPos.add(0, 1, 0));
                         }
                     }
                 }else {
                     if(this.nextBlockPos.getY() == this.mob.getPosY()){
-                        if(this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()){
+                        if(this.mob.level().getBlockState(this.nextBlockPos).getMaterial().isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.nextBlockPos);
-                        }else if(this.mob.world.getBlockState(this.nextBlockPos.add(0,1,0)).getMaterial().isSolid()){
+                        }else if(this.mob.level().getBlockState(this.nextBlockPos.add(0,1,0)).getMaterial().isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.nextBlockPos.add(0,1,0));
                         }
                     }else if(this.nextBlockPos.getY() < this.mob.getPosY()){
-                        if(this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()){
+                        if(this.mob.level().getBlockState(this.nextBlockPos).getMaterial().isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.nextBlockPos);
-                        }else if(this.mob.world.getBlockState(this.nextBlockPos.add(0,1,0)).getMaterial().isSolid()){
+                        }else if(this.mob.level().getBlockState(this.nextBlockPos.add(0,1,0)).getMaterial().isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.nextBlockPos.add(0,1,0));
-                        }else if(this.mob.world.getBlockState(this.nextBlockPos.add(0,2,0)).getMaterial().isSolid()){
+                        }else if(this.mob.level().getBlockState(this.nextBlockPos.add(0,2,0)).getMaterial().isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.nextBlockPos.add(0,2,0));
                         }
                     }else if(this.nextBlockPos.getY() > this.mob.getPosY()){
-                        if(this.mob.world.getBlockState(this.nextBlockPos).getMaterial().isSolid()){
+                        if(this.mob.level().getBlockState(this.nextBlockPos).getMaterial().isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.nextBlockPos);
-                        }else if(this.mob.world.getBlockState(this.nextBlockPos.add(0,1,0)).getMaterial().isSolid()){
+                        }else if(this.mob.level().getBlockState(this.nextBlockPos.add(0,1,0)).getMaterial().isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.nextBlockPos.add(0,1,0));
-                        }else if(this.mob.world.getBlockState(this.mob.getPosition().add(0,2,0)).getMaterial().isSolid()){
+                        }else if(this.mob.level().getBlockState(this.mob.getPosition().add(0,2,0)).getMaterial().isSolid()){
                             this.startBreakingBlock(this.tickCounter, this.mob.getPosition().add(0,2,0));
                         }
                     }
@@ -385,8 +389,8 @@ public class DiggingGoal extends Goal {
 
         /*if(!this.isBreakingBlock && !this.mob.world.getBlockState(this.nextBlockPos).isSolid() && !this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).isSolid() && (int) this.mob.getPosX() != this.nextBlockPos.getX() && (int) this.mob.getPosZ() != this.nextBlockPos.getZ())
         {
-            Path path = ((GroundPathNavigator) this.mob.getNavigator()).getPathToPos(this.nextBlockPos, 0);
-            if (path != null && path.reachesTarget()) {
+            Path path = ((GroundPathNavigation) this.mob.getNavigation()).getPathToPos(this.nextBlockPos, 0);
+            if (path != null && path.canReach()) {
                 this.moveTowardsTarget(this.nextBlockPos);
             }else {
                 this.isMovingTowardsTarget = false;
@@ -398,12 +402,12 @@ public class DiggingGoal extends Goal {
 
     public void moveTowardsTarget(BlockPos blockPos) {
         //this.isMovingTowardsTarget = true;
-        this.mob.getNavigator().tryMoveToXYZ(blockPos.getX(), blockPos.getY(), blockPos.getZ(), this.speedModifier);
+        this.mob.getNavigation().moveTo(blockPos.getX(), blockPos.getY(), blockPos.getZ(), this.speedModifier);
     }
 
     private void startBreakingBlock(long currentTick, BlockPos blockPos){
         this.isBreakingBlock = true;
-        int harvestLevel = this.mob.world.getBlockState(blockPos).getHarvestLevel();
+        int harvestLevel = this.mob.level().getBlockState(blockPos).getHarvestLevel();
         if(harvestLevel < 3) {
             this.blockBreakTime = 60 + harvestLevel * 20L;
         }else{
@@ -415,7 +419,7 @@ public class DiggingGoal extends Goal {
         //this.isMovingTowardsTarget = false;
         if(blockPos.getX() == (long)this.mob.getPosX() && blockPos.getZ() == (long)this.mob.getPosZ()){
             if(blockPos.getY() == (long)this.mob.getPosY() - 1){
-                if(!this.mob.world.getBlockState(blockPos.add(0, -1, 0)).getMaterial().isSolid()) {
+                if(!this.mob.level().getBlockState(blockPos.add(0, -1, 0)).getMaterial().isSolid()) {
                     this.placeBlockBlockPos = blockPos.add(0, -1, 0);
                     this.shouldPlaceBlock = true;
                     this.placeBlockTick = this.breakBlockTick + 5;
@@ -429,12 +433,12 @@ public class DiggingGoal extends Goal {
     private void breakBlock(BlockPos blockPos){
 
         //System.out.println(this.mob.world.getBlockState(blockPos));
-        this.mob.world.destroyBlock(blockPos, true);
-        this.mob.getEntity().world.playSound(null, blockPos, this.mob.world.getBlockState(blockPos).getSoundType().getBreakSound(), this.mob.getEntity().getSoundCategory(), 1.0F, 1.0F);
-        GroundPathNavigator groundPathNavigator = (GroundPathNavigator) this.mob.getNavigator();
-        this.pathToNextBlockPos = groundPathNavigator.getPathToPos(this.nextBlockPos, 0);
-        if(this.pathToNextBlockPos != null && this.pathToNextBlockPos.reachesTarget()) {
-            this.mob.getNavigator().setPath(this.pathToNextBlockPos, 0);
+        this.mob.level().destroyBlock(blockPos, true);
+        this.mob.level().playSound(null, blockPos, this.mob.level().getBlockState(blockPos).getSoundType().getBreakSound(), this.mob.getEntity().getSoundCategory(), 1.0F, 1.0F);
+        GroundPathNavigation groundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
+        this.pathToNextBlockPos = groundPathNavigation.createPath(this.nextBlockPos, 0);
+        if(this.pathToNextBlockPos != null && this.pathToNextBlockPos.canReach()) {
+            this.mob.getNavigation().setPath(this.pathToNextBlockPos, 0);
         }
     }
 
@@ -449,7 +453,7 @@ public class DiggingGoal extends Goal {
 
     private boolean isStandingOnBlock(){
         BlockPos pos = new BlockPos(this.mob.getPosX(), this.mob.getPosY() - 1, this.mob.getPosZ());
-        return this.mob.world.getBlockState(pos).getMaterial().isSolid();
+        return this.mob.level().getBlockState(pos).getMaterial().isSolid();
     }
 
 }
