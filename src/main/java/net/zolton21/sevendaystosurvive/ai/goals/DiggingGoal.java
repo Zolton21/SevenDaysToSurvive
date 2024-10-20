@@ -22,7 +22,6 @@ import java.util.EnumSet;
 
 public class DiggingGoal extends Goal {
 
-    protected EntityPredicate targetEntitySelector;
     private LivingEntity playerTarget;
     protected final double speedModifier;
     private final PathfinderMob mob;
@@ -42,7 +41,6 @@ public class DiggingGoal extends Goal {
         this.mob = creature;
         this.speedModifier = speed;
         this.setFlags(EnumSet.of(Flag.TARGET));
-        this.targetEntitySelector = (new EntityPredicate()).setDistance(this.mob.getAttributeValue(Attributes.FOLLOW_RANGE)).setCustomPredicate(null);
     }
 
     public boolean canUse() {
@@ -98,12 +96,12 @@ public class DiggingGoal extends Goal {
                                     //System.out.println("nextblockpos " + this.nextBlockPos);
                                     //System.out.println("nextblockpos material " + this.mob.world.getBlockState(this.nextBlockPos));
                                     if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)) {
-                                        if(this.mob.level().getBlockState(this.nextBlockPos).getHarvestLevel() != -1){
+                                        if(this.mob.level().getBlockState(this.nextBlockPos).getDestroySpeed(this.mob.level(), this.nextBlockPos) != -1.0F){
                                             return true;
                                         }
                                     }
                                     if(ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))){
-                                        if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, 1, 0)).getHarvestLevel() != -1) {
+                                        if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, 1, 0)).getDestroySpeed(this.mob.level(), this.nextBlockPos.offset(0, 1, 0)) != -1.0F) {
                                             return true;
                                         }
                                     }
@@ -113,38 +111,38 @@ public class DiggingGoal extends Goal {
                                     //System.out.println(this.nextBlockPos);
                                     //System.out.println(this.mob.world.getBlockState(this.nextBlockPos));
                                     if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)) {
-                                        if(this.mob.level().getBlockState(this.nextBlockPos).getHarvestLevel() != -1) {
+                                        if(this.mob.level().getBlockState(this.nextBlockPos).getDestroySpeed(this.mob.level(), this.nextBlockPos) != -1.0F) {
                                             return true;
                                         }
                                     }
                                     if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
-                                        if(this.mob.level().getBlockState(this.mob.blockPosition().offset(0, 2, 0)).getHarvestLevel() != -1) {
+                                        if(this.mob.level().getBlockState(this.mob.blockPosition().offset(0, 2, 0)).getDestroySpeed(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0)) != -1.0F) {
                                             return true;
                                         }
                                     } else if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
-                                        if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, 1, 0)).getHarvestLevel() != -1) {
+                                        if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, 1, 0)).getDestroySpeed(this.mob.level(), this.nextBlockPos.offset(0, 1, 0)) != -1.0F) {
                                             return true;
                                         }
                                     } else if (Math.abs(Math.abs(this.mob.getBlockX()) - Math.abs(this.nextBlockPos.getX())) < 2 || Math.abs(Math.abs(this.mob.getBlockZ()) - Math.abs(this.nextBlockPos.getZ())) < 2) {
                                         if (this.mob.level().getBlockState(this.mob.blockPosition().offset(0, 2, 0)).getMaterial().isSolid()) {
-                                            if(this.mob.level().getBlockState(this.mob.blockPosition().offset(0, 2, 0)).getHarvestLevel() != -1) {
+                                            if(this.mob.level().getBlockState(this.mob.blockPosition().offset(0, 2, 0)).getDestroySpeed(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0)) != -1.0F) {
                                                 return true;
                                             }
                                         }
                                     }
                                 } else if (nextPosY < mobY) {
                                     if(ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)){
-                                        if(this.mob.level().getBlockState(this.nextBlockPos).getHarvestLevel() != -1) {
+                                        if(this.mob.level().getBlockState(this.nextBlockPos).getDestroySpeed(this.mob.level(), this.nextBlockPos) != -1.0F) {
                                             return true;
                                         }
                                     }
                                     if(ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))){
-                                        if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, 1, 0)).getHarvestLevel() != -1) {
+                                        if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, 1, 0)).getDestroySpeed(this.mob.level(), this.nextBlockPos.offset(0, 1, 0)) != -1.0F) {
                                             return true;
                                         }
                                     }
                                     if (this.mob.level().getBlockState(this.nextBlockPos.offset(0, -1, 0)).getMaterial().isSolid()) {
-                                        if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, -1, 0)).getHarvestLevel() != -1) {
+                                        if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, -1, 0)).getDestroySpeed(this.mob.level(), this.nextBlockPos.offset(0, -1, 0)) != -1.0F) {
                                             return true;
                                         }
                                     }
@@ -186,13 +184,13 @@ public class DiggingGoal extends Goal {
             if (this.mob.getBlockX() == this.nextBlockPos.getX() && this.mob.getBlockZ() == this.nextBlockPos.getZ()) {
                 if(this.mob.getBlockY() < this.nextBlockPos.getY()) {
                     if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
-                        if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, 1, 0)).getHarvestLevel() != -1) {
+                        if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, 1, 0)).getDestroySpeed(this.mob.level(), this.nextBlockPos.offset(0, 1, 0)) != -1.0F) {
                             return true;
                         }
                     }
                 } else if (this.mob.getBlockY() > this.nextBlockPos.getY()) {
                     if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)) {
-                        if(this.mob.level().getBlockState(this.nextBlockPos).getHarvestLevel() != -1) {
+                        if(this.mob.level().getBlockState(this.nextBlockPos).getDestroySpeed(this.mob.level(), this.nextBlockPos) != -1.0F) {
                             return true;
                         }
                     }
@@ -208,49 +206,49 @@ public class DiggingGoal extends Goal {
                         double mobY = this.mob.getBlockY();
                         if (nextPosY == mobY) {
                             if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)) {
-                                if(this.mob.level().getBlockState(this.nextBlockPos).getHarvestLevel() != -1) {
+                                if(this.mob.level().getBlockState(this.nextBlockPos).getDestroySpeed(this.mob.level(), this.nextBlockPos) != -1.0F) {
                                     return true;
                                 }
                             }
                             if(ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))){
-                                if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, 1, 0)).getHarvestLevel() != -1) {
+                                if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, 1, 0)).getDestroySpeed(this.mob.level(), this.nextBlockPos.offset(0, 1, 0)) != -1.0F) {
                                     return true;
                                 }
                             }
                         } else if (nextPosY > mobY) {
                             if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)) {
-                                if(this.mob.level().getBlockState(this.nextBlockPos).getHarvestLevel() != -1) {
+                                if(this.mob.level().getBlockState(this.nextBlockPos).getDestroySpeed(this.mob.level(), this.nextBlockPos) != -1.0F) {
                                     return true;
                                 }
                             }
                             if (this.mob.level().getBlockState(this.mob.blockPosition().offset(0, 2, 0)).getMaterial().isSolid()) {
-                                if(this.mob.level().getBlockState(this.mob.blockPosition().offset(0, 2, 0)).getHarvestLevel() != -1) {
+                                if(this.mob.level().getBlockState(this.mob.blockPosition().offset(0, 2, 0)).getHarvestLevel() != -1.0F) {
                                     return true;
                                 }
                             } else if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
-                                if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, 1, 0)).getHarvestLevel() != -1) {
+                                if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, 1, 0)).getDestroySpeed(this.mob.level, this.nextBlockPos.offset(0, 1, 0)) != -1.0F) {
                                     return true;
                                 }
                             } else if (Math.abs(Math.abs(this.mob.getBlockX()) - Math.abs(this.nextBlockPos.getX())) < 2 || Math.abs(Math.abs(this.mob.getBlockZ()) - Math.abs(this.nextBlockPos.getZ())) < 2) {
                                 if (this.mob.level().getBlockState(this.mob.blockPosition().offset(0, 2, 0)).getMaterial().isSolid()) {
-                                    if (this.mob.level().getBlockState(this.mob.blockPosition().offset(0, 2, 0)).getHarvestLevel() != -1) {
+                                    if (this.mob.level().getBlockState(this.mob.blockPosition().offset(0, 2, 0)).getHarvestLevel() != -1.0F) {
                                         return true;
                                     }
                                 }
                             }
                         } else if (nextPosY < mobY) {
                             if (this.mob.level().getBlockState(this.nextBlockPos.offset(0, -1, 0)).getMaterial().isSolid()) {
-                                if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, -1, 0)).getHarvestLevel() != -1) {
+                                if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, -1, 0)).getDestroySpeed(this.mob.level(), this.nextBlockPos.offset(0, -1, 0)) != -1.0F) {
                                     return true;
                                 }
                             }
                             if(ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)){
-                                if(this.mob.level().getBlockState(this.nextBlockPos).getHarvestLevel() != -1) {
+                                if(this.mob.level().getBlockState(this.nextBlockPos).getDestroySpeed(this.mob.level(), this.nextBlockPos) != -1.0F) {
                                     return true;
                                 }
                             }
                             if(ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))){
-                                if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, 1, 0)).getHarvestLevel() != -1) {
+                                if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, 1, 0)).getDestroySpeed(this.mob.level(), this.nextBlockPos.offset(0, 1, 0)) != -1.0F) {
                                     return true;
                                 }
                             }

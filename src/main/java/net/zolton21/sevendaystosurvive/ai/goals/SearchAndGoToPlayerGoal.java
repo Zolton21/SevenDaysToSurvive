@@ -17,7 +17,6 @@ import java.util.EnumSet;
 
 public class SearchAndGoToPlayerGoal extends Goal {
 
-    protected EntityPredicate targetEntitySelector;
     private LivingEntity playerTarget;
     protected final double speedModifier;
     private final PathfinderMob mob;
@@ -31,7 +30,6 @@ public class SearchAndGoToPlayerGoal extends Goal {
         this.mob = creature;
         this.speedModifier = speed;
         this.setFlags(EnumSet.of(Flag.TARGET));
-        this.targetEntitySelector = (new EntityPredicate()).setDistance(this.mob.getAttributeValue(Attributes.FOLLOW_RANGE)).setCustomPredicate(null);
     }
 
     public boolean canUse() {
