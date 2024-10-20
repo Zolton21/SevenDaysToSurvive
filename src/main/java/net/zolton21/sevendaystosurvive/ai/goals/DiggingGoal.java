@@ -55,7 +55,7 @@ public class DiggingGoal extends Goal {
             }
         }
         //if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
-        if (this.isStandingOnBlock()) {
+        if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
             //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
             this.playerTarget = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget();
             if (this.playerTarget == null) {
@@ -262,7 +262,7 @@ public class DiggingGoal extends Goal {
                 }
             }
 
-            if(this.isStandingOnBlock()) {
+            if(ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
                 if(this.mob.getNavigation().getPath() != null) {
                     GroundPathNavigation groundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
                     Path pathToTarget = groundPathNavigation.createPath(this.playerTarget.blockPosition(), 0);
@@ -353,7 +353,7 @@ public class DiggingGoal extends Goal {
         }
 
         if(!this.isBreakingBlock && this.tickCounter % 30 == 0){
-            if(this.playerTarget != null && this.isStandingOnBlock()){
+            if(this.playerTarget != null && ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))){ //Check if mob is standing on a block
                 if(this.nextBlockPos.getX() == this.mob.getBlockX() && this.nextBlockPos.getZ() == this.mob.getBlockZ()){
                     if(this.mob.getBlockY() > this.nextBlockPos.getY()){
                         if(ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)){
@@ -454,11 +454,6 @@ public class DiggingGoal extends Goal {
         this.mob.rotationYaw = (float) yaw;
 
         this.mob.getLookController().setLookPosition(Vector3d.copyCentered(blockPos));
-    }
-
-    private boolean isStandingOnBlock(){
-        BlockPos pos = new BlockPos(this.mob.getBlockX(), this.mob.getBlockY() - 1, this.mob.getBlockZ());
-        return ModUtils.HasBlockEntityCollision(this.mob.level(), pos);
     }
 
 }

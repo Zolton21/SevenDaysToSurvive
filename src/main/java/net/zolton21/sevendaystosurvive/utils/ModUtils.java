@@ -11,4 +11,5 @@ public class ModUtils {
         BlockState blockState = level.getBlockState(blockPos);
         return !blockState.getCollisionShape(level, blockPos, CollisionContext.empty()).isEmpty();
     }
+
 }

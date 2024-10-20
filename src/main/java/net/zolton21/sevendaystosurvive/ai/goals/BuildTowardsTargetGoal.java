@@ -14,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.pathfinder.Path;
 import net.zolton21.sevendaystosurvive.helper.IZombieCustomTarget;
+import net.zolton21.sevendaystosurvive.utils.ModUtils;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -52,7 +53,7 @@ public class BuildTowardsTargetGoal extends Goal {
             }
         }
         //if (((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
-        if (this.isStandingOnBlock()) {
+        if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
             ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$findReachableTarget();
             this.playerTarget = ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getModGoalTarget();
             if (this.playerTarget == null) {
@@ -200,7 +201,7 @@ public class BuildTowardsTargetGoal extends Goal {
                     }
                 }
 
-                if (this.isStandingOnBlock()) {
+                if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
                     if (this.mob.getNavigation().getPath() != null) {
                         GroundPathNavigation GroundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
                         Path pathToTarget = GroundPathNavigation.createPath(this.playerTarget.getPosition(), 0);
@@ -267,7 +268,7 @@ public class BuildTowardsTargetGoal extends Goal {
                         this.startPlacingBlock(this.tickCounter, this.nextBlockPos.add(0, 1, 0), false);
                     }
                 }else {
-                    if (!this.isStandingOnBlock()) {
+                    if (!ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
                         if (Math.abs(this.nextBlockPos.getY()) - Math.abs(this.mob.getBlockY()) < 2) {
                             if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.nextBlockPos.getX())) < 3 ||
                                     Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.nextBlockPos.getZ())) < 3) {
@@ -342,11 +343,6 @@ public class BuildTowardsTargetGoal extends Goal {
                 monsterEntity.getJumpController().setJumping();
             }
         }
-    }
-
-    private boolean isStandingOnBlock(){
-        BlockPos pos = new BlockPos(this.mob.getBlockX(), this.mob.getBlockY() - 1, this.mob.getBlockZ());
-        return this.mob.level().getBlockState(pos).getMaterial().isSolid();
     }
 
     private void placeBlock(BlockPos blockPos, boolean shouldMove){

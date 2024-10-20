@@ -11,6 +11,7 @@ import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.pathfinder.Path;
 import net.zolton21.sevendaystosurvive.helper.IZombieCustomTarget;
+import net.zolton21.sevendaystosurvive.utils.ModUtils;
 
 import java.util.EnumSet;
 
@@ -44,7 +45,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
             }
         }
         if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
-            if (this.isStandingOnBlock()) {
+            if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
                 //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
                 this.playerTarget = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget();
 
@@ -56,17 +57,17 @@ public class SearchAndGoToPlayerGoal extends Goal {
                     this.pathToNextBlockPos = groundPathNavigation.createPath(this.nextBlockPos, 0);
                     if (this.pathToNextBlockPos != null){
                         if (this.pathToNextBlockPos.canReach()) {
-                            if (!this.mob.level().getBlockState(this.nextBlockPos.offset(0, -1, 0)).getMaterial().isSolid()) {
+                            if (!ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -1, 0))) {
                                //SevendaysToSurvive.LOGGER.info("should execute return false 2");
                                 //System.out.println("should execute return false 2");
                                 return false;
                             }
-                            if (this.mob.level().getBlockState(this.nextBlockPos.offset(0, 1, 0)).getMaterial().isSolid()) {
+                            if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
                                //SevendaysToSurvive.LOGGER.info("should execute return false 3");
                                 //System.out.println("should execute return false 3");
                                 return false;
                             }
-                            if (this.mob.level().getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
+                            if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)) {
                                //SevendaysToSurvive.LOGGER.info("should execute return false 4");
                                 //System.out.println("should execute return false 4");
                                 return false;
@@ -88,8 +89,8 @@ public class SearchAndGoToPlayerGoal extends Goal {
 
     public boolean canContinueToUse() {
         if(this.mob.getTarget() != null && this.mob.getTarget() instanceof Player) {
-            if(this.mob.getNavigation().createPath(this.mob.getTarget().getPosition(), 0) != null) {
-                if (this.mob.getNavigation().createPath(this.mob.getTarget().getPosition(), 0).reachesTarget()) {
+            if(this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0) != null) {
+                if (this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0).canReach()) {
                    //SevendaysToSurvive.LOGGER.info("should continue executing return false 1");
                     return false;
                 }
@@ -98,15 +99,15 @@ public class SearchAndGoToPlayerGoal extends Goal {
         if(this.playerTarget != null && this.playerTarget.isAlive()) {
             if (this.pathToNextBlockPos != null) {
                 if (this.pathToNextBlockPos.canReach()) {
-                    if (!this.mob.level().getBlockState(this.nextBlockPos.offset(0, -1, 0)).getMaterial().isSolid()) {
+                    if (!ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -1, 0))) {
                        //SevendaysToSurvive.LOGGER.info("should continue executing return false 2");
                         return false;
                     }
-                    if (this.mob.level().getBlockState(this.nextBlockPos.offset(0, 1, 0)).getMaterial().isSolid()) {
+                    if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
                        //SevendaysToSurvive.LOGGER.info("should continue executing return false 3");
                         return false;
                     }
-                    if (this.mob.level().getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
+                    if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)) {
                        //SevendaysToSurvive.LOGGER.info("should continue executing return false 4");
                         return false;
                     }
@@ -127,7 +128,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
             //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
             this.playerTarget = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget();
             if (this.playerTarget != null) {
-                this.playerTargetPos = this.playerTarget.getPosition();
+                this.playerTargetPos = this.playerTarget.blockPosition();
                 ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$runFindCustomPath();
                 this.nextBlockPos = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos();
                 GroundPathNavigation groundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
@@ -173,10 +174,5 @@ public class SearchAndGoToPlayerGoal extends Goal {
         ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$customGoalFinished();
         ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$setLastExecutingGoal(this);
         //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
-    }
-
-    private boolean isStandingOnBlock(){
-        BlockPos pos = new BlockPos(this.mob.getBlockX(), this.mob.getBlockY() - 1, this.mob.getBlockZ());
-        return this.mob.level().getBlockState(pos).getMaterial().isSolid();
     }
 }
