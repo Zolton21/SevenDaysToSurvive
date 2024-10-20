@@ -191,7 +191,7 @@ public abstract class ZombieMixin extends Monster implements IZombieCustomTarget
                         if (this.level().getBlockState(this.sevenDaysToSurvive$nextBlockPos).getDestroySpeed(level(), this.sevenDaysToSurvive$nextBlockPos) >= 0.0F) {
                             this.sevenDaysToSurvive$nextBlockPos = this.sevenDaysToSurvive$nextBlockPos.above(1);
                         } else {
-                            this.sevenDaysToSurvive$nextBlockPos = this.getPosition().add(0, 1, 0);
+                            this.sevenDaysToSurvive$nextBlockPos = this.blockPosition().offset(0, 1, 0);
                         }
                     }
                 }

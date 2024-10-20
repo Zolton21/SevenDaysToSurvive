@@ -67,13 +67,13 @@ public class BuildTowardsTargetGoal extends Goal {
                     //SevendaysToSurvive.LOGGER.info("should execute return false 3");
                     return false;
                 }
-                if ((long) this.mob.getPosX() == this.nextBlockPos.getX() && (long) this.mob.getPosZ() == this.nextBlockPos.getZ()) {
-                    if (this.nextBlockPos.getY() > this.mob.getPosY()) {
+                if ( this.mob.getBlockX() == this.nextBlockPos.getX() &&  this.mob.getBlockZ() == this.nextBlockPos.getZ()) {
+                    if (this.nextBlockPos.getY() > this.mob.getBlockY()) {
                         if (this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
                             //SevendaysToSurvive.LOGGER.info("should execute return false 4");
                             return false;
                         }
-                    } else if (this.nextBlockPos.getY() < this.mob.getPosY()) {
+                    } else if (this.nextBlockPos.getY() < this.mob.getBlockY()) {
                         if (this.mob.level().getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
                             //SevendaysToSurvive.LOGGER.info("should execute return false 5");
                             return false;
@@ -88,7 +88,7 @@ public class BuildTowardsTargetGoal extends Goal {
                     if (this.pathToNextBlockPos != null) {
                         if (this.mob.level().getBlockState(this.nextBlockPos.add(0, -1, 0)).getMaterial().isSolid()) {
                             double nextPosY = this.nextBlockPos.getY();
-                            double mobY = this.mob.getPosY();
+                            double mobY = this.mob.getBlockY();
                             if (this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
                                 //SevendaysToSurvive.LOGGER.info("should execute return false 6");
                                 return false;
@@ -109,8 +109,8 @@ public class BuildTowardsTargetGoal extends Goal {
                     return true;
                 }
                 if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
-                    if (Math.abs(this.nextBlockPos.getY() - this.mob.getPosY()) < 3) {
-                        if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.mob.getPosX())) < 3 || Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.mob.getPosZ())) < 3) {
+                    if (Math.abs(this.nextBlockPos.getY() - this.mob.getBlockY()) < 3) {
+                        if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.mob.getBlockX())) < 3 || Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.mob.getBlockZ())) < 3) {
                             if (this.mob.level().getBlockState(this.nextBlockPos).getMaterial() == Material.LAVA || this.mob.world.getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial() == Material.LAVA) {
                                 return true;
                             }
@@ -155,15 +155,15 @@ public class BuildTowardsTargetGoal extends Goal {
                     }
                 }
 
-                if ((long) this.mob.getPosX() == this.nextBlockPos.getX() && (long) this.mob.getPosZ() == this.nextBlockPos.getZ()) {
-                    if (this.nextBlockPos.getY() > this.mob.getPosY()) {
+                if ( this.mob.getBlockX() == this.nextBlockPos.getX() &&  this.mob.getBlockZ() == this.nextBlockPos.getZ()) {
+                    if (this.nextBlockPos.getY() > this.mob.getBlockY()) {
                         if (!this.isJumping) {
                             if (this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
                                //SevendaysToSurvive.LOGGER.info("should continue executing return false 3");
                                 return false;
                             }
                         }
-                    } else if (this.nextBlockPos.getY() < this.mob.getPosY()) {
+                    } else if (this.nextBlockPos.getY() < this.mob.getBlockY()) {
                         if (this.mob.level().getBlockState(this.nextBlockPos).getMaterial().isSolid()) {
                             if(!this.isJumping) {
                                //SevendaysToSurvive.LOGGER.info("should continue executing return false 4");
@@ -179,7 +179,7 @@ public class BuildTowardsTargetGoal extends Goal {
                         if (this.pathToNextBlockPos != null) {
                             if (this.mob.level().getBlockState(this.nextBlockPos.add(0, -1, 0)).getMaterial().isSolid()) {
                                 double nextPosY = this.nextBlockPos.getY();
-                                double mobY = this.mob.getPosY();
+                                double mobY = this.mob.getBlockY();
                                 if (this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial().isSolid()) {
                                    //SevendaysToSurvive.LOGGER.info("should continue executing return false 5");
                                     return false;
@@ -219,8 +219,8 @@ public class BuildTowardsTargetGoal extends Goal {
             }
         }
         if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
-            if (Math.abs(this.nextBlockPos.getY() - this.mob.getPosY()) < 3) {
-                if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.mob.getPosX())) < 3 || Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.mob.getPosZ())) < 3) {
+            if (Math.abs(this.nextBlockPos.getY() - this.mob.getBlockY()) < 3) {
+                if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.mob.getBlockX())) < 3 || Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.mob.getBlockZ())) < 3) {
                     if (this.mob.level().getBlockState(this.nextBlockPos).getMaterial() == Material.LAVA || this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial() == Material.LAVA) {
                         return true;
                     }
@@ -252,23 +252,23 @@ public class BuildTowardsTargetGoal extends Goal {
         }
 
         if(this.isJumping && this.tickCounter == this.endJumpTick){
-            this.placeBlock(new BlockPos(this.mob.getPosX(), this.mob.getPosY() - 1, this.mob.getPosZ()), false);
+            this.placeBlock(new BlockPos(this.mob.getBlockX(), this.mob.getBlockY() - 1, this.mob.getBlockZ()), false);
             this.isJumping = false;
         }
 
         if (!this.isPlacingBlock && this.tickCounter % 20 == 0) {
             if (this.playerTarget != null) {
                 if (this.mob.level().getBlockState(this.nextBlockPos).getMaterial() == Material.LAVA) {
-                    if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.mob.getPosX())) < 3 || Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.mob.getPosZ())) < 3) {
+                    if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.mob.getBlockX())) < 3 || Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.mob.getBlockZ())) < 3) {
                         this.startPlacingBlock(this.tickCounter, this.nextBlockPos, false);
                     }
                 }else if(this.mob.level().getBlockState(this.nextBlockPos.add(0, 1, 0)).getMaterial() == Material.LAVA){
-                    if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.mob.getPosX())) < 3 || Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.mob.getPosZ())) < 3) {
+                    if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.mob.getBlockX())) < 3 || Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.mob.getBlockZ())) < 3) {
                         this.startPlacingBlock(this.tickCounter, this.nextBlockPos.add(0, 1, 0), false);
                     }
                 }else {
                     if (!this.isStandingOnBlock()) {
-                        if (Math.abs(this.nextBlockPos.getY()) - Math.abs(this.mob.getPosY()) < 2) {
+                        if (Math.abs(this.nextBlockPos.getY()) - Math.abs(this.mob.getBlockY()) < 2) {
                             if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.nextBlockPos.getX())) < 3 ||
                                     Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.nextBlockPos.getZ())) < 3) {
                                 this.startPlacingBlock(this.tickCounter, this.mob.getPosition().add(0, -1, 0), false);
@@ -282,7 +282,7 @@ public class BuildTowardsTargetGoal extends Goal {
                             boolean canPlaceBlock = true;
                             BlockPos blockPos;
                             for (long i = 0; i < 3; i++) {
-                                blockPos = new BlockPos(this.mob.getPosX(), this.mob.getPosY() + i, this.mob.getPosZ());
+                                blockPos = new BlockPos(this.mob.getBlockX(), this.mob.getBlockY() + i, this.mob.getBlockZ());
                                 if (this.mob.level().getBlockState(blockPos).getMaterial().isSolid()) {
                                     canPlaceBlock = false;
                                     break;
@@ -292,7 +292,7 @@ public class BuildTowardsTargetGoal extends Goal {
                                 this.mobJump(this.tickCounter);
                             }
                         } else {
-                            if (Math.abs(Math.abs(this.nextBlockPos.getY()) - Math.abs(this.mob.getPosY())) < 2) {
+                            if (Math.abs(Math.abs(this.nextBlockPos.getY()) - Math.abs(this.mob.getBlockY())) < 2) {
                                 if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.nextBlockPos.getX())) < 3 ||
                                         Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.nextBlockPos.getZ())) < 3) {
                                     BlockPos blockPos = new BlockPos(this.nextBlockPos.add(0, -1, 0));
@@ -316,8 +316,8 @@ public class BuildTowardsTargetGoal extends Goal {
     }
 
     public void faceTarget(BlockPos blockPos){
-        /*double deltaX = this.nextBlockPos.getX() - this.mob.getPosX();
-        double deltaZ = this.nextBlockPos.getZ() - this.mob.getPosZ();
+        /*double deltaX = this.nextBlockPos.getX() - this.mob.getBlockX();
+        double deltaZ = this.nextBlockPos.getZ() - this.mob.getBlockZ();
         double yaw = Math.atan2(deltaZ, deltaX);yaw = Math.toDegrees(yaw) - 90.0;
         this.mob.rotationYaw = (float) yaw;*/
         this.mob.getLookController().setLookPosition(Vector3d.copyCentered(blockPos));
@@ -326,9 +326,9 @@ public class BuildTowardsTargetGoal extends Goal {
     private void mobJump(long currentTick){
 
         this.isJumping = true;
-        double x = this.mob.getPosX();
-        double y = this.mob.getPosY() + 3;
-        double z = this.mob.getPosZ();
+        double x = this.mob.getBlockX();
+        double y = this.mob.getBlockY() + 3;
+        double z = this.mob.getBlockZ();
         if(this.mob.level().getBlockState(new BlockPos(x, y, z)).getMaterial().isSolid()){
             this.endJumpTick = currentTick + 4;
         }else {
@@ -345,7 +345,7 @@ public class BuildTowardsTargetGoal extends Goal {
     }
 
     private boolean isStandingOnBlock(){
-        BlockPos pos = new BlockPos(this.mob.getPosX(), this.mob.getPosY() - 1, this.mob.getPosZ());
+        BlockPos pos = new BlockPos(this.mob.getBlockX(), this.mob.getBlockY() - 1, this.mob.getBlockZ());
         return this.mob.level().getBlockState(pos).getMaterial().isSolid();
     }
 
@@ -385,7 +385,7 @@ public class BuildTowardsTargetGoal extends Goal {
         this.nextBlockPos = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos();
 
         if (this.nextBlockPos != null) {
-            if(Math.abs(Math.abs(this.nextBlockPos.getY()) - Math.abs(this.mob.getPosY())) >= 2
+            if(Math.abs(Math.abs(this.nextBlockPos.getY()) - Math.abs(this.mob.getBlockY())) >= 2
                     && (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.nextBlockPos.getX())) >= 2
                     && Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.nextBlockPos.getZ())) >= 2)){
 
