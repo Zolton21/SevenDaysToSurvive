@@ -411,7 +411,7 @@ public class DiggingGoal extends Goal {
     }
 
     private void startBreakingBlock(long currentTick, BlockPos blockPos){
-        this.isBreakingBlock = true;
+        this.isBreakingBlock = true; this.mob.level().getBlockState(blockPos).getDestroySpeed();
         int harvestLevel = this.mob.level().getBlockState(blockPos).getHarvestLevel();
         if(harvestLevel < 3) {
             this.blockBreakTime = 60 + harvestLevel * 20L;
