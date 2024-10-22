@@ -114,9 +114,6 @@ public abstract class ZombieMixin extends Monster implements IZombieCustomTarget
     }
 
     public void sevenDaysToSurvive$findReachableTarget(){
-        if(this.sevenDaysToSurvive$targetEntitySelector == null) {
-            this.sevenDaysToSurvive$targetEntitySelector = (new EntityPredicate()).setDistance(this.getAttributeValue(Attributes.FOLLOW_RANGE)).setCustomPredicate(null);
-        }
         this.sevenDaysToSurvive$modGoalTarget = this.level().getNearestPlayer(this, 60);
     }
 
