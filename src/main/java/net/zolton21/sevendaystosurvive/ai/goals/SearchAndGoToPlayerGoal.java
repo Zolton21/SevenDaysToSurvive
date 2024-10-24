@@ -142,7 +142,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
     }
 
     public void start(){
-        //System.out.println("start executing searchAndGoToPlayerGoal");
+        System.out.println("start executing searchAndGoToPlayerGoal");
         //System.out.println("current blockpos: " + this.mob.getPosition() + "; nextBlockPos: " + this.nextBlockPos);
         //SevenDaysToSurvive.LOGGER.info("start executing searchAndGoToPlayerGoal");
        //SevendaysToSurvive.LOGGER.info("current blockpos: " + this.mob.getPosition() + "; nextBlockPos: " + this.nextBlockPos);
@@ -166,8 +166,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
     }
 
     public void stop(){
-        //SevenDaysToSurvive.LOGGER.info("stop executing searchAndGoToPlayerGoal");
-        //System.out.println("resetTask SearchAndGoToPlayerGoal");
+        System.out.println("stop executing SearchAndGoToPlayerGoal");
         this.mob.getNavigation().stop();
         ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$customGoalFinished();
         ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$setLastExecutingGoal(this);

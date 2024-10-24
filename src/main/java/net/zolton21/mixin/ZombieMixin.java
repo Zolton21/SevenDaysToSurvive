@@ -6,21 +6,18 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
-import net.minecraft.world.phys.AABB;
 import net.zolton21.sevendaystosurvive.ai.goals.BuildTowardsTargetGoal;
 import net.zolton21.sevendaystosurvive.ai.goals.DiggingGoal;
 import net.zolton21.sevendaystosurvive.ai.goals.SearchAndGoToPlayerGoal;
 import net.zolton21.sevendaystosurvive.helper.IZombieCustomTarget;
+import net.zolton21.sevendaystosurvive.utils.ModUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -58,7 +55,6 @@ public abstract class ZombieMixin extends Monster implements IZombieCustomTarget
 
     @Inject(method = "tick()V", at = @At("HEAD"))
     public void tickInject(CallbackInfo ci) {
-        //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin tick");
         if(this.getNavigation() instanceof GroundPathNavigation) {
             if (this.getTarget() == null) {
                 //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 1");
@@ -114,7 +110,7 @@ public abstract class ZombieMixin extends Monster implements IZombieCustomTarget
     }
 
     public void sevenDaysToSurvive$findReachableTarget(){
-        this.sevenDaysToSurvive$modGoalTarget = this.level().getNearestPlayer(this, 60);
+        this.sevenDaysToSurvive$modGoalTarget = ModUtils.getNearestSurvivalPlayer(this, 60);
     }
 
     public void sevenDaysToSurvive$runFindCustomPath(){

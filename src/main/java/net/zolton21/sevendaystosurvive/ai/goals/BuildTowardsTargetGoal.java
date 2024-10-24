@@ -1,13 +1,11 @@
 package net.zolton21.sevendaystosurvive.ai.goals;
 
 
-import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.monster.Monster;
@@ -18,6 +16,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.zolton21.sevendaystosurvive.SevenDaysToSurvive;
 import net.zolton21.sevendaystosurvive.helper.IZombieCustomTarget;
 import net.zolton21.sevendaystosurvive.utils.ModUtils;
 
@@ -368,8 +367,7 @@ public class BuildTowardsTargetGoal extends Goal {
     }
 
     public void start() {
-        //SevenDaysToSurvive.LOGGER.info("start executing BuildForwardGoal");
-        //System.out.println("start executing BuildForwardGoal");
+        System.out.println("start executing BuildForwardGoal");
        //System.out.println("current blockpos: " + this.mob.getPosition());
        //System.out.println("nextBlockPos: " + this.nextBlockPos);*/
        //SevendaysToSurvive.LOGGER.info("start executing BuildForwardGoal");
@@ -404,10 +402,9 @@ public class BuildTowardsTargetGoal extends Goal {
         ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$customGoalFinished();
         ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$setLastExecutingGoal(this);
 
-        //SevenDaysToSurvive.LOGGER.info("stop executing BuildForwardGoal");
-        //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
+       //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
        //SevendaysToSurvive.LOGGER.info("stop executing BuildForwardGoal");
-        //System.out.println("stop executing BuildForwardGoal");
+        System.out.println("stop executing BuildForwardGoal");
     }
 
 }

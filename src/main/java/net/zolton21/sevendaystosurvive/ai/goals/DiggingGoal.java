@@ -1,21 +1,17 @@
 package net.zolton21.sevendaystosurvive.ai.goals;
 
-import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
 
 import net.zolton21.sevendaystosurvive.helper.IZombieCustomTarget;
 import net.zolton21.sevendaystosurvive.utils.ModUtils;
@@ -411,13 +407,15 @@ public class DiggingGoal extends Goal {
     }
 
     private void startBreakingBlock(long currentTick, BlockPos blockPos){
-        this.isBreakingBlock = true; this.mob.level().getBlockState(blockPos).getDestroySpeed();
-        int harvestLevel = this.mob.level().getBlockState(blockPos).getHarvestLevel();
+        this.isBreakingBlock = true;
+        //this.mob.level().getBlockState(blockPos).getDestroySpeed();
+        /*int harvestLevel = this.mob.level().getBlockState(blockPos).getHarvestLevel();
         if(harvestLevel < 3) {
             this.blockBreakTime = 60 + harvestLevel * 20L;
         }else{
             this.blockBreakTime = 740 + harvestLevel * 20L;
-        }
+        }*/
+        this.blockBreakTime = 60;
         //this.mob.world.getBlockState(blockPos).getHarvestLevel();
         this.breakBlockTick = currentTick + this.blockBreakTime;
         this.breakBlockBlockPos = blockPos;
