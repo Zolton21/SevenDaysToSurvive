@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 
-import net.zolton21.sevendaystosurvive.helper.IZombieCustomTarget;
+import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
 import net.zolton21.sevendaystosurvive.utils.ModUtils;
 
 import java.util.EnumSet;
@@ -29,7 +29,7 @@ public class DiggingGoal extends Goal {
     private boolean isBreakingBlock;
     private long breakBlockTick;
     private BlockPos breakBlockBlockPos;
-    private long blockBreakTime;
+    private float blockBreakTime;
     private ItemStack offHandHeldItem;
     private boolean shouldPlaceBlock;
     private long placeBlockTick;
@@ -53,14 +53,14 @@ public class DiggingGoal extends Goal {
         //if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
         if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
             //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
-            this.playerTarget = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget();
+            this.playerTarget = ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget();
             if (this.playerTarget == null) {
                 //System.out.println("should execute return false 2");
                 return false;
             }
-            ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$runFindCustomPath();
-            if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
-                this.nextBlockPos = ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getNextBlockPos();
+            ((IZombieHelper)this.mob).sevenDaysToSurvive$findCustomPath();
+            if(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
+                this.nextBlockPos = ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos();
                 if ( this.mob.getBlockX() == this.nextBlockPos.getX() &&  this.mob.getBlockZ() == this.nextBlockPos.getZ()) {
                     if (this.mob.getY() < this.nextBlockPos.getY()) {
                         if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
@@ -170,12 +170,19 @@ public class DiggingGoal extends Goal {
                 }
             }
         }
+
+        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() == null) {
+            return false;
+        } else if (!((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive() || (((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget()).isSpectator() || ((Player)((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget()).isCreative()) {
+            return false;
+        }
+
         if(this.tickCounter % 200 == 0 && !this.isBreakingBlock){
             //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
-            this.playerTarget = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget();
+            this.playerTarget = ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget();
             if(this.playerTarget != null) {
-                ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$runFindCustomPath();
-                this.nextBlockPos = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos();
+                ((IZombieHelper)this.mob).sevenDaysToSurvive$findCustomPath();
+                this.nextBlockPos = ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos();
             }
         }
         if(this.playerTarget != null) {
@@ -282,8 +289,7 @@ public class DiggingGoal extends Goal {
     }
 
     public void start(){
-        //SevenDaysToSurvive.LOGGER.info("start executing DiggingGoal");
-        //System.out.println("start executing DiggingGoal");
+        System.out.println("start executing DiggingGoal");
         //System.out.println("current blockpos: " + this.mob.getPosition() + "; nextBlockPos: " + this.nextBlockPos);
         //System.out.println("current blockpos: " + this.mob.getPosition());
         //System.out.println("nextBlockPos: " + this.nextBlockPos);
@@ -292,7 +298,7 @@ public class DiggingGoal extends Goal {
         this.shouldPlaceBlock = false;
         this.placeBlockTick = 0;
 
-        ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$customGoalStarted();
+        ((IZombieHelper)this.mob).sevenDaysToSurvive$customGoalStarted();
         //GroundPathNavigation groundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
 
         //this.pathToNextBlockPos = groundPathNavigation.getPathToPos(this.nextBlockPos, 0);
@@ -300,14 +306,13 @@ public class DiggingGoal extends Goal {
     }
 
     public void stop(){
-        //SevenDaysToSurvive.LOGGER.info("stop executing DiggingGoal");
-        //System.out.println("stop executing DiggingGoal");
+        System.out.println("stop executing DiggingGoal");
         this.mob.getNavigation().stop();
         if(this.breakBlockBlockPos != null) {
             this.mob.level().destroyBlockProgress(this.mob.getId(), this.breakBlockBlockPos, -1);
         }
-        ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$customGoalFinished();
-        ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$setLastExecutingGoal(this);
+        ((IZombieHelper)this.mob).sevenDaysToSurvive$customGoalFinished();
+        ((IZombieHelper)this.mob).sevenDaysToSurvive$setLastExecutingGoal(this);
         //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
         //System.out.println("stop executing DiggingGoal");
     }
@@ -408,16 +413,12 @@ public class DiggingGoal extends Goal {
 
     private void startBreakingBlock(long currentTick, BlockPos blockPos){
         this.isBreakingBlock = true;
-        //this.mob.level().getBlockState(blockPos).getDestroySpeed();
-        /*int harvestLevel = this.mob.level().getBlockState(blockPos).getHarvestLevel();
-        if(harvestLevel < 3) {
-            this.blockBreakTime = 60 + harvestLevel * 20L;
-        }else{
-            this.blockBreakTime = 740 + harvestLevel * 20L;
-        }*/
-        this.blockBreakTime = 60;
-        //this.mob.world.getBlockState(blockPos).getHarvestLevel();
-        this.breakBlockTick = currentTick + this.blockBreakTime;
+
+        float blockHardness = this.mob.level().getBlockState(blockPos).getDestroySpeed(this.mob.level(), blockPos);
+        this.blockBreakTime = blockHardness * 50.0F / ((IZombieHelper) this.mob).sevenDaysToSurvive$getBlockBreakingSpeedModifier();
+        //this.blockBreakTime = 60;
+
+        this.breakBlockTick = currentTick + (long) this.blockBreakTime;
         this.breakBlockBlockPos = blockPos;
         //this.isMovingTowardsTarget = false;
         if(blockPos.getX() == this.mob.getBlockX() && blockPos.getZ() == this.mob.getBlockZ()){

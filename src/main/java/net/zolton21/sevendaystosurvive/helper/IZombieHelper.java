@@ -4,11 +4,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 
-public interface IZombieCustomTarget {
+public interface IZombieHelper {
 
     BlockPos sevenDaysToSurvive$getNextBlockPos();
 
-    void sevenDaysToSurvive$runFindCustomPath();
+    void sevenDaysToSurvive$findCustomPath();
+
+    float sevenDaysToSurvive$getBlockBreakingSpeedModifier();
 
     void sevenDaysToSurvive$findReachableTarget();
 

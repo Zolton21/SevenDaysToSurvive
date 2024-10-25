@@ -16,17 +16,23 @@ public class ModUtils {
     }
 
     public static Player getNearestSurvivalPlayer(Mob mob, double range){
-        ServerLevel serverLevel = (ServerLevel) mob.level();
-        Player nearestPlayer = null;
-        double closestDistance = Double.MAX_VALUE;
 
-        for(Player player: serverLevel.players()){
-            if (player.distanceTo(mob) < range){
-                if(player.isAlive() && !player.isSpectator() && !player.isCreative()){
-                    double distance = mob.distanceToSqr(player);
-                    if(distance < closestDistance){
-                        closestDistance = distance;
-                        nearestPlayer = player;
+        Player nearestPlayer = null;
+
+        if(mob.getServer() != null) {
+            ServerLevel serverLevel = mob.getServer().getLevel(mob.level().dimension());
+            double closestDistance = Double.MAX_VALUE;
+
+            if (serverLevel != null) {
+                for (Player player : serverLevel.players()) {
+                    if (player.distanceTo(mob) < range) {
+                        if (player.isAlive() && !player.isSpectator() && !player.isCreative()) {
+                            double distance = mob.distanceToSqr(player);
+                            if (distance < closestDistance) {
+                                closestDistance = distance;
+                                nearestPlayer = player;
+                            }
+                        }
                     }
                 }
             }

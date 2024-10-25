@@ -1,16 +1,14 @@
 package net.zolton21.sevendaystosurvive.ai.goals;
 
 
-import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.pathfinder.Path;
-import net.zolton21.sevendaystosurvive.helper.IZombieCustomTarget;
+import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
 import net.zolton21.sevendaystosurvive.utils.ModUtils;
 
 import java.util.EnumSet;
@@ -42,15 +40,15 @@ public class SearchAndGoToPlayerGoal extends Goal {
                 }
             }
         }
-        if(((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
+        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
             if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
                 //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
-                this.playerTarget = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget();
+                this.playerTarget = ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget();
 
                 if (this.playerTarget != null && this.playerTarget.isAlive()) {
                     this.playerTargetPos = this.playerTarget.blockPosition();
-                    ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$runFindCustomPath();
-                    this.nextBlockPos = ((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getNextBlockPos();
+                    ((IZombieHelper) this.mob).sevenDaysToSurvive$findCustomPath();
+                    this.nextBlockPos = ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos();
                     GroundPathNavigation groundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
                     this.pathToNextBlockPos = groundPathNavigation.createPath(this.nextBlockPos, 0);
                     if (this.pathToNextBlockPos != null){
@@ -124,11 +122,11 @@ public class SearchAndGoToPlayerGoal extends Goal {
         this.tickCounter++;
         if (this.tickCounter % 200 == 0) {
             //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
-            this.playerTarget = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getModGoalTarget();
+            this.playerTarget = ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget();
             if (this.playerTarget != null) {
                 this.playerTargetPos = this.playerTarget.blockPosition();
-                ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$runFindCustomPath();
-                this.nextBlockPos = ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$getNextBlockPos();
+                ((IZombieHelper)this.mob).sevenDaysToSurvive$findCustomPath();
+                this.nextBlockPos = ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos();
                 GroundPathNavigation groundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
                 this.pathToNextBlockPos = groundPathNavigation.createPath(this.nextBlockPos, 0);
             }
@@ -146,7 +144,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
         //System.out.println("current blockpos: " + this.mob.getPosition() + "; nextBlockPos: " + this.nextBlockPos);
         //SevenDaysToSurvive.LOGGER.info("start executing searchAndGoToPlayerGoal");
        //SevendaysToSurvive.LOGGER.info("current blockpos: " + this.mob.getPosition() + "; nextBlockPos: " + this.nextBlockPos);
-        ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$customGoalStarted();
+        ((IZombieHelper)this.mob).sevenDaysToSurvive$customGoalStarted();
         this.tickCounter = 0;
     }
 
@@ -168,8 +166,8 @@ public class SearchAndGoToPlayerGoal extends Goal {
     public void stop(){
         System.out.println("stop executing SearchAndGoToPlayerGoal");
         this.mob.getNavigation().stop();
-        ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$customGoalFinished();
-        ((IZombieCustomTarget)this.mob).sevenDaysToSurvive$setLastExecutingGoal(this);
+        ((IZombieHelper)this.mob).sevenDaysToSurvive$customGoalFinished();
+        ((IZombieHelper)this.mob).sevenDaysToSurvive$setLastExecutingGoal(this);
         //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
     }
 }
