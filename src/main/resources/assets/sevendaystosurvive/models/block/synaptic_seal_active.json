@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "sevendaystosurvive:block/synaptic_seal_active"
+  }
+}
