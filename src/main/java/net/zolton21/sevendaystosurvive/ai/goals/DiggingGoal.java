@@ -60,7 +60,7 @@ public class DiggingGoal extends Goal {
         if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
             this.playerTarget = ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget();
             if (this.playerTarget == null) {
-                //System.out.println("should execute return false 2");
+               //System.out.println("should execute return false 2");
                 return false;
             }
             ((IZombieHelper)this.mob).sevenDaysToSurvive$findCustomPath();
@@ -142,10 +142,10 @@ public class DiggingGoal extends Goal {
         }
 
         if(!ModUtils.IsMobStandingOnAFullBlock(this.mob) && this.playerTarget != null){
-            //System.out.println("!ModUtils.IsMobStandingOnAFullBlock(this.mob) is true");
+           //System.out.println("!ModUtils.IsMobStandingOnAFullBlock(this.mob) is true");
             return true;
         }
-       //System.out.println("return false 3");
+      //System.out.println("return false 3");
         return false;
     }
 
@@ -153,7 +153,7 @@ public class DiggingGoal extends Goal {
         if(this.mob.getTarget() != null && this.mob.getTarget() instanceof Player) {
             if(this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0) != null) {
                 if (this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0).canReach()) {
-                   //System.out.println("should continue executing return false 1");
+                  //System.out.println("should continue executing return false 1");
                     return false;
                 }
             }
@@ -255,7 +255,7 @@ public class DiggingGoal extends Goal {
                     if (pathToTarget != null && path != null) {
                         if (pathToTarget.getTarget() != path.getTarget()) {
                             if (pathToTarget.canReach()) {
-                               //System.out.println("should continue executing return false 2");
+                              //System.out.println("should continue executing return false 2");
                                 return false;
                             }
                         }
@@ -267,16 +267,16 @@ public class DiggingGoal extends Goal {
             }
 
             if(!ModUtils.IsMobStandingOnAFullBlock(this.mob)){
-               //System.out.println("should continue executing return true");
+              //System.out.println("should continue executing return true");
                 return true;
             }
         }
-       //System.out.println("should continue executing return false 3");
+      //System.out.println("should continue executing return false 3");
         return false;
     }
 
     public void start(){
-       //System.out.println("start executing DiggingGoal");
+        System.out.println("start executing DiggingGoal");
         this.tickCounter = 0;
         this.isBreakingBlock = false;
         this.shouldPlaceBlock = false;
@@ -286,7 +286,7 @@ public class DiggingGoal extends Goal {
     }
 
     public void stop(){
-       //System.out.println("stop executing DiggingGoal");
+        System.out.println("stop executing DiggingGoal");
         this.mob.getNavigation().stop();
         if(this.breakBlockBlockPos != null) {
             this.mob.level().destroyBlockProgress(this.mob.getId(), this.breakBlockBlockPos, -1);
@@ -314,14 +314,15 @@ public class DiggingGoal extends Goal {
             }
         }
         if(this.isBreakingBlock){
-            if(!ModUtils.HasBlockEntityCollision(this.mob.level(), this.breakBlockBlockPos)){
+            if(!ModUtils.HasBlockEntityCollision(this.mob.level(), this.breakBlockBlockPos) && !ModUtils.HasBlockEntityCollision(this.mob.level(), this.breakBlockBlockPos.offset(0, -1, 0))){
                 this.mob.getNavigation().setSpeedModifier(this.speedModifier);
                 this.isBreakingBlock = false;
+                //System.out.println("if1");
             }else {
-               //System.out.println("this.blockBreakTime: " + this.blockBreakTime);
-               //System.out.println("this.breakBlockTick: " + this.breakBlockTick);
-               //System.out.println("this.tickCounter: " + this.tickCounter);
-               //System.out.println("destroyBlockProgress: " + (int) ((this.blockBreakTime - (this.breakBlockTick - this.tickCounter)) / this.blockBreakTime * 10.0F));
+                //System.out.println("this.blockBreakTime: " + this.blockBreakTime);
+                //System.out.println("this.breakBlockTick: " + this.breakBlockTick);
+                //System.out.println("this.tickCounter: " + this.tickCounter);
+                //System.out.println("destroyBlockProgress: " + (int) ((this.blockBreakTime - (this.breakBlockTick - this.tickCounter)) / this.blockBreakTime * 10.0F));
                 this.mob.level().destroyBlockProgress(this.mob.getId(), this.breakBlockBlockPos, (int) ((this.blockBreakTime - (this.breakBlockTick - this.tickCounter)) / this.blockBreakTime * 10.0F));
                 this.mob.getNavigation().setSpeedModifier(0);
                 this.faceTarget(this.breakBlockBlockPos);
@@ -340,7 +341,7 @@ public class DiggingGoal extends Goal {
             if(this.playerTarget != null){
                //System.out.println("!ModUtils.IsMobStandingOnAFullBlock(this.mob): " + !ModUtils.IsMobStandingOnAFullBlock(this.mob));
                 if(!ModUtils.IsMobStandingOnAFullBlock(this.mob)){
-                   //System.out.println("start breaking slab/fence");
+                   System.out.println("start breaking slab/fence");
                     if(!ModUtils.hasAFullBlockCollision(this.mob, this.mob.blockPosition())){
                         startBreakingBlock(this.tickCounter, this.mob.blockPosition());
                     } else if (!ModUtils.hasAFullBlockCollision(this.mob, this.mob.blockPosition().offset(0, -1, 0))) {
@@ -397,8 +398,8 @@ public class DiggingGoal extends Goal {
         this.isBreakingBlock = true;
 
         float blockHardness = this.mob.level().getBlockState(blockPos).getDestroySpeed(this.mob.level(), blockPos);
-       //System.out.println("Block Type: " + this.mob.level().getBlockState(blockPos));
-       //System.out.println("BlockHardness: " + this.mob.level().getBlockState(blockPos).getDestroySpeed(this.mob.level(), blockPos));
+       System.out.println("Block Type: " + this.mob.level().getBlockState(blockPos));
+       System.out.println("BlockHardness: " + this.mob.level().getBlockState(blockPos).getDestroySpeed(this.mob.level(), blockPos));
         this.blockBreakTime = blockHardness * 50.0F / ((IZombieHelper) this.mob).sevenDaysToSurvive$getBlockBreakingSpeedModifier();
 
         this.breakBlockTick = currentTick + (long) this.blockBreakTime;
@@ -417,6 +418,7 @@ public class DiggingGoal extends Goal {
     }
 
     private void breakBlock(BlockPos blockPos){
+        System.out.println("Breaking block");
         this.mob.level().destroyBlock(blockPos, true);
         this.mob.level().playSound(null, blockPos, this.mob.level().getBlockState(blockPos).getSoundType().getBreakSound(), this.mob.getSoundSource(), 1.0F, 1.0F);
         GroundPathNavigation groundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();

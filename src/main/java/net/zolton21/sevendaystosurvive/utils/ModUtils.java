@@ -27,17 +27,14 @@ public class ModUtils {
             return true;
         }else{
             VoxelShape collisionShape = blockState.getCollisionShape(mob.level(), blockPos);
+            //System.out.println("blockState: " + blockState);
             if(!collisionShape.isEmpty()) {
-                System.out.println("collisionShape: " + blockState);
-                System.out.println("collisionShape: " + collisionShape.bounds().maxY);
-            }else{
-                System.out.println("collisionShape: " + blockState);
+                //System.out.println("collisionShape: " + collisionShape.bounds().maxY);
             }
             if(!collisionShape.isEmpty() && collisionShape.bounds().maxY == 1.0){
                 return true;
-            }else{
-                return false;
             }
+            return false;
         }
     }
 

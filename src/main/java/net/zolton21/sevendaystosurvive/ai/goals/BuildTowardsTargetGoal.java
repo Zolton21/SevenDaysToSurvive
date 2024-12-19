@@ -108,6 +108,8 @@ public class BuildTowardsTargetGoal extends Goal {
                                     return false;
                                 }
                             }
+                        }else if(ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -2, 0))){
+                            return false;
                         }
                     }
                     return true;
@@ -201,6 +203,8 @@ public class BuildTowardsTargetGoal extends Goal {
                                         return false;
                                     }
                                 }
+                            }else if(ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -2, 0))){
+                                return false;
                             }
                         }
                     }
