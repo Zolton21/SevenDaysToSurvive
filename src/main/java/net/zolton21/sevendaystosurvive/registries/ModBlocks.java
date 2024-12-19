@@ -1,4 +1,4 @@
-package net.zolton21.sevendaystosurvive.blocks;
+package net.zolton21.sevendaystosurvive.registries;
 
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -10,14 +10,14 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.zolton21.sevendaystosurvive.SevenDaysToSurvive;
-import net.zolton21.sevendaystosurvive.items.ModItems;
+import net.zolton21.sevendaystosurvive.blocks.SynapticSealBlock;
 
 import java.util.function.Supplier;
 
 public class ModBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, SevenDaysToSurvive.MOD_ID);
 
-    public static final RegistryObject<Block> SYNAPTIC_SEAL_BLOCK = registerBlock("synaptic_seal_block", () -> new SynapticSealBlock(BlockBehaviour.Properties.copy(Blocks.OBSIDIAN)));
+    public static final RegistryObject<Block> SYNAPTIC_SEAL_BLOCK = registerBlock("synaptic_seal", () -> new SynapticSealBlock(BlockBehaviour.Properties.copy(Blocks.OBSIDIAN).lightLevel(state -> state.getValue(SynapticSealBlock.ACTIVE) ? 15 : 0)));
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block){
         RegistryObject<T> toReturn = BLOCKS.register(name, block);

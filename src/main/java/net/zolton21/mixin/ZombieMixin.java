@@ -44,8 +44,6 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     protected ZombieMixin(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.sevenDaysToSurvive$executingCustomGoal = false;
-        this.sevenDaysToSurvive$blockBreakingSpeedModifier = 1.0f + new Random().nextFloat();
-        System.out.println("blockBreakingSpeedModifier: " + this.sevenDaysToSurvive$blockBreakingSpeedModifier);
     }
 
     @Inject(method = "addBehaviourGoals()V", at = @At("TAIL"))
@@ -53,6 +51,9 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
         this.goalSelector.addGoal(3, new DiggingGoal(this, 1.0));
         this.goalSelector.addGoal(4, new BuildTowardsTargetGoal(this, 1.0));
         this.goalSelector.addGoal(5, new SearchAndGoToPlayerGoal(this, 1.0));
+
+        this.sevenDaysToSurvive$blockBreakingSpeedModifier = 1.0f + new Random().nextFloat();
+        System.out.println("blockBreakingSpeedModifier: " + this.sevenDaysToSurvive$blockBreakingSpeedModifier);
     }
 
     @Inject(method = "tick()V", at = @At("HEAD"))

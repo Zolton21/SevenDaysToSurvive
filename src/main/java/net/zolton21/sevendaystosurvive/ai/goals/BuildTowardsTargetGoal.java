@@ -56,7 +56,7 @@ public class BuildTowardsTargetGoal extends Goal {
             }
         }
         //if (((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
-        if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
+        if (ModUtils.IsMobStandingOnAFullBlock(this.mob) && ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
             ((IZombieHelper) this.mob).sevenDaysToSurvive$findReachableTarget();
             this.playerTarget = ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget();
             if (this.playerTarget == null) {
@@ -206,7 +206,7 @@ public class BuildTowardsTargetGoal extends Goal {
                     }
                 }
 
-                if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
+                if (ModUtils.IsMobStandingOnAFullBlock(this.mob) && ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
                     if (this.mob.getNavigation().getPath() != null) {
                         GroundPathNavigation GroundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
                         Path pathToTarget = GroundPathNavigation.createPath(this.playerTarget.blockPosition(), 0);
@@ -273,7 +273,7 @@ public class BuildTowardsTargetGoal extends Goal {
                         this.startPlacingBlock(this.tickCounter, this.nextBlockPos.offset(0, 1, 0), false);
                     }
                 }else {
-                    if (!ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
+                    if (!ModUtils.IsMobStandingOnAFullBlock(this.mob) && ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
                         if (Math.abs(this.nextBlockPos.getY()) - Math.abs(this.mob.getBlockY()) < 2) {
                             if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.nextBlockPos.getX())) < 3 ||
                                     Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.nextBlockPos.getZ())) < 3) {

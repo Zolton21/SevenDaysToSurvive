@@ -1,10 +1,10 @@
 {
   "variants": {
-    "active=false": {
-      "model": "sevendaystosurvive:block/synaptic_seal_inactive"
-    },
     "active=true": {
       "model": "sevendaystosurvive:block/synaptic_seal_active"
+    },
+    "active=false": {
+      "model": "sevendaystosurvive:block/synaptic_seal_inactive"
     }
   }
 }
