@@ -25,7 +25,6 @@ import java.util.List;
 import static net.minecraft.world.level.block.Blocks.LAVA;
 
 public class BuildTowardsTargetGoal extends Goal {
-    private LivingEntity playerTarget;
     protected final double speedModifier;
     private final PathfinderMob mob;
     private Path pathToNextBlockPos;
@@ -57,9 +56,8 @@ public class BuildTowardsTargetGoal extends Goal {
         }
         //if (((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
         if (ModUtils.IsMobStandingOnAFullBlock(this.mob) && ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
-            ((IZombieHelper) this.mob).sevenDaysToSurvive$findReachableTarget();
-            this.playerTarget = ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget();
-            if (this.playerTarget == null) {
+            //this.playerTarget = ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget();
+            if (((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() == null) {
                 //SevendaysToSurvive.LOGGER.info("should execute return false 2");
                 return false;
             }
@@ -86,7 +84,7 @@ public class BuildTowardsTargetGoal extends Goal {
                 }
 
                 GroundPathNavigation GroundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
-                Path pathToTarget = GroundPathNavigation.createPath(this.playerTarget.blockPosition(), 0);
+                Path pathToTarget = GroundPathNavigation.createPath(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget().blockPosition(), 0);
                 this.pathToNextBlockPos = GroundPathNavigation.createPath(this.nextBlockPos, 0);
                 if (pathToTarget != null && !pathToTarget.canReach()) {
                     if (this.pathToNextBlockPos != null) {
@@ -149,13 +147,13 @@ public class BuildTowardsTargetGoal extends Goal {
         if(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
             if(this.tickCounter % 200 == 0){
                 //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
-                this.playerTarget = ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget();
-                if(this.playerTarget != null) {
+                //this.playerTarget = ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget();
+                if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
                     ((IZombieHelper)this.mob).sevenDaysToSurvive$findCustomPath();
                     this.nextBlockPos = ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos();
                 }
             }
-            if (this.playerTarget != null) {
+            if (((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
                 if(!this.isJumping) {
                     if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -1, 0))) {
                        //SevendaysToSurvive.LOGGER.info("should continue executing return false 2");
@@ -181,7 +179,7 @@ public class BuildTowardsTargetGoal extends Goal {
                     }
                 } else {
                     GroundPathNavigation GroundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
-                    Path pathToTarget = GroundPathNavigation.createPath(this.playerTarget.blockPosition(), 0);
+                    Path pathToTarget = GroundPathNavigation.createPath(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget().blockPosition(), 0);
                     this.pathToNextBlockPos = GroundPathNavigation.createPath(this.nextBlockPos, 0);
                     if (pathToTarget != null && !pathToTarget.canReach()) {
                         if (this.pathToNextBlockPos != null) {
@@ -213,7 +211,7 @@ public class BuildTowardsTargetGoal extends Goal {
                 if (ModUtils.IsMobStandingOnAFullBlock(this.mob) && ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
                     if (this.mob.getNavigation().getPath() != null) {
                         GroundPathNavigation GroundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
-                        Path pathToTarget = GroundPathNavigation.createPath(this.playerTarget.blockPosition(), 0);
+                        Path pathToTarget = GroundPathNavigation.createPath(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget().blockPosition(), 0);
                         Path path = this.mob.getNavigation().getPath();
                         if (pathToTarget != null && path != null) {
                             if (pathToTarget.getTarget() != path.getTarget()) {
@@ -267,7 +265,7 @@ public class BuildTowardsTargetGoal extends Goal {
         }
 
         if (!this.isPlacingBlock && this.tickCounter % 20 == 0) {
-            if (this.playerTarget != null) {
+            if (((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
                 if (this.mob.level().getBlockState(this.nextBlockPos).is(LAVA)) {
                     if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.mob.getBlockX())) < 3 || Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.mob.getBlockZ())) < 3) {
                         this.startPlacingBlock(this.tickCounter, this.nextBlockPos, false);

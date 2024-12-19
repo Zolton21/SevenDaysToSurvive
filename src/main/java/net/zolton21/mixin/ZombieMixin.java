@@ -63,7 +63,10 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                 //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 1");
                 if (!this.sevenDaysToSurvive$executingCustomGoal) {
                     //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 2");
-                    this.sevenDaysToSurvive$findReachableTarget();
+                    if(this.tickCount % 60 == 0) {
+                        this.sevenDaysToSurvive$findReachableTarget();
+                    }
+
                     if (this.sevenDaysToSurvive$modGoalTarget != null) {
                         //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 3");
                         GroundPathNavigation groundPathNavigator = (GroundPathNavigation) this.getNavigation();

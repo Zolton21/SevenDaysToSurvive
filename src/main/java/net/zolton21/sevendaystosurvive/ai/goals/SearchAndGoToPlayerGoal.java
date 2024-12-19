@@ -15,7 +15,6 @@ import java.util.EnumSet;
 
 public class SearchAndGoToPlayerGoal extends Goal {
 
-    private LivingEntity playerTarget;
     protected final double speedModifier;
     private final PathfinderMob mob;
     private BlockPos nextBlockPos;
@@ -43,10 +42,10 @@ public class SearchAndGoToPlayerGoal extends Goal {
         if(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
             if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
                 //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
-                this.playerTarget = ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget();
+                //this.playerTarget = ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget();
 
-                if (this.playerTarget != null && this.playerTarget.isAlive()) {
-                    this.playerTargetPos = this.playerTarget.blockPosition();
+                if (((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null && ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive()) {
+                    this.playerTargetPos = ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget().blockPosition();
                     ((IZombieHelper) this.mob).sevenDaysToSurvive$findCustomPath();
                     this.nextBlockPos = ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos();
                     GroundPathNavigation groundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
@@ -92,7 +91,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
                 }
             }
         }
-        if(this.playerTarget != null && this.playerTarget.isAlive()) {
+        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null && ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive()) {
             if (this.pathToNextBlockPos != null) {
                 if (this.pathToNextBlockPos.canReach()) {
                     if (!ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -1, 0))) {
@@ -122,16 +121,15 @@ public class SearchAndGoToPlayerGoal extends Goal {
         this.tickCounter++;
         if (this.tickCounter % 200 == 0) {
             //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
-            this.playerTarget = ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget();
-            if (this.playerTarget != null) {
-                this.playerTargetPos = this.playerTarget.blockPosition();
+            if (((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
+                this.playerTargetPos = ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget().blockPosition();
                 ((IZombieHelper)this.mob).sevenDaysToSurvive$findCustomPath();
                 this.nextBlockPos = ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos();
                 GroundPathNavigation groundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
                 this.pathToNextBlockPos = groundPathNavigation.createPath(this.nextBlockPos, 0);
             }
         }
-        if(this.playerTarget != null) {
+        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
             this.moveTowardsPlayer();
         }
         if(this.tickCounter > 400){
@@ -154,8 +152,8 @@ public class SearchAndGoToPlayerGoal extends Goal {
             BlockPos blockPos = this.playerTargetPos;
             //Goal lastGoal = ((IZombieCustomTarget) this.mob).getSevenDaysToSurvive$lastExecutingGoal();
             if (this.tickCounter > 300) {
-                if(this.playerTarget != null && this.playerTarget.isAlive()) {
-                    this.mob.getNavigation().moveTo(this.playerTarget, this.speedModifier);
+                if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null && ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive()) {
+                    this.mob.getNavigation().moveTo(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget(), this.speedModifier);
                 }
             } else {
                 this.mob.getNavigation().moveTo(blockPos.getX(), blockPos.getY(), blockPos.getZ(), this.speedModifier);
