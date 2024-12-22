@@ -24,5 +24,5 @@ public interface IZombieHelper {
 
     void sevenDaysToSurvive$setLastExecutingGoal(Goal goal);
 
-    Goal getSevenDaysToSurvive$lastExecutingGoal();
+    boolean getSevenDaysToSurvive$canReachTarget();
 }

@@ -41,13 +41,16 @@ public class DiggingGoal extends Goal {
     }
 
     public boolean canUse() {
-        if(this.mob.getTarget() != null && this.mob.getTarget() instanceof Player) {
+        /*if(this.mob.getTarget() != null && this.mob.getTarget() instanceof Player) {
             if(this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0) != null) {
                 if (this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0).canReach()) {
                    //System.out.println("should execute return false 1");
                     return false;
                 }
             }
+        }*/
+        if(ModUtils.mobHasPlayerTargetAndCanReach(this.mob)){
+            return false;
         }
 
         if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() == null) {
@@ -140,7 +143,7 @@ public class DiggingGoal extends Goal {
             }
         }
 
-        if(!ModUtils.IsMobStandingOnAFullBlock(this.mob) && ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null){
+        if(!ModUtils.isMobStandingOnAFullBlock(this.mob) && ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null){
            //System.out.println("!ModUtils.IsMobStandingOnAFullBlock(this.mob) is true");
             return true;
         }
@@ -149,14 +152,19 @@ public class DiggingGoal extends Goal {
     }
 
     public boolean canContinueToUse() {
-        if(this.mob.getTarget() != null && this.mob.getTarget() instanceof Player) {
+        /*if(this.mob.getTarget() != null && this.mob.getTarget() instanceof Player) {
             if(this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0) != null) {
                 if (this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0).canReach()) {
                   //System.out.println("should continue executing return false 1");
                     return false;
                 }
             }
+        }*/
+        if(ModUtils.mobHasPlayerTargetAndCanReach(this.mob)){
+            return false;
         }
+
+
 
         if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() == null) {
             return false;
@@ -265,7 +273,7 @@ public class DiggingGoal extends Goal {
                 return true;
             }
 
-            if(!ModUtils.IsMobStandingOnAFullBlock(this.mob)){
+            if(!ModUtils.isMobStandingOnAFullBlock(this.mob)){
               //System.out.println("should continue executing return true");
                 return true;
             }
@@ -339,7 +347,7 @@ public class DiggingGoal extends Goal {
         if(!this.isBreakingBlock && this.tickCounter % 30 == 0){
             if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null){
                //System.out.println("!ModUtils.IsMobStandingOnAFullBlock(this.mob): " + !ModUtils.IsMobStandingOnAFullBlock(this.mob));
-                if(!ModUtils.IsMobStandingOnAFullBlock(this.mob)){
+                if(!ModUtils.isMobStandingOnAFullBlock(this.mob)){
                    //System.out.println("start breaking slab/fence");
                     if(!ModUtils.hasAFullBlockCollision(this.mob, this.mob.blockPosition())){
                         startBreakingBlock(this.tickCounter, this.mob.blockPosition());

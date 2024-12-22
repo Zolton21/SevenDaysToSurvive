@@ -39,11 +39,14 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     private Goal sevenDaysToSurvive$lastExecutingGoal;
     @Unique
     private float sevenDaysToSurvive$blockBreakingSpeedModifier;
+    @Unique
+    private boolean sevenDaysToSurvive$canReachTarget;
 
 
     protected ZombieMixin(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.sevenDaysToSurvive$executingCustomGoal = false;
+        this.sevenDaysToSurvive$canReachTarget = false;
     }
 
     @Inject(method = "addBehaviourGoals()V", at = @At("TAIL"))
@@ -58,42 +61,27 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     @Inject(method = "tick()V", at = @At("HEAD"))
     public void tickInject(CallbackInfo ci) {
-        if(this.getNavigation() instanceof GroundPathNavigation) {
+        if(this.getNavigation() instanceof GroundPathNavigation groundPathNavigator) {
             if (this.getTarget() == null) {
-                //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 1");
                 if (!this.sevenDaysToSurvive$executingCustomGoal) {
-                    //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 2");
                     if(this.tickCount % 60 == 0) {
                         this.sevenDaysToSurvive$findReachableTarget();
                     }
-
-                    if (this.sevenDaysToSurvive$modGoalTarget != null) {
-                        //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 3");
-                        GroundPathNavigation groundPathNavigator = (GroundPathNavigation) this.getNavigation();
-                        Path path = groundPathNavigator.createPath(this.sevenDaysToSurvive$modGoalTarget.blockPosition(), 0);
-                        if (path != null) {
-                            //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 4");
-                            if (path.canReach()) {
-                                //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 5");
-                                this.setTarget(this.sevenDaysToSurvive$modGoalTarget);
-                            } else {
-                                //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 6");
-                                this.sevenDaysToSurvive$findCustomPath();
-                            }
-                        } else {
-                            //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 7");
-                            this.sevenDaysToSurvive$findCustomPath();
-                        }
-                    }
-                } else if (this.sevenDaysToSurvive$modGoalTarget != null) {
-                    //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 8");
+                } /*else if (this.sevenDaysToSurvive$modGoalTarget != null) {
                     Path path = this.getNavigation().createPath(this.sevenDaysToSurvive$modGoalTarget.blockPosition(), 0);
                     if (path != null) {
-                        //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 9");
                         if (path.canReach()) {
-                            //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 10");
                             this.setTarget(this.sevenDaysToSurvive$modGoalTarget);
                         }
+                    }
+                }*/
+                if (this.sevenDaysToSurvive$modGoalTarget != null) {
+                    if(this.tickCount % 60 == 0) {
+                        this.sevenDaysToSurvive$canReachTarget();
+                        if (this.sevenDaysToSurvive$canReachTarget) {
+                            this.setTarget(this.sevenDaysToSurvive$modGoalTarget);
+                        }
+                        this.sevenDaysToSurvive$findCustomPath();
                     }
                 }
             }
@@ -107,12 +95,22 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
         }
     }
 
+    public void sevenDaysToSurvive$canReachTarget(){
+        LivingEntity target = this.sevenDaysToSurvive$modGoalTarget;
+        if(target != null) {
+            Path path = ((GroundPathNavigation) this.getNavigation()).createPath(target.blockPosition(), 0);
+            this.sevenDaysToSurvive$canReachTarget = path.canReach();
+        }
+        this.sevenDaysToSurvive$canReachTarget = false;
+    }
+
     public void sevenDaysToSurvive$customGoalStarted(){
         this.sevenDaysToSurvive$executingCustomGoal = true;
     }
 
     public void sevenDaysToSurvive$customGoalFinished(){
         this.sevenDaysToSurvive$executingCustomGoal = false;
+        this.sevenDaysToSurvive$canReachTarget = false;
     }
 
     public void sevenDaysToSurvive$findReachableTarget(){
@@ -250,8 +248,8 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     public Goal getSevenDaysToSurvive$lastExecutingGoal(){
         return this.sevenDaysToSurvive$lastExecutingGoal;
     }
-    //@Shadow public abstract CreatureAttribute getCreatureAttribute();
 
-    //@Shadow public abstract void livingTick();
-
+    public boolean getSevenDaysToSurvive$canReachTarget(){
+        return this.sevenDaysToSurvive$canReachTarget;
+    }
 }

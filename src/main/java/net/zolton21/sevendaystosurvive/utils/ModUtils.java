@@ -6,19 +6,28 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class ModUtils {
 
-    public static boolean IsMobStandingOnAFullBlock(Mob mob){  //no slabs, fences, etc.
+    public static boolean mobHasPlayerTargetAndCanReach(Mob mob){
+        if(mob.getTarget() != null && mob.getTarget() instanceof Player player){
+            Path path = mob.getNavigation().createPath(player.blockPosition(), 0);
+            if(path != null)
+                return path.canReach();
+        }
+        return false;
+    }
+
+    public static boolean isMobStandingOnAFullBlock(Mob mob){  //no slabs, fences, etc.
         if(!ModUtils.hasAFullBlockCollision(mob, mob.blockPosition())){
             return false;
         }else if(!ModUtils.hasAFullBlockCollision(mob, mob.blockPosition().offset(0, -1, 0))){
             return false;
-        }else {
-            return true;
         }
+        return true;
     }
 
     public static boolean hasAFullBlockCollision(Mob mob, BlockPos blockPos){
