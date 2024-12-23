@@ -4,7 +4,6 @@ package net.zolton21.sevendaystosurvive.ai.goals;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
@@ -29,7 +28,7 @@ public class BuildTowardsTargetGoal extends Goal {
     private final PathfinderMob mob;
     private Path pathToNextBlockPos;
     private BlockPos nextBlockPos;
-    private boolean pathToNextBlockPosActive;
+    //private boolean pathToNextBlockPosActive;
     private long tickCounter;
     private long endJumpTick;
     private boolean isJumping;
@@ -46,15 +45,8 @@ public class BuildTowardsTargetGoal extends Goal {
     }
 
     public boolean canUse() {
-        /*if(this.mob.getTarget() != null && this.mob.getTarget() instanceof Player) {
-            if(this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0) != null) {
-                if (this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0).canReach()) {
-                   //SevendaysToSurvive.LOGGER.info("should execute return false 1");
-                    return false;
-                }
-            }
-        }*/
         if(ModUtils.mobHasPlayerTargetAndCanReach(this.mob)){
+            System.out.println("can use false 1");
             return false;
         }
 
@@ -62,60 +54,30 @@ public class BuildTowardsTargetGoal extends Goal {
         if (ModUtils.isMobStandingOnAFullBlock(this.mob) && ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
             //this.playerTarget = ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget();
             if (((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() == null) {
-                //SevendaysToSurvive.LOGGER.info("should execute return false 2");
+                System.out.println("can use false 2");
                 return false;
             }
-            ((IZombieHelper) this.mob).sevenDaysToSurvive$findCustomPath();
             if(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
                 this.nextBlockPos = ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos();
 
                 if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -1, 0))) {
-                    //SevendaysToSurvive.LOGGER.info("should execute return false 3");
+                    System.out.println("can use false 3");
                     return false;
                 }
                 if ( this.mob.getBlockX() == this.nextBlockPos.getX() &&  this.mob.getBlockZ() == this.nextBlockPos.getZ()) {
                     if (this.nextBlockPos.getY() > this.mob.getBlockY()) {
                         if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
-                            //SevendaysToSurvive.LOGGER.info("should execute return false 4");
+                            System.out.println("can use false 4");
                             return false;
                         }
                     } else if (this.nextBlockPos.getY() < this.mob.getBlockY()) {
                         if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)) {
-                            //SevendaysToSurvive.LOGGER.info("should execute return false 5");
+                            System.out.println("can use false 5");
                             return false;
                         }
                     }
                 }
 
-                GroundPathNavigation GroundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
-                Path pathToTarget = GroundPathNavigation.createPath(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget().blockPosition(), 0);
-                this.pathToNextBlockPos = GroundPathNavigation.createPath(this.nextBlockPos, 0);
-                if (pathToTarget != null && !pathToTarget.canReach()) {
-                    if (this.pathToNextBlockPos != null) {
-                        if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -1, 0))) {
-                            double nextPosY = this.nextBlockPos.getY();
-                            double mobY = this.mob.getBlockY();
-                            if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
-                                //SevendaysToSurvive.LOGGER.info("should execute return false 6");
-                                return false;
-                            }
-                            if (nextPosY > mobY) {
-                                if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
-                                    //SevendaysToSurvive.LOGGER.info("should execute return false 7");
-                                    return false;
-                                }
-                            } else if (nextPosY < mobY) {
-                                if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 2, 0))) {
-                                    //SevendaysToSurvive.LOGGER.info("should execute return false 8");
-                                    return false;
-                                }
-                            }
-                        }else if(ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -2, 0))){
-                            return false;
-                        }
-                    }
-                    return true;
-                }
                 if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
                     if (Math.abs(this.nextBlockPos.getY() - this.mob.getBlockY()) < 3) {
                         if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.mob.getBlockX())) < 3 || Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.mob.getBlockZ())) < 3) {
@@ -125,26 +87,45 @@ public class BuildTowardsTargetGoal extends Goal {
                         }
                     }
                 }
+
+                this.pathToNextBlockPos = ((IZombieHelper) this.mob).sevenDaysToSurvive$getPathToNextBlockPos();
+
+                if (this.pathToNextBlockPos != null) {
+                    if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -1, 0))) {
+                        double nextPosY = this.nextBlockPos.getY();
+                        double mobY = this.mob.getBlockY();
+                        if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
+                            System.out.println("can use false 6");
+                            return false;
+                        }
+                        if (nextPosY > mobY) {
+                            if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
+                                System.out.println("can use false 7");
+                                return false;
+                            }
+                        } else if (nextPosY < mobY) {
+                            if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 2, 0))) {
+                                System.out.println("can use false 8");
+                                return false;
+                            }
+                        }
+                    }else if(ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -2, 0)) && this.nextBlockPos.getX() != this.mob.getBlockX() && this.nextBlockPos.getZ() != this.mob.getBlockZ()){
+                        System.out.println("can use false 9");
+                        return false;
+                    }
+                }
+                return true;
             }
         }
         //}
-       //SevendaysToSurvive.LOGGER.info("should execute return false 9");
+        System.out.println("can use false 10");
         return false;
     }
 
     public boolean canContinueToUse() {
-        /*if(this.mob.getTarget() != null && this.mob.getTarget() instanceof Player) {
-            if(this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0) != null) {
-                if (this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0).canReach()) {
-                   //SevendaysToSurvive.LOGGER.info("should continue executing return false 1");
-                    return false;
-                }
-            }
-        }*/
         if(ModUtils.mobHasPlayerTargetAndCanReach(this.mob)){
             return false;
         }
-
 
         if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() == null) {
             return false;
@@ -153,14 +134,6 @@ public class BuildTowardsTargetGoal extends Goal {
         }
 
         if(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
-            if(this.tickCounter % 200 == 0){
-                //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
-                //this.playerTarget = ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget();
-                if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
-                    ((IZombieHelper)this.mob).sevenDaysToSurvive$findCustomPath();
-                    this.nextBlockPos = ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos();
-                }
-            }
             if (((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
                 if(!this.isJumping) {
                     if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -1, 0))) {
@@ -186,49 +159,35 @@ public class BuildTowardsTargetGoal extends Goal {
                         }
                     }
                 } else {
-                    GroundPathNavigation GroundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
-                    Path pathToTarget = GroundPathNavigation.createPath(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget().blockPosition(), 0);
-                    this.pathToNextBlockPos = GroundPathNavigation.createPath(this.nextBlockPos, 0);
-                    if (pathToTarget != null && !pathToTarget.canReach()) {
-                        if (this.pathToNextBlockPos != null) {
-                            if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -1, 0))) {
-                                double nextPosY = this.nextBlockPos.getY();
-                                double mobY = this.mob.getBlockY();
-                                if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
-                                   //SevendaysToSurvive.LOGGER.info("should continue executing return false 5");
-                                    return false;
-                                }
-                                if (nextPosY > mobY) {
-                                    if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
-                                       //SevendaysToSurvive.LOGGER.info("should continue executing return false 6");
-                                        return false;
-                                    }
-                                } else if (nextPosY < mobY) {
-                                    if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 2, 0))) {
-                                       //SevendaysToSurvive.LOGGER.info("should continue executing return false 7");
-                                        return false;
-                                    }
-                                }
-                            }else if(ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -2, 0))){
+                    this.pathToNextBlockPos = ((IZombieHelper) this.mob).sevenDaysToSurvive$getPathToNextBlockPos();
+                    if (this.pathToNextBlockPos != null) {
+                        if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -1, 0))) {
+                            double nextPosY = this.nextBlockPos.getY();
+                            double mobY = this.mob.getBlockY();
+                            if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
+                                //SevendaysToSurvive.LOGGER.info("should continue executing return false 5");
                                 return false;
                             }
+                            if (nextPosY > mobY) {
+                                if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
+                                    //SevendaysToSurvive.LOGGER.info("should continue executing return false 6");
+                                    return false;
+                                }
+                            } else if (nextPosY < mobY) {
+                                if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 2, 0))) {
+                                    //SevendaysToSurvive.LOGGER.info("should continue executing return false 7");
+                                    return false;
+                                }
+                            }
+                        }else if(ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -2, 0))){
+                            return false;
                         }
                     }
                 }
 
                 if (ModUtils.isMobStandingOnAFullBlock(this.mob) && ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
-                    if (this.mob.getNavigation().getPath() != null) {
-                        GroundPathNavigation GroundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
-                        Path pathToTarget = GroundPathNavigation.createPath(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget().blockPosition(), 0);
-                        Path path = this.mob.getNavigation().getPath();
-                        if (pathToTarget != null && path != null) {
-                            if (pathToTarget.getTarget() != path.getTarget()) {
-                                if (pathToTarget.canReach()) {
-                                   //SevendaysToSurvive.LOGGER.info("should continue executing return false 8");
-                                    return false;
-                                }
-                            }
-                        }
+                    if (((IZombieHelper) this.mob).SevenDaysToSurvive$getCanReachTarget()) {
+                        return false;
                     }
                 }
                 return true;
@@ -250,12 +209,11 @@ public class BuildTowardsTargetGoal extends Goal {
     public void tick(){
         this.tickCounter++;
 
-        if(this.mob.getNavigation().isDone()){
+        /*if(this.mob.getNavigation().isDone()){
             ////System.out.println("no Path");
             this.pathToNextBlockPosActive = false;
-            ((IZombieHelper)this.mob).sevenDaysToSurvive$findCustomPath();
             this.nextBlockPos = ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos();
-        }
+        }*/
 
         if(this.isPlacingBlock){
             this.faceTarget(this.placeBlockBlockPos);
@@ -276,45 +234,39 @@ public class BuildTowardsTargetGoal extends Goal {
             if (((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
                 if (this.mob.level().getBlockState(this.nextBlockPos).is(LAVA)) {
                     if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.mob.getBlockX())) < 3 || Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.mob.getBlockZ())) < 3) {
+                        System.out.println("Star placing block 1");
                         this.startPlacingBlock(this.tickCounter, this.nextBlockPos, false);
                     }
                 }else if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, 1, 0)).is(LAVA)){
                     if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.mob.getBlockX())) < 3 || Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.mob.getBlockZ())) < 3) {
+                        System.out.println("Star placing block 2");
                         this.startPlacingBlock(this.tickCounter, this.nextBlockPos.offset(0, 1, 0), false);
                     }
                 }else {
-                    if (!ModUtils.isMobStandingOnAFullBlock(this.mob) && ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
-                        if (Math.abs(this.nextBlockPos.getY()) - Math.abs(this.mob.getBlockY()) < 2) {
-                            if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.nextBlockPos.getX())) < 3 ||
-                                    Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.nextBlockPos.getZ())) < 3) {
-                                this.startPlacingBlock(this.tickCounter, this.mob.blockPosition().offset(0, -1, 0), false);
+                    if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition())) {
+                        this.mobJump(this.tickCounter);
+                    }
+                    if (this.mob.blockPosition().getX() == this.nextBlockPos.getX() && this.mob.blockPosition().getY() < this.nextBlockPos.getY() && this.mob.blockPosition().getZ() == this.nextBlockPos.getZ()) {
+                        boolean canPlaceBlock = true;
+                        BlockPos blockPos;
+                        for (int i = 0; i < 3; i++) {
+                            blockPos = new BlockPos(this.mob.getBlockX(), this.mob.getBlockY() + i, this.mob.getBlockZ());
+                            if (ModUtils.HasBlockEntityCollision(this.mob.level(), blockPos)) {
+                                canPlaceBlock = false;
+                                break;
                             }
                         }
-                    } else {
-                        if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition())) {
+                        if (canPlaceBlock) {
                             this.mobJump(this.tickCounter);
                         }
-                        if (this.mob.blockPosition().getX() == this.nextBlockPos.getX() && this.mob.blockPosition().getY() < this.nextBlockPos.getY() && this.mob.blockPosition().getZ() == this.nextBlockPos.getZ()) {
-                            boolean canPlaceBlock = true;
-                            BlockPos blockPos;
-                            for (int i = 0; i < 3; i++) {
-                                blockPos = new BlockPos(this.mob.getBlockX(), this.mob.getBlockY() + i, this.mob.getBlockZ());
-                                if (ModUtils.HasBlockEntityCollision(this.mob.level(), blockPos)) {
-                                    canPlaceBlock = false;
-                                    break;
-                                }
-                            }
-                            if (canPlaceBlock) {
-                                this.mobJump(this.tickCounter);
-                            }
-                        } else {
-                            if (Math.abs(Math.abs(this.nextBlockPos.getY()) - Math.abs(this.mob.getBlockY())) < 2) {
-                                if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.nextBlockPos.getX())) < 3 ||
-                                        Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.nextBlockPos.getZ())) < 3) {
-                                    BlockPos blockPos = new BlockPos(this.nextBlockPos.offset(0, -1, 0));
-                                    if (!ModUtils.HasBlockEntityCollision(this.mob.level(), blockPos)) {
-                                        this.startPlacingBlock(this.tickCounter, blockPos, true);
-                                    }
+                    } else {
+                        if (Math.abs(Math.abs(this.nextBlockPos.getY()) - Math.abs(this.mob.getBlockY())) < 2) {
+                            if (Math.abs(Math.abs(this.nextBlockPos.getX()) - Math.abs(this.nextBlockPos.getX())) < 3 ||
+                                    Math.abs(Math.abs(this.nextBlockPos.getZ()) - Math.abs(this.nextBlockPos.getZ())) < 3) {
+                                BlockPos blockPos = new BlockPos(this.nextBlockPos.offset(0, -1, 0));
+                                if (!ModUtils.HasBlockEntityCollision(this.mob.level(), blockPos)) {
+                                    System.out.println("Star placing block 4");
+                                    this.startPlacingBlock(this.tickCounter, blockPos, true);
                                 }
                             }
                         }
@@ -362,6 +314,9 @@ public class BuildTowardsTargetGoal extends Goal {
 
     private void placeBlock(BlockPos blockPos, boolean shouldMove){
         System.out.println("placing block");
+        System.out.println("mob blockPos: " + this.mob.blockPosition());
+        System.out.println("next blockPos: " + this.nextBlockPos);
+        System.out.println("place block blockPos: " + blockPos);
         if(!ModUtils.HasBlockEntityCollision(this.mob.level(), blockPos)) {
             this.mob.level().setBlock(blockPos, Blocks.COBBLESTONE.defaultBlockState(), 3);
             this.mob.swing(InteractionHand.MAIN_HAND);
@@ -370,10 +325,10 @@ public class BuildTowardsTargetGoal extends Goal {
         if(shouldMove) {
             GroundPathNavigation GroundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
             this.pathToNextBlockPos = GroundPathNavigation.createPath(new BlockPos(this.nextBlockPos.offset(0, 1, 0)), 0);
-            if (!this.pathToNextBlockPosActive) {
+            /*if (!this.pathToNextBlockPosActive) {
                 this.mob.getNavigation().moveTo(this.pathToNextBlockPos, this.speedModifier);
                 //this.pathToNextBlockPosActive = true;
-            }
+            }*/
         }
     }
 
@@ -387,11 +342,10 @@ public class BuildTowardsTargetGoal extends Goal {
         this.tickCounter = 0;
         this.isJumping = false;
         this.isPlacingBlock = false;
-        this.pathToNextBlockPosActive = true;
+        //this.pathToNextBlockPosActive = true;
         this.heldItem = this.mob.getItemInHand(InteractionHand.MAIN_HAND);
         this.mob.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.COBBLESTONE));
 
-        ((IZombieHelper)this.mob).sevenDaysToSurvive$findCustomPath();
         this.nextBlockPos = ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos();
 
         if (this.nextBlockPos != null) {
@@ -411,9 +365,7 @@ public class BuildTowardsTargetGoal extends Goal {
         this.mob.setItemInHand(InteractionHand.MAIN_HAND, this.heldItem);
         this.mob.getNavigation().stop();
         ((IZombieHelper)this.mob).sevenDaysToSurvive$customGoalFinished();
-        ((IZombieHelper)this.mob).sevenDaysToSurvive$setLastExecutingGoal(this);
 
-       //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
        //SevendaysToSurvive.LOGGER.info("stop executing BuildForwardGoal");
         System.out.println("stop executing BuildForwardGoal");
     }
