@@ -27,15 +27,6 @@ public class SearchAndGoToPlayerGoal extends Goal {
     }
 
     public boolean canUse() {
-        /*if(this.mob.getTarget() != null && this.mob.getTarget() instanceof Player) {
-            if(this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0) != null) {
-                if (this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0).canReach()) {
-                    //System.out.println("should execute return false 1");
-                   //SevendaysToSurvive.LOGGER.info("should execute return false 1");
-                    return false;
-                }
-            }
-        }*/
         if(ModUtils.mobHasPlayerTargetAndCanReach(this.mob)){
             return false;
         }
@@ -82,14 +73,6 @@ public class SearchAndGoToPlayerGoal extends Goal {
     }
 
     public boolean canContinueToUse() {
-        /*if(this.mob.getTarget() != null && this.mob.getTarget() instanceof Player) {
-            if(this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0) != null) {
-                if (this.mob.getNavigation().createPath(this.mob.getTarget().blockPosition(), 0).canReach()) {
-                   //SevendaysToSurvive.LOGGER.info("should continue executing return false 1");
-                    return false;
-                }
-            }
-        }*/
         if(ModUtils.mobHasPlayerTargetAndCanReach(this.mob)){
             return false;
         }
@@ -166,6 +149,5 @@ public class SearchAndGoToPlayerGoal extends Goal {
         System.out.println("stop executing SearchAndGoToPlayerGoal");
         this.mob.getNavigation().stop();
         ((IZombieHelper)this.mob).sevenDaysToSurvive$customGoalFinished();
-        //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
     }
 }

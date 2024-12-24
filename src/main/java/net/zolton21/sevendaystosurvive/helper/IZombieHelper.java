@@ -2,7 +2,6 @@ package net.zolton21.sevendaystosurvive.helper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.pathfinder.Path;
 
 public interface IZombieHelper {
@@ -10,8 +9,6 @@ public interface IZombieHelper {
     BlockPos sevenDaysToSurvive$getNextBlockPos();
 
     float sevenDaysToSurvive$getBlockBreakingSpeedModifier();
-
-    void sevenDaysToSurvive$findReachableTarget();
 
     void sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
 
@@ -25,5 +22,4 @@ public interface IZombieHelper {
 
     Path sevenDaysToSurvive$getPathToNextBlockPos();
 
-    void setSevenDaysToSurvive$nextBlockPos(BlockPos newNextBlockPos);
 }

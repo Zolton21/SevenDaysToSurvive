@@ -119,6 +119,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     public void sevenDaysToSurvive$customGoalFinished(){
         this.sevenDaysToSurvive$executingCustomGoal = false;
         this.sevenDaysToSurvive$canReachTarget = false;
+        this.sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
     }
 
     public void sevenDaysToSurvive$findReachableTarget(){
@@ -140,57 +141,10 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                 Direction.Axis axis = this.sevenDaysToSurvive$setAxis();
                 Direction.AxisDirection axisDirection = this.sevenDaysToSurvive$setAxisDirection(axis);
 
-                /*if(axis == Direction.Axis.X){
-                    if(Math.abs(Math.abs(this.getBlockX()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockX())) < Math.abs(Math.abs(this.getBlockY()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY()))){
-                        if(y < targetYPos) {
-                            this.sevenDaysToSurvive$nextBlockPos = new BlockPos(this.getBlockX(), y + 1, this.getBlockZ());
-                        } else if (y > targetYPos) {
-                            this.sevenDaysToSurvive$nextBlockPos = new BlockPos(this.getBlockX(), y - 1, this.getBlockZ());
-                        } else {
-                            this.sevenDaysToSurvive$nextBlockPos = new BlockPos(this.getBlockX(), y, this.getBlockZ());
-                        }
-                    }else {
-                        if(Math.abs(Math.abs(this.getBlockX()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockX())) == Math.abs(Math.abs(this.getBlockY()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY()))){
-                            if (this.getBlockY() < this.sevenDaysToSurvive$modGoalTarget.getBlockY()) {
-                                y = y + 1;
-                            } else if (this.getBlockY() > this.sevenDaysToSurvive$modGoalTarget.getBlockY()) {
-                                y = y - 1;
-                            }
-                        }
-                        if (axisDirection == Direction.AxisDirection.POSITIVE) {
-                            this.sevenDaysToSurvive$nextBlockPos = new BlockPos(this.getBlockX() + 1, y, this.getBlockZ());
-                        } else {
-                            this.sevenDaysToSurvive$nextBlockPos = new BlockPos(this.getBlockX() - 1, y, this.getBlockZ());
-                        }
-                    }
-                }else{
-                    if(Math.abs(Math.abs(this.getBlockZ()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockZ())) < Math.abs(Math.abs(this.getBlockY()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY()))){
-                        if(y < targetYPos) {
-                            this.sevenDaysToSurvive$nextBlockPos = new BlockPos(this.getBlockX(), y + 1, this.getBlockZ());
-                        } else if (y > targetYPos) {
-                            this.sevenDaysToSurvive$nextBlockPos = new BlockPos(this.getBlockX(), y - 1, this.getBlockZ());
-                        } else {
-                            this.sevenDaysToSurvive$nextBlockPos = new BlockPos(this.getBlockX(), y, this.getBlockZ());
-                        }
-                    } else {
-                        if (axisDirection == Direction.AxisDirection.POSITIVE) {
-                            if(Math.abs(Math.abs(this.getBlockZ()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockZ())) == Math.abs(Math.abs(this.getBlockY()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY()))){
-                                if (this.getBlockY() < this.sevenDaysToSurvive$modGoalTarget.getBlockY()) {
-                                    y = y + 1;
-                                } else if (this.getBlockY() > this.sevenDaysToSurvive$modGoalTarget.getBlockY()) {
-                                    y = y - 1;
-                                }
-                            }
-                            this.sevenDaysToSurvive$nextBlockPos = new BlockPos(this.getBlockX(), y, this.getBlockZ() + 1);
-                        } else {
-                            this.sevenDaysToSurvive$nextBlockPos = new BlockPos(this.getBlockX(), y, this.getBlockZ() - 1);
-                        }
-                    }
-                }*/
                 System.out.println("target y: " + targetYPos + " mob y: " + this.getBlockY());
                 System.out.println("||x1|-|x2||+||z1|-|z2||: " + (Math.abs(Math.abs(this.getBlockX()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockX())) + Math.abs(Math.abs(this.getBlockZ()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockZ()))));
-                System.out.println("||y1|+|y2||: " + Math.abs(Math.abs(this.getBlockY()) + Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY())));
-                if(Math.abs(Math.abs(this.getBlockX()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockX())) + Math.abs(Math.abs(this.getBlockZ()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockZ())) < Math.abs(Math.abs(this.getBlockY()) + Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY()))){
+                System.out.println("||y1|-|y2||: " + Math.abs(Math.abs(this.getBlockY()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY())));
+                if(Math.abs(Math.abs(this.getBlockX()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockX())) + Math.abs(Math.abs(this.getBlockZ()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockZ())) < Math.abs(Math.abs(this.getBlockY()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY()))){
                     if(y < targetYPos) {
                         this.sevenDaysToSurvive$nextBlockPos = new BlockPos(this.getBlockX(), y + 1, this.getBlockZ());
                     } else if (y > targetYPos) {
@@ -200,7 +154,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                     }
                 }
                 else {
-                    if(Math.abs(Math.abs(this.getBlockX()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockX())) + Math.abs(Math.abs(this.getBlockZ()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockZ())) == Math.abs(Math.abs(this.getBlockY()) + Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY()))) {
+                    if(Math.abs(Math.abs(this.getBlockX()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockX())) + Math.abs(Math.abs(this.getBlockZ()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockZ())) == Math.abs(Math.abs(this.getBlockY()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY()))) {
                         if (this.getBlockY() < this.sevenDaysToSurvive$modGoalTarget.getBlockY()) {
                             y++;
                         } else if (this.getBlockY() > this.sevenDaysToSurvive$modGoalTarget.getBlockY()) {
@@ -236,7 +190,6 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
             }
 
         }
-        //System.out.println("next blockpos " + this.sevenDaysToSurvive$nextBlockPos);
     }
 
     public Path sevenDaysToSurvive$getPathToNextBlockPos(){
