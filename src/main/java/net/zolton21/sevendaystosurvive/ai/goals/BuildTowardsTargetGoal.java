@@ -2,6 +2,7 @@ package net.zolton21.sevendaystosurvive.ai.goals;
 
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.PathfinderMob;
@@ -15,6 +16,7 @@ import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
+import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
 import net.zolton21.sevendaystosurvive.utils.ModUtils;
 
 import java.util.EnumSet;
@@ -42,18 +44,25 @@ public class BuildTowardsTargetGoal extends Goal {
     }
 
     public boolean canUse() {
+        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getIsWithinSynapticSealActivityRange()){
+            return false;
+        }
+
+        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null && PlayerHelper.isPlayerProtected((ServerPlayer) ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget())){
+            return false;
+        }
+
         if(ModUtils.mobHasPlayerTargetAndCanReach(this.mob)){
             System.out.println("can use false 1");
             return false;
         }
 
-        //if (((IZombieCustomTarget) this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
+        if (((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() == null) {
+            System.out.println("can use false 2");
+            return false;
+        }
         if (ModUtils.isMobStandingOnAFullBlock(this.mob)) { //Check if mob is standing on a block
-            //this.playerTarget = ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget();
-            if (((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() == null) {
-                System.out.println("can use false 2");
-                return false;
-            }
+
             if(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
                 this.nextBlockPos = ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos();
                 if(this.nextBlockPos != null) {
@@ -128,6 +137,14 @@ public class BuildTowardsTargetGoal extends Goal {
     }
 
     public boolean canContinueToUse() {
+        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getIsWithinSynapticSealActivityRange()){
+            return false;
+        }
+
+        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null && PlayerHelper.isPlayerProtected((ServerPlayer) ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget())){
+            return false;
+        }
+
         if(ModUtils.mobHasPlayerTargetAndCanReach(this.mob)){
             System.out.println("cancel 1");
             return false;

@@ -2,6 +2,7 @@ package net.zolton21.sevendaystosurvive.utils;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -9,8 +10,26 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
+
+import static net.zolton21.sevendaystosurvive.blocks.SynapticSealBlock.SYNAPTIC_DUST_COUNT;
 
 public class ModUtils {
+    public static boolean isPlayerWithinRange(BlockPos pos, BlockState state, ServerPlayer player){
+        int chunkActivityRange = state.getValue(SYNAPTIC_DUST_COUNT);
+
+        int blockChunkX = Math.floorDiv(pos.getX(), 16 * chunkActivityRange);
+        int blockChunkZ = Math.floorDiv(pos.getZ(), 16 * chunkActivityRange);
+        int minChunkX = blockChunkX - 1; // Adjust range as needed
+        int maxChunkX = blockChunkX + 1;
+        int minChunkZ = blockChunkZ - 1;
+        int maxChunkZ = blockChunkZ + 1;
+
+        int playerChunkX = Math.floorDiv(player.getBlockX(), 16);
+        int playerChunkZ = Math.floorDiv(player.getBlockZ(), 16);
+
+        return playerChunkX >= minChunkX && playerChunkX <= maxChunkX && playerChunkZ >= minChunkZ && playerChunkZ <= maxChunkZ;
+    }
 
     public static boolean mobHasPlayerTargetAndCanReach(Mob mob){
         if(mob.getTarget() != null && mob.getTarget() instanceof Player player){
@@ -52,7 +71,7 @@ public class ModUtils {
         return !blockState.getCollisionShape(level, blockPos, CollisionContext.empty()).isEmpty();
     }
 
-    public static Player getNearestSurvivalPlayer(Mob mob, double range){
+    public static Player getNearestUnprotectedSurvivalPlayer(Mob mob, double range){
 
         Player nearestPlayer = null;
 
@@ -63,7 +82,7 @@ public class ModUtils {
             if (serverLevel != null) {
                 for (Player player : serverLevel.players()) {
                     if (player.distanceTo(mob) < range) {
-                        if (player.isAlive() && !player.isSpectator() && !player.isCreative()) {
+                        if (player.isAlive() && !player.isSpectator() && !player.isCreative() && !PlayerHelper.isPlayerProtected((ServerPlayer) player)) {
                             double distance = mob.distanceToSqr(player);
                             if (distance < closestDistance) {
                                 closestDistance = distance;

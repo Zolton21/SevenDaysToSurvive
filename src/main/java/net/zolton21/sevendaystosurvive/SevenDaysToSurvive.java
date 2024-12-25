@@ -6,6 +6,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.zolton21.sevendaystosurvive.registries.ModBlockEntities;
 import net.zolton21.sevendaystosurvive.registries.ModBlocks;
 import net.zolton21.sevendaystosurvive.registries.ModItems;
 import org.apache.logging.log4j.LogManager;
@@ -23,7 +24,7 @@ public class SevenDaysToSurvive{
 
         ModItems.register(eventBus);
         ModBlocks.register(eventBus);
-        //ModItemsTab.register(eventBus);
+        ModBlockEntities.register(eventBus);
 
         eventBus.addListener(this::setup);
         MinecraftForge.EVENT_BUS.register(this);

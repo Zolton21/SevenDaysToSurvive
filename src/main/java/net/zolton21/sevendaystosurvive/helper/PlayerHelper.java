@@ -4,8 +4,19 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 
 public class PlayerHelper {
-    private static final String TAG_KEY = "synaptic_seal_block_placement";
+    private static final String TAG_KEY = "synaptic_seal_block_protection";
 
+    public static boolean isPlayerProtected(ServerPlayer player){
+        CompoundTag tag = player.getPersistentData().getCompound(player.getStringUUID());
+        return tag.getBoolean(TAG_KEY);
+    }
+
+    public static void changePlayerProtectionState(ServerPlayer player, boolean isProtected){
+        CompoundTag tag = player.getPersistentData().getCompound(player.getStringUUID());
+        tag.putBoolean(TAG_KEY, isProtected);
+    }
+    /*
+    private static final String TAG_KEY = "synaptic_seal_block_placement";
     public static int getBlockPlacementCount(ServerPlayer player){
         CompoundTag tag = player.getPersistentData().getCompound(player.getStringUUID());
         return tag.getInt(TAG_KEY);
@@ -23,5 +34,5 @@ public class PlayerHelper {
         int blockCount = tag.getInt(TAG_KEY);
         tag.putInt(TAG_KEY, blockCount - 1);
         player.getPersistentData().put(player.getUUID().toString(), tag);
-    }
+    }*/
 }

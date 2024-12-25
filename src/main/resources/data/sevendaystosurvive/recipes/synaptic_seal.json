@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "sds",
+    "ozo",
+    "sds"
+  ],
+  "key": {
+    "z": {
+      "item": "minecraft:zombie_head"
+    },
+    "s": {
+      "item": "sevendaystosurvive:synaptic_dust"
+    },
+    "o": {
+      "item": "minecraft:obsidian"
+    },
+    "d": {
+      "item": "minecraft:diamond_block"
+    }
+  },
+  "result": {
+    "item": "sevendaystosurvive:synaptic_seal"
+  }
+}

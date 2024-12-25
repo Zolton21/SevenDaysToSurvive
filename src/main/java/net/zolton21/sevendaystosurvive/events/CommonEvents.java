@@ -14,7 +14,7 @@ import net.zolton21.sevendaystosurvive.registries.ModBlocks;
 @Mod.EventBusSubscriber(modid = SevenDaysToSurvive.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class CommonEvents {
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     public static void onBlockPlace(BlockEvent.EntityPlaceEvent event){
         if(event.getPlacedBlock().getBlock() == ModBlocks.SYNAPTIC_SEAL_BLOCK.get() && event.getEntity() instanceof Player player) {
             if (player instanceof ServerPlayer) {
@@ -41,6 +41,6 @@ public class CommonEvents {
                 event.getPlayer().displayClientMessage(Component.literal("Synaptic Seal:" + PlayerHelper.getBlockPlacementCount((ServerPlayer) player) + "/" + 2), true);
             }
         }
-    }
+    }*/
 
 }

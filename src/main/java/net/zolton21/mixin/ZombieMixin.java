@@ -3,9 +3,9 @@ package net.zolton21.mixin;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
@@ -16,6 +16,7 @@ import net.zolton21.sevendaystosurvive.ai.goals.BuildTowardsTargetGoal;
 import net.zolton21.sevendaystosurvive.ai.goals.DiggingGoal;
 import net.zolton21.sevendaystosurvive.ai.goals.SearchAndGoToPlayerGoal;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
+import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
 import net.zolton21.sevendaystosurvive.utils.ModUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -42,12 +43,13 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     private boolean sevenDaysToSurvive$canReachTarget;
     @Unique
     private Path sevenDaysToSurvive$pathToNextBlockPos;
-
+    private boolean isWithinSynapticSealActivityRange;
 
     protected ZombieMixin(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.sevenDaysToSurvive$executingCustomGoal = false;
         this.sevenDaysToSurvive$canReachTarget = false;
+        this.isWithinSynapticSealActivityRange = false;
     }
 
     @Inject(method = "addBehaviourGoals()V", at = @At("TAIL"))
@@ -67,6 +69,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                 if (!this.sevenDaysToSurvive$executingCustomGoal) {
                     if(this.tickCount % 60 == 0) {
                         this.sevenDaysToSurvive$findReachableTarget();
+                        //this.sevenDaysToSurvive$modGoalTarget
                     }
                 }
             }else{
@@ -103,13 +106,13 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     public void sevenDaysToSurvive$canReachTarget(){
         LivingEntity target = this.sevenDaysToSurvive$modGoalTarget;
+        this.sevenDaysToSurvive$canReachTarget = false;
         if(target != null) {
             Path path = this.getNavigation().createPath(target.blockPosition(), 0);
             if(path != null) {
                 this.sevenDaysToSurvive$canReachTarget = path.canReach();
             }
         }
-        this.sevenDaysToSurvive$canReachTarget = false;
     }
 
     public void sevenDaysToSurvive$customGoalStarted(){
@@ -123,7 +126,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     }
 
     public void sevenDaysToSurvive$findReachableTarget(){
-        this.sevenDaysToSurvive$modGoalTarget = ModUtils.getNearestSurvivalPlayer(this, 60);
+        this.sevenDaysToSurvive$modGoalTarget = ModUtils.getNearestUnprotectedSurvivalPlayer(this, 60);
     }
 
     public void sevenDaysToSurvive$findCustomPath(){
@@ -249,5 +252,13 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     public boolean SevenDaysToSurvive$getCanReachTarget(){
         return this.sevenDaysToSurvive$canReachTarget;
+    }
+
+    public void sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(boolean isTrue){
+        this.isWithinSynapticSealActivityRange = isTrue;
+    }
+
+    public boolean sevenDaysToSurvive$getIsWithinSynapticSealActivityRange(){
+        return isWithinSynapticSealActivityRange;
     }
 }

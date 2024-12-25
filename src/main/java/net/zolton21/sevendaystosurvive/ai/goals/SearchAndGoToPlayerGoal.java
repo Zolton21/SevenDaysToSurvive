@@ -2,10 +2,12 @@ package net.zolton21.sevendaystosurvive.ai.goals;
 
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.pathfinder.Path;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
+import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
 import net.zolton21.sevendaystosurvive.utils.ModUtils;
 
 import java.util.EnumSet;
@@ -27,6 +29,14 @@ public class SearchAndGoToPlayerGoal extends Goal {
     }
 
     public boolean canUse() {
+        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getIsWithinSynapticSealActivityRange()){
+            return false;
+        }
+
+        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null && PlayerHelper.isPlayerProtected((ServerPlayer) ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget())){
+            return false;
+        }
+
         if(ModUtils.mobHasPlayerTargetAndCanReach(this.mob)){
             return false;
         }
@@ -73,6 +83,14 @@ public class SearchAndGoToPlayerGoal extends Goal {
     }
 
     public boolean canContinueToUse() {
+        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getIsWithinSynapticSealActivityRange()){
+            return false;
+        }
+
+        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null && PlayerHelper.isPlayerProtected((ServerPlayer) ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget())){
+            return false;
+        }
+
         if(ModUtils.mobHasPlayerTargetAndCanReach(this.mob)){
             return false;
         }

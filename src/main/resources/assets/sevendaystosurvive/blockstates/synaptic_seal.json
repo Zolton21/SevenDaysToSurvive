@@ -1,13 +1,7 @@
 {
   "variants": {
-    "synaptic_dust_count=0": { "model": "sevendaystosurvive:block/synaptic_seal_active" },
-    "synaptic_dust_count=1": { "model": "sevendaystosurvive:block/synaptic_seal_active" },
-    "synaptic_dust_count=2": { "model": "sevendaystosurvive:block/synaptic_seal_active" },
-    "synaptic_dust_count=3": { "model": "sevendaystosurvive:block/synaptic_seal_active" },
-    "synaptic_dust_count=4": { "model": "sevendaystosurvive:block/synaptic_seal_active" },
-    "synaptic_dust_count=5": { "model": "sevendaystosurvive:block/synaptic_seal_active" },
-    "synaptic_dust_count=6": { "model": "sevendaystosurvive:block/synaptic_seal_active" },
-    "synaptic_dust_count=7": { "model": "sevendaystosurvive:block/synaptic_seal_active" },
-    "synaptic_dust_count=8": { "model": "sevendaystosurvive:block/synaptic_seal_active" }
+    "state=0": { "model": "sevendaystosurvive:block/synaptic_seal_active" },
+    "state=1": { "model": "sevendaystosurvive:block/synaptic_seal_active" },
+    "state=2": { "model": "sevendaystosurvive:block/synaptic_seal_active" }
     }
 }
