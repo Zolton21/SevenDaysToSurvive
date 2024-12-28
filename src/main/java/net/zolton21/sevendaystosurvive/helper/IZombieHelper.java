@@ -26,4 +26,6 @@ public interface IZombieHelper {
 
     boolean sevenDaysToSurvive$getIsWithinSynapticSealActivityRange();
 
+    void sevenDaysToSurvive$findCustomPath();
+
 }

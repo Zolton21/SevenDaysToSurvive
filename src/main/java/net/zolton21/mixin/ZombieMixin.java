@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
@@ -73,11 +74,11 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                     }
                 }
             }else{
-                if(this.sevenDaysToSurvive$modGoalTarget != this.getTarget()){
+                if(this.sevenDaysToSurvive$getModGoalTarget() != this.getTarget()){
                     this.sevenDaysToSurvive$modGoalTarget = this.getTarget();
                 }
             }
-            if (this.sevenDaysToSurvive$modGoalTarget != null) {
+            if (this.sevenDaysToSurvive$getModGoalTarget() != null) {
                 if(this.tickCount % 60 == 0) {
                     if(!this.sevenDaysToSurvive$getModGoalTarget().isAlive() || this.sevenDaysToSurvive$getModGoalTarget().isSpectator() || ((Player)this.sevenDaysToSurvive$getModGoalTarget()).isCreative()){
                         this.sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
@@ -144,9 +145,10 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                 Direction.Axis axis = this.sevenDaysToSurvive$setAxis();
                 Direction.AxisDirection axisDirection = this.sevenDaysToSurvive$setAxisDirection(axis);
 
-                System.out.println("target y: " + targetYPos + " mob y: " + this.getBlockY());
+                /*System.out.println("target y: " + targetYPos + " mob y: " + this.getBlockY());
                 System.out.println("||x1|-|x2||+||z1|-|z2||: " + (Math.abs(Math.abs(this.getBlockX()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockX())) + Math.abs(Math.abs(this.getBlockZ()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockZ()))));
                 System.out.println("||y1|-|y2||: " + Math.abs(Math.abs(this.getBlockY()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY())));
+                */
                 if(Math.abs(Math.abs(this.getBlockX()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockX())) + Math.abs(Math.abs(this.getBlockZ()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockZ())) < Math.abs(Math.abs(this.getBlockY()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY()))){
                     if(y < targetYPos) {
                         this.sevenDaysToSurvive$nextBlockPos = new BlockPos(this.getBlockX(), y + 1, this.getBlockZ());

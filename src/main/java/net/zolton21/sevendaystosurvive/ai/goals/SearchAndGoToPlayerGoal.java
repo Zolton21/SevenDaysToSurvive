@@ -33,8 +33,10 @@ public class SearchAndGoToPlayerGoal extends Goal {
             return false;
         }
 
-        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null && PlayerHelper.isPlayerProtected((ServerPlayer) ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget())){
-            return false;
+        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null){
+            if(PlayerHelper.isPlayerProtected((ServerPlayer) ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget())){
+                return false;
+            }
         }
 
         if(ModUtils.mobHasPlayerTargetAndCanReach(this.mob)){
@@ -42,6 +44,10 @@ public class SearchAndGoToPlayerGoal extends Goal {
         }
 
         if(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
+            if(!this.mob.level().getBlockState(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty()){
+                return false;
+            }
+
             if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
                 //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
                 //this.playerTarget = ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget();
@@ -87,8 +93,10 @@ public class SearchAndGoToPlayerGoal extends Goal {
             return false;
         }
 
-        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null && PlayerHelper.isPlayerProtected((ServerPlayer) ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget())){
-            return false;
+        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null){
+            if(PlayerHelper.isPlayerProtected((ServerPlayer) ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget())){
+                return false;
+            }
         }
 
         if(ModUtils.mobHasPlayerTargetAndCanReach(this.mob)){
@@ -96,6 +104,12 @@ public class SearchAndGoToPlayerGoal extends Goal {
         }
 
         if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null && ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive()) {
+            if(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
+                if (!this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty()) {
+                    return false;
+                }
+            }
+
             if (this.pathToNextBlockPos != null) {
                 if (this.pathToNextBlockPos.canReach()) {
                     if (!ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -1, 0))) {
@@ -123,6 +137,9 @@ public class SearchAndGoToPlayerGoal extends Goal {
 
     public void tick() {
         this.tickCounter++;
+        if(this.tickCounter % 10 == 0){
+            ((IZombieHelper)this.mob).sevenDaysToSurvive$findCustomPath();
+        }
         if (this.tickCounter % 200 == 0) {
             //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
             if (((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {

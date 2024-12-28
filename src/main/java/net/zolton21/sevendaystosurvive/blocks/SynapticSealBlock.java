@@ -3,8 +3,11 @@ package net.zolton21.sevendaystosurvive.blocks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -20,19 +23,22 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
+import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
 import net.zolton21.sevendaystosurvive.registries.ModBlockEntities;
 import net.zolton21.sevendaystosurvive.registries.ModItems;
 import org.jetbrains.annotations.Nullable;
 
-public class SynapticSealBlock extends BaseEntityBlock {
+import java.util.ArrayList;
+import java.util.List;
 
+public class SynapticSealBlock extends BaseEntityBlock {
     public static final int MIN_SYNAPTIC_DUST_COUNT = 0;
     public static final int MAX_SYNAPTIC_DUST_COUNT = 8;
     public static final IntegerProperty SYNAPTIC_DUST_COUNT = IntegerProperty.create("synaptic_dust_count", 0, MAX_SYNAPTIC_DUST_COUNT);
     public static final IntegerProperty STATE = IntegerProperty.create("state", 0, 2);
-
-    //activity radius(in chunks)
-    //public static final IntegerProperty RANGE = IntegerProperty.create("range", 0, 32);
+    List<Player> protectedPlayers = new ArrayList<>();
+    List<Zombie> zombiesWithinRange = new ArrayList<>();
 
     public SynapticSealBlock(Properties pProperties) {
         super(pProperties);
@@ -99,6 +105,22 @@ public class SynapticSealBlock extends BaseEntityBlock {
 
     @Override
     public void destroy(LevelAccessor pLevel, BlockPos pPos, BlockState pState) {
+        System.out.println("onDestroyed");
+        for (Player player : this.protectedPlayers){
+            if(player != null && player.isAlive()) {
+                //this.protectedPlayers.remove(player);
+                PlayerHelper.changePlayerProtectionState((ServerPlayer) player, false);
+                System.out.println("Player : " + player + " is no longer protected");
+            }
+        }
+        for(Zombie zombie : this.zombiesWithinRange) {
+            if(zombie != null && zombie.isAlive()) {
+                //this.zombiesWithinRange.remove(zombie);
+                ((IZombieHelper) zombie).sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(false);
+                System.out.println("Zombie is no longer within synaptic seal activity range");
+            }
+        }
+
         super.destroy(pLevel, pPos, pState);
 
         ItemStack drop = new ItemStack(ModItems.SYNAPTIC_DUST.get(), pState.getValue(SYNAPTIC_DUST_COUNT));
@@ -120,5 +142,13 @@ public class SynapticSealBlock extends BaseEntityBlock {
 
         return  createTickerHelper(pBlockEntityType, ModBlockEntities.SYNAPTIC_SEAL_BLOCK_ENTITY.get(),
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1, pPos, pState1));
+    }
+
+    protected void updateLists(List<Player> list1, List<Zombie> list2){
+        System.out.println("updateLists");
+        this.protectedPlayers.clear();
+        this.zombiesWithinRange.clear();
+        this.protectedPlayers.addAll(list1);
+        this.zombiesWithinRange.addAll(list2);
     }
 }

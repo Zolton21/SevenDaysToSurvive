@@ -45,8 +45,10 @@ public class DiggingGoal extends Goal {
             return false;
         }
 
-        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null && PlayerHelper.isPlayerProtected((ServerPlayer) ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget())){
-            return false;
+        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null){
+            if(PlayerHelper.isPlayerProtected((ServerPlayer) ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget())){
+                return false;
+            }
         }
 
         if(ModUtils.mobHasPlayerTargetAndCanReach(this.mob)){
@@ -171,8 +173,10 @@ public class DiggingGoal extends Goal {
             return false;
         }
 
-        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null && PlayerHelper.isPlayerProtected((ServerPlayer) ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget())){
-            return false;
+        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null){
+            if(PlayerHelper.isPlayerProtected((ServerPlayer) ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget())){
+                return false;
+            }
         }
 
         if(ModUtils.mobHasPlayerTargetAndCanReach(this.mob)){

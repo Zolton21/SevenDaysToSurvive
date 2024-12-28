@@ -1,20 +1,26 @@
 package net.zolton21.sevendaystosurvive.blocks;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
 import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
 import net.zolton21.sevendaystosurvive.registries.ModBlockEntities;
+import net.zolton21.sevendaystosurvive.registries.ModItems;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static net.zolton21.sevendaystosurvive.blocks.SynapticSealBlock.*;
 
@@ -79,16 +85,20 @@ public class SynapticSealBlockEntity extends BlockEntity {
     public void tick(Level pLevel1, BlockPos pPos, BlockState pState1) {
         for(Player player : pLevel1.players()) {
             if(this.isEntityWithinRange(pPos, pState1, (ServerPlayer) player)){
-                if (this.protectedPlayers.stream().noneMatch(p -> p.equals(player))) {
-                    this.protectedPlayers.add(player);
-                    PlayerHelper.changePlayerProtectionState((ServerPlayer) player, true);
-                    System.out.println("Player : " + player + " is protected");
+                if(player != null && player.isAlive()) {
+                    if (this.protectedPlayers.stream().noneMatch(p -> p.equals(player))) {
+                        this.protectedPlayers.add(player);
+                        PlayerHelper.changePlayerProtectionState((ServerPlayer) player, true);
+                        System.out.println("Player : " + player + " is protected");
+                    }
                 }
             }else{
                 if (this.protectedPlayers.stream().anyMatch(p -> p.equals(player))){
-                    this.protectedPlayers.remove(player);
-                    PlayerHelper.changePlayerProtectionState((ServerPlayer) player, false);
-                    System.out.println("Player : " + player + " is no longer protected");
+                    if(player != null && player.isAlive()) {
+                        this.protectedPlayers.remove(player);
+                        PlayerHelper.changePlayerProtectionState((ServerPlayer) player, false);
+                        System.out.println("Player : " + player + " is no longer protected");
+                    }
                 }
             }
         }
@@ -111,6 +121,11 @@ public class SynapticSealBlockEntity extends BlockEntity {
                     System.out.println("Zombie is no longer within synaptic seal activity range");
                 }
             }
+        }
+
+        Block block = this.getBlockState().getBlock();
+        if(block instanceof SynapticSealBlock){
+            ((SynapticSealBlock) block).updateLists(this.protectedPlayers, this.zombiesWithinRange);
         }
     }
 }
