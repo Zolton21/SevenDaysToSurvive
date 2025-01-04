@@ -1,4 +1,4 @@
-package net.zolton21.sevendaystosurvive.blocks;
+package net.zolton21.sevendaystosurvive.block;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -6,7 +6,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -23,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.zolton21.sevendaystosurvive.blockentity.SynapticSealBlockEntity;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
 import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
 import net.zolton21.sevendaystosurvive.registries.ModBlockEntities;
@@ -57,7 +57,7 @@ public class SynapticSealBlock extends BaseEntityBlock {
     }
 
     public RenderShape getRenderShape(BlockState pState) {
-        return RenderShape.MODEL;
+        return RenderShape.ENTITYBLOCK_ANIMATED;
     }
 
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
@@ -144,7 +144,7 @@ public class SynapticSealBlock extends BaseEntityBlock {
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1, pPos, pState1));
     }
 
-    protected void updateLists(List<Player> list1, List<Zombie> list2){
+    public void updateLists(List<Player> list1, List<Zombie> list2){
         System.out.println("updateLists");
         this.protectedPlayers.clear();
         this.zombiesWithinRange.clear();

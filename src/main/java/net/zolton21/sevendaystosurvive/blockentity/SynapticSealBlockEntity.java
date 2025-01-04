@@ -1,30 +1,34 @@
-package net.zolton21.sevendaystosurvive.blocks;
+package net.zolton21.sevendaystosurvive.blockentity;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.zolton21.sevendaystosurvive.block.SynapticSealBlock;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
 import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
 import net.zolton21.sevendaystosurvive.registries.ModBlockEntities;
-import net.zolton21.sevendaystosurvive.registries.ModItems;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.constant.DefaultAnimations;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.*;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-import static net.zolton21.sevendaystosurvive.blocks.SynapticSealBlock.*;
+import static net.zolton21.sevendaystosurvive.block.SynapticSealBlock.*;
 
-public class SynapticSealBlockEntity extends BlockEntity {
+public class SynapticSealBlockEntity extends BlockEntity implements GeoBlockEntity{
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
     List<Player> protectedPlayers = new ArrayList<>();
     List<Zombie> zombiesWithinRange = new ArrayList<>();
 
@@ -127,5 +131,19 @@ public class SynapticSealBlockEntity extends BlockEntity {
         if(block instanceof SynapticSealBlock){
             ((SynapticSealBlock) block).updateLists(this.protectedPlayers, this.zombiesWithinRange);
         }
+    }
+
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
+        controllerRegistrar.add(new AnimationController<>(this, "controller", 0, this::predicate));
+    }
+
+    private PlayState predicate(AnimationState<SynapticSealBlockEntity> synapticSealBlockEntityAnimationState) {
+        synapticSealBlockEntityAnimationState.getController().setAnimation(RawAnimation.begin().then("animation.synaptic_seal.idle", Animation.LoopType.LOOP));
+        return PlayState.CONTINUE;
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return this.cache;
     }
 }

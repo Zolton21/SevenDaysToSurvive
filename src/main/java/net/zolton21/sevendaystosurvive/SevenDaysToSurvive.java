@@ -1,7 +1,6 @@
 package net.zolton21.sevendaystosurvive;
 
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -34,9 +33,6 @@ public class SevenDaysToSurvive{
     {
     }
 
-    private void addCreative(BuildCreativeModeTabContentsEvent event){
-        //if(event.getTabKey() == CreativeModeTabs.)
-    }
 
 
 }

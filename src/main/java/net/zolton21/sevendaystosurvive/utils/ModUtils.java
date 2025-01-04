@@ -12,7 +12,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
 
-import static net.zolton21.sevendaystosurvive.blocks.SynapticSealBlock.SYNAPTIC_DUST_COUNT;
+import static net.zolton21.sevendaystosurvive.block.SynapticSealBlock.SYNAPTIC_DUST_COUNT;
 
 public class ModUtils {
     public static boolean isPlayerWithinRange(BlockPos pos, BlockState state, ServerPlayer player){

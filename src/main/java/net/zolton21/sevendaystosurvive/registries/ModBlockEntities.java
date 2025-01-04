@@ -6,7 +6,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.zolton21.sevendaystosurvive.SevenDaysToSurvive;
-import net.zolton21.sevendaystosurvive.blocks.SynapticSealBlockEntity;
+import net.zolton21.sevendaystosurvive.blockentity.SynapticSealBlockEntity;
 
 public class ModBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, SevenDaysToSurvive.MOD_ID);

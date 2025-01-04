@@ -65,7 +65,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     @Inject(method = "tick()V", at = @At("HEAD"))
     public void tickInject(CallbackInfo ci) {
-        if(this.getNavigation() instanceof GroundPathNavigation groundPathNavigator) {
+        if(this.getNavigation() instanceof GroundPathNavigation) {
             if (this.getTarget() == null) {
                 if (!this.sevenDaysToSurvive$executingCustomGoal) {
                     if(this.tickCount % 60 == 0) {
@@ -145,10 +145,10 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                 Direction.Axis axis = this.sevenDaysToSurvive$setAxis();
                 Direction.AxisDirection axisDirection = this.sevenDaysToSurvive$setAxisDirection(axis);
 
-                /*System.out.println("target y: " + targetYPos + " mob y: " + this.getBlockY());
+                System.out.println("target y: " + targetYPos + " mob y: " + this.getBlockY());
                 System.out.println("||x1|-|x2||+||z1|-|z2||: " + (Math.abs(Math.abs(this.getBlockX()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockX())) + Math.abs(Math.abs(this.getBlockZ()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockZ()))));
                 System.out.println("||y1|-|y2||: " + Math.abs(Math.abs(this.getBlockY()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY())));
-                */
+
                 if(Math.abs(Math.abs(this.getBlockX()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockX())) + Math.abs(Math.abs(this.getBlockZ()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockZ())) < Math.abs(Math.abs(this.getBlockY()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY()))){
                     if(y < targetYPos) {
                         this.sevenDaysToSurvive$nextBlockPos = new BlockPos(this.getBlockX(), y + 1, this.getBlockZ());

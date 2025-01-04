@@ -1,7 +1,7 @@
 {
   "variants": {
-    "state=0": { "model": "sevendaystosurvive:block/synaptic_seal_active" },
-    "state=1": { "model": "sevendaystosurvive:block/synaptic_seal_active" },
-    "state=2": { "model": "sevendaystosurvive:block/synaptic_seal_active" }
+    "state=0": { "model": "sevendaystosurvive:block/synaptic_seal" },
+    "state=1": { "model": "sevendaystosurvive:block/synaptic_seal" },
+    "state=2": { "model": "sevendaystosurvive:block/synaptic_seal" }
     }
 }

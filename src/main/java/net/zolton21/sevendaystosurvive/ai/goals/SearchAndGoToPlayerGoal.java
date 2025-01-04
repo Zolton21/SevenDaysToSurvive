@@ -16,10 +16,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
 
     protected final double speedModifier;
     private final PathfinderMob mob;
-    private BlockPos nextBlockPos;
     private long tickCounter;
-    private Path pathToNextBlockPos;
-    private BlockPos playerTargetPos;
 
 
     public SearchAndGoToPlayerGoal(PathfinderMob creature, double speed) {
@@ -30,52 +27,49 @@ public class SearchAndGoToPlayerGoal extends Goal {
 
     public boolean canUse() {
         if(((IZombieHelper)this.mob).sevenDaysToSurvive$getIsWithinSynapticSealActivityRange()){
+            System.out.println("Search and go canUse false1");
             return false;
         }
 
         if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null){
             if(PlayerHelper.isPlayerProtected((ServerPlayer) ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget())){
+                System.out.println("Search and go canUse false2");
                 return false;
             }
         }
 
         if(ModUtils.mobHasPlayerTargetAndCanReach(this.mob)){
+            System.out.println("Search and go canUse false3");
             return false;
         }
 
         if(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
             if(!this.mob.level().getBlockState(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty()){
+                System.out.println("Search and go canUse false4");
                 return false;
             }
 
-            if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) { //Check if mob is standing on a block
+            if (ModUtils.isMobStandingOnAFullBlock(this.mob) || ModUtils.hasAFullBlockCollision(this.mob, ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0))) { //Check if mob is standing on a block
                 //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
                 //this.playerTarget = ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget();
 
                 if (((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null && ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive()) {
-                    this.playerTargetPos = ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget().blockPosition();
-                    this.nextBlockPos = ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos();
-                    this.pathToNextBlockPos = ((IZombieHelper) this.mob).sevenDaysToSurvive$getPathToNextBlockPos();
-                    if (this.pathToNextBlockPos != null){
-                        if (this.pathToNextBlockPos.canReach()) {
-                            if (!ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -1, 0))) {
-                               //SevendaysToSurvive.LOGGER.info("should execute return false 2");
-                                //System.out.println("should execute return false 2");
+                    if (((IZombieHelper) this.mob).sevenDaysToSurvive$getPathToNextBlockPos() != null){
+                        if (((IZombieHelper) this.mob).sevenDaysToSurvive$getPathToNextBlockPos().canReach()) {
+                            if (!ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0))) {
+                                System.out.println("Search and go canUse false5");
                                 return false;
                             }
-                            if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
-                               //SevendaysToSurvive.LOGGER.info("should execute return false 3");
-                                //System.out.println("should execute return false 3");
+                            if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0))) {
+                                System.out.println("Search and go canUse false6");
                                 return false;
                             }
-                            if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)) {
-                               //SevendaysToSurvive.LOGGER.info("should execute return false 4");
-                                //System.out.println("should execute return false 4");
+                            if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos())) {
+                                System.out.println("Search and go canUse false6");
                                 return false;
                             }
                         } else {
-                           //SevendaysToSurvive.LOGGER.info("should execute return false 5");
-                            //System.out.println("should execute return false 5");
+                            System.out.println("Search and go canUse false7");
                             return false;
                         }
                     }
@@ -83,8 +77,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
                 }
             }
         }
-       //SevendaysToSurvive.LOGGER.info("should execute return false 6");
-        //System.out.println("should execute return false 6");
+        System.out.println("Search and go canUse false8");
         return false;
     }
 
@@ -110,17 +103,17 @@ public class SearchAndGoToPlayerGoal extends Goal {
                 }
             }
 
-            if (this.pathToNextBlockPos != null) {
-                if (this.pathToNextBlockPos.canReach()) {
-                    if (!ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, -1, 0))) {
+            if (((IZombieHelper) this.mob).sevenDaysToSurvive$getPathToNextBlockPos() != null) {
+                if (((IZombieHelper) this.mob).sevenDaysToSurvive$getPathToNextBlockPos().canReach()) {
+                    if (!ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0))) {
                        //SevendaysToSurvive.LOGGER.info("should continue executing return false 2");
                         return false;
                     }
-                    if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
+                    if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0))) {
                        //SevendaysToSurvive.LOGGER.info("should continue executing return false 3");
                         return false;
                     }
-                    if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)) {
+                    if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos())) {
                        //SevendaysToSurvive.LOGGER.info("should continue executing return false 4");
                         return false;
                     }
@@ -140,42 +133,49 @@ public class SearchAndGoToPlayerGoal extends Goal {
         if(this.tickCounter % 10 == 0){
             ((IZombieHelper)this.mob).sevenDaysToSurvive$findCustomPath();
         }
-        if (this.tickCounter % 200 == 0) {
-            //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
-            if (((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
-                this.playerTargetPos = ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget().blockPosition();
-                this.nextBlockPos = ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos();
-                this.pathToNextBlockPos = ((IZombieHelper) this.mob).sevenDaysToSurvive$getPathToNextBlockPos();
-            }
-        }
         if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
             this.moveTowardsPlayer();
         }
-        if(this.tickCounter > 400){
+        if(this.tickCounter > 200){
             this.tickCounter = 0;
         }
     }
 
     public void start(){
         System.out.println("start executing searchAndGoToPlayerGoal");
-        //System.out.println("current blockpos: " + this.mob.getPosition() + "; nextBlockPos: " + this.nextBlockPos);
+        //System.out.println("current blockpos: " + this.mob.getPosition() + "; nextBlockPos: " + ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos());
         //SevenDaysToSurvive.LOGGER.info("start executing searchAndGoToPlayerGoal");
-       //SevendaysToSurvive.LOGGER.info("current blockpos: " + this.mob.getPosition() + "; nextBlockPos: " + this.nextBlockPos);
+       //SevendaysToSurvive.LOGGER.info("current blockpos: " + this.mob.getPosition() + "; nextBlockPos: " + ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos());
         ((IZombieHelper)this.mob).sevenDaysToSurvive$customGoalStarted();
         this.tickCounter = 0;
     }
 
     public void moveTowardsPlayer() {
-        //System.out.println("moveTowards run");
-        if(this.playerTargetPos != null) {
-            BlockPos blockPos = this.playerTargetPos;
-            //Goal lastGoal = ((IZombieCustomTarget) this.mob).getSevenDaysToSurvive$lastExecutingGoal();
-            if (this.tickCounter > 300) {
-                if(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() != null && ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive()) {
-                    this.mob.getNavigation().moveTo(((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget(), this.speedModifier);
+        System.out.println("moveTowards run");
+        if(this.tickCounter <= 100) {
+            if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() != null && ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive()) {
+                this.mob.getNavigation().moveTo(((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget(), this.speedModifier);
+            }
+        }else{
+            int x = 0;
+            int z = 0;
+            if (this.mob.blockPosition().getX() == ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().getX()){
+                if(this.mob.blockPosition().getZ() < ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().getZ()){
+                    z++;
+                }else{
+                    z--;
                 }
-            } else {
-                this.mob.getNavigation().moveTo(blockPos.getX(), blockPos.getY(), blockPos.getZ(), this.speedModifier);
+            } else if (this.mob.blockPosition().getZ() == ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().getZ()) {
+                if(this.mob.blockPosition().getX() < ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().getX()){
+                    x++;
+                }else{
+                    x--;
+                }
+            }
+            if(x != 0 || z != 0){
+                this.mob.getNavigation().moveTo(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().getX() + x, ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().getY(), ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().getZ() + z, this.speedModifier);
+            }else {
+                this.mob.getNavigation().moveTo(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getX(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getY(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getZ(), this.speedModifier);
             }
         }
     }
