@@ -7,28 +7,9 @@ import net.zolton21.sevendaystosurvive.blockentity.SynapticSealBlockEntity;
 import software.bernie.geckolib.model.DefaultedBlockGeoModel;
 
 public class SynapticSealBlockModel extends DefaultedBlockGeoModel<SynapticSealBlockEntity> {
-    private final ResourceLocation MODEL = buildFormattedModelPath(new ResourceLocation(SevenDaysToSurvive.MOD_ID, "synaptic_seal"));
-    private final ResourceLocation TEXTURE = buildFormattedTexturePath(new ResourceLocation(SevenDaysToSurvive.MOD_ID, "synaptic_seal"));
-    private final ResourceLocation ANIMATIONS = buildFormattedAnimationPath(new ResourceLocation(SevenDaysToSurvive.MOD_ID, "synaptic_seal"));
-
 
     public SynapticSealBlockModel() {
         super(new ResourceLocation(SevenDaysToSurvive.MOD_ID, "synaptic_seal"));
-    }
-
-    @Override
-    public ResourceLocation getAnimationResource(SynapticSealBlockEntity animatable) {
-        return ANIMATIONS;
-    }
-
-    @Override
-    public ResourceLocation getModelResource(SynapticSealBlockEntity animatable) {
-        return MODEL;
-    }
-
-    @Override
-    public ResourceLocation getTextureResource(SynapticSealBlockEntity animatable) {
-        return TEXTURE;
     }
 
     @Override

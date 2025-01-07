@@ -25,8 +25,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.zolton21.sevendaystosurvive.blockentity.SynapticSealBlockEntity;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
 import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
-import net.zolton21.sevendaystosurvive.registries.ModBlockEntities;
-import net.zolton21.sevendaystosurvive.registries.ModItems;
+import net.zolton21.sevendaystosurvive.registries.BlockEntityRegistry;
+import net.zolton21.sevendaystosurvive.registries.ItemRegistry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -64,14 +64,14 @@ public class SynapticSealBlock extends BaseEntityBlock {
         if (!pLevel.isClientSide()){
             ItemStack itemStack = pPlayer.getMainHandItem();
             int value = pState.getValue(SYNAPTIC_DUST_COUNT);
-            if(itemStack.getItem() == ModItems.SYNAPTIC_DUST.get()){
+            if(itemStack.getItem() == ItemRegistry.SYNAPTIC_DUST.get()){
                 if(value < MAX_SYNAPTIC_DUST_COUNT) {
                     itemStack.shrink(1);
                     value++;
                 }
             }else if(itemStack.isEmpty() && pPlayer.isCrouching()){
                 if(value > MIN_SYNAPTIC_DUST_COUNT) {
-                    pPlayer.addItem(new ItemStack(ModItems.SYNAPTIC_DUST.get()));
+                    pPlayer.addItem(new ItemStack(ItemRegistry.SYNAPTIC_DUST.get()));
                     value--;
                 }
             }
@@ -105,26 +105,28 @@ public class SynapticSealBlock extends BaseEntityBlock {
 
     @Override
     public void destroy(LevelAccessor pLevel, BlockPos pPos, BlockState pState) {
-        System.out.println("onDestroyed");
-        for (Player player : this.protectedPlayers){
-            if(player != null && player.isAlive()) {
-                //this.protectedPlayers.remove(player);
-                PlayerHelper.changePlayerProtectionState((ServerPlayer) player, false);
-                System.out.println("Player : " + player + " is no longer protected");
+        if(!pLevel.isClientSide()) {
+            System.out.println("onDestroyed");
+            for (Player player : this.protectedPlayers) {
+                if (player != null && player.isAlive()) {
+                    //this.protectedPlayers.remove(player);
+                    PlayerHelper.changePlayerProtectionState((ServerPlayer) player, false);
+                    System.out.println("Player : " + player + " is no longer protected");
+                }
             }
-        }
-        for(Zombie zombie : this.zombiesWithinRange) {
-            if(zombie != null && zombie.isAlive()) {
-                //this.zombiesWithinRange.remove(zombie);
-                ((IZombieHelper) zombie).sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(false);
-                System.out.println("Zombie is no longer within synaptic seal activity range");
+            for (Zombie zombie : this.zombiesWithinRange) {
+                if (zombie != null && zombie.isAlive()) {
+                    //this.zombiesWithinRange.remove(zombie);
+                    ((IZombieHelper) zombie).sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(false);
+                    System.out.println("Zombie is no longer within synaptic seal activity range");
+                }
             }
+
+            super.destroy(pLevel, pPos, pState);
+
+            ItemStack drop = new ItemStack(ItemRegistry.SYNAPTIC_DUST.get(), pState.getValue(SYNAPTIC_DUST_COUNT));
+            popResource((Level) pLevel, pPos, drop);
         }
-
-        super.destroy(pLevel, pPos, pState);
-
-        ItemStack drop = new ItemStack(ModItems.SYNAPTIC_DUST.get(), pState.getValue(SYNAPTIC_DUST_COUNT));
-        popResource((Level) pLevel, pPos, drop);
     }
 
     @Nullable
@@ -140,7 +142,7 @@ public class SynapticSealBlock extends BaseEntityBlock {
             return null;
         }
 
-        return  createTickerHelper(pBlockEntityType, ModBlockEntities.SYNAPTIC_SEAL_BLOCK_ENTITY.get(),
+        return  createTickerHelper(pBlockEntityType, BlockEntityRegistry.SYNAPTIC_SEAL.get(),
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1, pPos, pState1));
     }
 

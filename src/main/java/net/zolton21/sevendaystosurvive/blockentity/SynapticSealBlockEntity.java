@@ -13,9 +13,8 @@ import net.minecraft.world.phys.AABB;
 import net.zolton21.sevendaystosurvive.block.SynapticSealBlock;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
 import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
-import net.zolton21.sevendaystosurvive.registries.ModBlockEntities;
+import net.zolton21.sevendaystosurvive.registries.BlockEntityRegistry;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.constant.DefaultAnimations;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
@@ -33,7 +32,7 @@ public class SynapticSealBlockEntity extends BlockEntity implements GeoBlockEnti
     List<Zombie> zombiesWithinRange = new ArrayList<>();
 
     public SynapticSealBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.SYNAPTIC_SEAL_BLOCK_ENTITY.get(), pPos, pBlockState);
+        super(BlockEntityRegistry.SYNAPTIC_SEAL.get(), pPos, pBlockState);
     }
 
     public List<Zombie> zombiesWithinRange(BlockPos blockPos, BlockState blockState, ServerLevel world) {

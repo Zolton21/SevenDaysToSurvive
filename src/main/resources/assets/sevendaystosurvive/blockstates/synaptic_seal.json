@@ -1,7 +1,7 @@
 {
   "variants": {
-    "state=0": { "model": "sevendaystosurvive:block/synaptic_seal" },
-    "state=1": { "model": "sevendaystosurvive:block/synaptic_seal" },
-    "state=2": { "model": "sevendaystosurvive:block/synaptic_seal" }
+    "state=0": { "model": "minecraft:block/air" },
+    "state=1": { "model": "minecraft:block/air" },
+    "state=2": { "model": "minecraft:block/air" }
     }
 }
