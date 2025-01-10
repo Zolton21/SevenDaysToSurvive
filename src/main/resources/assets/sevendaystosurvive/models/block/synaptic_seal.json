@@ -2,6 +2,6 @@
   "parent": "block/cube_all",
   "textures": {
     "1": "sevendaystosurvive:block/empty",
-    "particle": "sevendaystosurvive:block/synaptic_seal"
+    "particle": "sevendaystosurvive:particles/synaptic_seal"
   }
 }
