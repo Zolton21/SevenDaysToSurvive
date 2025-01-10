@@ -2,14 +2,17 @@ package net.zolton21.sevendaystosurvive.block;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -28,6 +31,7 @@ import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
 import net.zolton21.sevendaystosurvive.registries.BlockEntityRegistry;
 import net.zolton21.sevendaystosurvive.registries.ItemRegistry;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +62,25 @@ public class SynapticSealBlock extends BaseEntityBlock {
 
     public RenderShape getRenderShape(BlockState pState) {
         return RenderShape.ENTITYBLOCK_ANIMATED;
+    }
+
+    @Override
+    public void animateTick(BlockState pState, Level pLevel, BlockPos pPos, RandomSource pRandom) {
+        super.animateTick(pState, pLevel, pPos, pRandom);
+        if(pLevel.isClientSide()){
+            double radius = 0.5;
+            DustParticleOptions particle = new DustParticleOptions(new Vector3f(0.161F, 0.874F, 0.922F), 1.0F);
+            int particleCount = pState.getValue(SYNAPTIC_DUST_COUNT) * 10;
+            for (int i = 0; i < particleCount; i++) {
+                double theta = pRandom.nextDouble() * Math.PI;
+                double phi = pRandom.nextDouble() * 2 * Math.PI;
+                double x = pPos.getX() + 0.5 + radius * Math.sin(theta) * Math.cos(phi);
+                double y = pPos.getY() + 0.5 + radius * Math.cos(theta);
+                double z = pPos.getZ() + 0.5 + radius * Math.sin(theta) * Math.sin(phi);
+
+                pLevel.addParticle(particle, x, y, z, 0, 0, 0);
+            }
+        }
     }
 
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
@@ -156,5 +179,10 @@ public class SynapticSealBlock extends BaseEntityBlock {
         if(!list2.isEmpty()) {
             this.zombiesWithinRange.addAll(list2);
         }
+    }
+
+    @Override
+    public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
+        return Integer.min(state.getValue(SYNAPTIC_DUST_COUNT) * 2, 15);
     }
 }

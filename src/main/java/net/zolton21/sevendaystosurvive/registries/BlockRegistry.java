@@ -16,7 +16,7 @@ public class BlockRegistry {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, SevenDaysToSurvive.MOD_ID);
 
     public static final RegistryObject<Block> SYNAPTIC_SEAL = registerBlock("synaptic_seal",
-            () -> new SynapticSealBlock(BlockBehaviour.Properties.copy(Blocks.OBSIDIAN).lightLevel(state -> 15).noOcclusion()));
+            () -> new SynapticSealBlock(BlockBehaviour.Properties.copy(Blocks.OBSIDIAN).noOcclusion()));
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block){
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
