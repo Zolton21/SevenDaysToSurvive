@@ -37,7 +37,7 @@ public class SynapticSealBlock extends BaseEntityBlock {
     public static final int MAX_SYNAPTIC_DUST_COUNT = 8;
     public static final IntegerProperty SYNAPTIC_DUST_COUNT = IntegerProperty.create("synaptic_dust_count", 0, MAX_SYNAPTIC_DUST_COUNT);
     public static final IntegerProperty STATE = IntegerProperty.create("state", 0, 2);
-    List<Player> protectedPlayers = new ArrayList<>();
+    List<ServerPlayer> protectedPlayers = new ArrayList<>();
     List<Zombie> zombiesWithinRange = new ArrayList<>();
 
     public SynapticSealBlock(Properties pProperties) {
@@ -53,7 +53,7 @@ public class SynapticSealBlock extends BaseEntityBlock {
 
     @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
-        return (BlockState)this.defaultBlockState().setValue(SYNAPTIC_DUST_COUNT, 0).setValue(STATE, 0);
+        return this.defaultBlockState().setValue(SYNAPTIC_DUST_COUNT, 0).setValue(STATE, 0);
     }
 
     public RenderShape getRenderShape(BlockState pState) {
@@ -146,11 +146,15 @@ public class SynapticSealBlock extends BaseEntityBlock {
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1, pPos, pState1));
     }
 
-    public void updateLists(List<Player> list1, List<Zombie> list2){
+    public void updateLists(List<ServerPlayer> list1, List<Zombie> list2){
         System.out.println("updateLists");
         this.protectedPlayers.clear();
         this.zombiesWithinRange.clear();
-        this.protectedPlayers.addAll(list1);
-        this.zombiesWithinRange.addAll(list2);
+        if(!list1.isEmpty()) {
+            this.protectedPlayers.addAll(list1);
+        }
+        if(!list2.isEmpty()) {
+            this.zombiesWithinRange.addAll(list2);
+        }
     }
 }

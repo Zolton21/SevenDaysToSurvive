@@ -28,7 +28,7 @@ import static net.zolton21.sevendaystosurvive.block.SynapticSealBlock.*;
 public class SynapticSealBlockEntity extends BlockEntity implements GeoBlockEntity{
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    List<Player> protectedPlayers = new ArrayList<>();
+    List<ServerPlayer> protectedPlayers = new ArrayList<>();
     List<Zombie> zombiesWithinRange = new ArrayList<>();
 
     public SynapticSealBlockEntity(BlockPos pPos, BlockState pBlockState) {
@@ -87,20 +87,21 @@ public class SynapticSealBlockEntity extends BlockEntity implements GeoBlockEnti
 
     public void tick(Level pLevel1, BlockPos pPos, BlockState pState1) {
         for(Player player : pLevel1.players()) {
-            if(this.isEntityWithinRange(pPos, pState1, (ServerPlayer) player)){
-                if(player != null && player.isAlive()) {
-                    if (this.protectedPlayers.stream().noneMatch(p -> p.equals(player))) {
-                        this.protectedPlayers.add(player);
-                        PlayerHelper.changePlayerProtectionState((ServerPlayer) player, true);
-                        System.out.println("Player : " + player + " is protected");
+            ServerPlayer serverPlayer = (ServerPlayer) player;
+            if(this.isEntityWithinRange(pPos, pState1, serverPlayer)){
+                if(serverPlayer != null && serverPlayer.isAlive()) {
+                    if (this.protectedPlayers.stream().noneMatch(p -> p.equals(serverPlayer))) {
+                        this.protectedPlayers.add(serverPlayer);
+                        PlayerHelper.changePlayerProtectionState(serverPlayer, true);
+                        System.out.println("Player : " + serverPlayer + " is protected");
                     }
                 }
             }else{
-                if (this.protectedPlayers.stream().anyMatch(p -> p.equals(player))){
-                    if(player != null && player.isAlive()) {
-                        this.protectedPlayers.remove(player);
-                        PlayerHelper.changePlayerProtectionState((ServerPlayer) player, false);
-                        System.out.println("Player : " + player + " is no longer protected");
+                if (this.protectedPlayers.stream().anyMatch(p -> p.equals(serverPlayer))){
+                    if(serverPlayer != null && serverPlayer.isAlive()) {
+                        this.protectedPlayers.remove(serverPlayer);
+                        PlayerHelper.changePlayerProtectionState(serverPlayer, false);
+                        System.out.println("Player : " + serverPlayer + " is no longer protected");
                     }
                 }
             }

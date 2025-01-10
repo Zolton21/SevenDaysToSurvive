@@ -28,4 +28,6 @@ public interface IZombieHelper {
 
     void sevenDaysToSurvive$findCustomPath();
 
+    BlockPos SevenDaysToSurvive$getPreviousBlockPos();
+
 }

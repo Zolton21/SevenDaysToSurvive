@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
@@ -32,10 +31,13 @@ public class ModUtils {
     }
 
     public static boolean mobHasPlayerTargetAndCanReach(Mob mob){
-        if(mob.getTarget() != null && mob.getTarget() instanceof Player player){
+        if(mob.getTarget() != null && mob.getTarget() instanceof ServerPlayer player){
             Path path = mob.getNavigation().createPath(player.blockPosition(), 0);
-            if(path != null)
-                return path.canReach();
+            if(path != null) {
+                if(path.getTarget() == player.blockPosition()) {
+                    return path.canReach();
+                }
+            }
         }
         return false;
     }
@@ -71,16 +73,16 @@ public class ModUtils {
         return !blockState.getCollisionShape(level, blockPos, CollisionContext.empty()).isEmpty();
     }
 
-    public static Player getNearestUnprotectedSurvivalPlayer(Mob mob, double range){
+    public static ServerPlayer getNearestUnprotectedSurvivalPlayer(Mob mob, double range){
 
-        Player nearestPlayer = null;
+        ServerPlayer nearestPlayer = null;
 
         if(mob.getServer() != null) {
             ServerLevel serverLevel = mob.getServer().getLevel(mob.level().dimension());
             double closestDistance = Double.MAX_VALUE;
 
             if (serverLevel != null) {
-                for (Player player : serverLevel.players()) {
+                for (ServerPlayer player : serverLevel.players()) {
                     if (player.distanceTo(mob) < range) {
                         if (player.isAlive() && !player.isSpectator() && !player.isCreative() && !PlayerHelper.isPlayerProtected((ServerPlayer) player)) {
                             double distance = mob.distanceToSqr(player);

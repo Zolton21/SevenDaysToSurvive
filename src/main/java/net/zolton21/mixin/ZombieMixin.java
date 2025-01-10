@@ -4,12 +4,19 @@ package net.zolton21.mixin;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
-import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.Turtle;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.ZombifiedPiglin;
+import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.Path;
@@ -17,9 +24,9 @@ import net.zolton21.sevendaystosurvive.ai.goals.BuildTowardsTargetGoal;
 import net.zolton21.sevendaystosurvive.ai.goals.DiggingGoal;
 import net.zolton21.sevendaystosurvive.ai.goals.SearchAndGoToPlayerGoal;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
-import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
 import net.zolton21.sevendaystosurvive.utils.ModUtils;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -41,79 +48,90 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     @Unique
     private float sevenDaysToSurvive$blockBreakingSpeedModifier;
     @Unique
-    private boolean sevenDaysToSurvive$canReachTarget;
-    @Unique
     private Path sevenDaysToSurvive$pathToNextBlockPos;
-    private boolean isWithinSynapticSealActivityRange;
+    @Unique
+    private boolean sevenDaysToSurvive$isWithinSynapticSealActivityRange;
+    @Unique
+    private BlockPos sevenDaysToSurvive$previousBlockPos;
 
     protected ZombieMixin(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.sevenDaysToSurvive$executingCustomGoal = false;
-        this.sevenDaysToSurvive$canReachTarget = false;
-        this.isWithinSynapticSealActivityRange = false;
+        this.sevenDaysToSurvive$isWithinSynapticSealActivityRange = false;
     }
 
-    @Inject(method = "addBehaviourGoals()V", at = @At("TAIL"))
+    @Inject(method = "addBehaviourGoals()V", at = @At("HEAD"))
     public void applyCustomAI(CallbackInfo ci){
         this.goalSelector.addGoal(3, new DiggingGoal(this, 1.0));
-        this.goalSelector.addGoal(4, new BuildTowardsTargetGoal(this, 1.0));
-        this.goalSelector.addGoal(5, new SearchAndGoToPlayerGoal(this, 1.0));
-
+        this.goalSelector.addGoal(3, new BuildTowardsTargetGoal(this, 1.0));
+        this.goalSelector.addGoal(3, new SearchAndGoToPlayerGoal(this, 1.0));
         this.sevenDaysToSurvive$blockBreakingSpeedModifier = 1.0f + new Random().nextFloat();
         System.out.println("blockBreakingSpeedModifier: " + this.sevenDaysToSurvive$blockBreakingSpeedModifier);
     }
 
     @Inject(method = "tick()V", at = @At("HEAD"))
     public void tickInject(CallbackInfo ci) {
-        if(this.getNavigation() instanceof GroundPathNavigation) {
-            if (this.getTarget() == null) {
-                if (!this.sevenDaysToSurvive$executingCustomGoal) {
-                    if(this.tickCount % 60 == 0) {
-                        this.sevenDaysToSurvive$findReachableTarget();
-                        //this.sevenDaysToSurvive$modGoalTarget
-                    }
-                }
-            }else{
-                if(this.sevenDaysToSurvive$getModGoalTarget() != this.getTarget()){
-                    this.sevenDaysToSurvive$modGoalTarget = this.getTarget();
-                }
-            }
-            if (this.sevenDaysToSurvive$getModGoalTarget() != null) {
-                if(this.tickCount % 60 == 0) {
-                    if(!this.sevenDaysToSurvive$getModGoalTarget().isAlive() || this.sevenDaysToSurvive$getModGoalTarget().isSpectator() || ((Player)this.sevenDaysToSurvive$getModGoalTarget()).isCreative()){
-                        this.sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
-                    }else {
-                        this.sevenDaysToSurvive$canReachTarget();
-                        if (this.sevenDaysToSurvive$canReachTarget) {
-                            this.setTarget(this.sevenDaysToSurvive$modGoalTarget);
+        if(this.isAlive()) {
+            if (this.getNavigation() instanceof GroundPathNavigation) {
+                if (this.getTarget() == null) {
+                    if (!this.sevenDaysToSurvive$executingCustomGoal) {
+                        if (this.tickCount % 60 == 0) {
+                            this.sevenDaysToSurvive$findReachableTarget();
+                            //this.sevenDaysToSurvive$modGoalTarget
                         }
-                        this.sevenDaysToSurvive$findCustomPath();
-                        System.out.println("Zombie blockpos: " + this.blockPosition());
-                        System.out.println("nextBlockPos: " + this.sevenDaysToSurvive$getNextBlockPos());
-                        this.sevenDaysToSurvive$pathToNextBlockPos = this.getNavigation().createPath(this.sevenDaysToSurvive$getNextBlockPos(), 0);
+                    }
+                } else {
+                    if (this.sevenDaysToSurvive$getModGoalTarget() != this.getTarget()) {
+                        if(this.getTarget() instanceof ServerPlayer) {
+                            this.sevenDaysToSurvive$modGoalTarget = this.getTarget();
+                        }
                     }
                 }
-            }
+                if (this.sevenDaysToSurvive$getModGoalTarget() != null) {
+                    if (!this.sevenDaysToSurvive$getModGoalTarget().isAlive() || this.sevenDaysToSurvive$getModGoalTarget().isSpectator() || ((ServerPlayer) this.sevenDaysToSurvive$getModGoalTarget()).isCreative()) {
+                        this.sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
+                    } else {
+                        if (this.tickCount % 40 == 0) {
+                            if (!ModUtils.mobHasPlayerTargetAndCanReach(this)) {
+                                if (this.sevenDaysToSurvive$canReachTarget(this.sevenDaysToSurvive$modGoalTarget)) {
+                                    this.setTarget(this.sevenDaysToSurvive$modGoalTarget);
+                                }
+                            }
+                        }
+                        if(this.sevenDaysToSurvive$previousBlockPos != this.blockPosition()) {
+                            this.sevenDaysToSurvive$previousBlockPos = this.blockPosition();
+                            this.sevenDaysToSurvive$findCustomPath();
+                            System.out.println("Zombie blockpos: " + this.blockPosition());
+                            System.out.println("nextBlockPos: " + this.sevenDaysToSurvive$getNextBlockPos());
+                            if(!this.sevenDaysToSurvive$executingCustomGoal) {
+                                if (this.sevenDaysToSurvive$getNextBlockPos() != null) {
+                                    this.sevenDaysToSurvive$pathToNextBlockPos = this.getNavigation().createPath(this.sevenDaysToSurvive$getNextBlockPos(), 0);
+                                }
+                            }
+                        }
+                    }
+                }
 
-            if (this.tickCount % 500 == 0 && this.sevenDaysToSurvive$modGoalTarget != null) {
-                //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 11");
-                if (this.distanceTo(this.sevenDaysToSurvive$modGoalTarget) > 50) {
-                    //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 12");
-                    this.sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
+                if (this.tickCount % 500 == 0 && this.sevenDaysToSurvive$modGoalTarget != null) {
+                    //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 11");
+                    if (this.distanceTo(this.sevenDaysToSurvive$modGoalTarget) > 50) {
+                        //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 12");
+                        this.sevenDaysToSurvive$findReachableTarget();
+                    }
                 }
             }
         }
     }
 
-    public void sevenDaysToSurvive$canReachTarget(){
-        LivingEntity target = this.sevenDaysToSurvive$modGoalTarget;
-        this.sevenDaysToSurvive$canReachTarget = false;
-        if(target != null) {
-            Path path = this.getNavigation().createPath(target.blockPosition(), 0);
-            if(path != null) {
-                this.sevenDaysToSurvive$canReachTarget = path.canReach();
+    @Unique
+    private boolean sevenDaysToSurvive$canReachTarget(LivingEntity livingEntity){
+        Path path = this.getNavigation().createPath(livingEntity, 0);
+        if(path != null) {
+            if (livingEntity.blockPosition().equals(path.getTarget())) {
+                return path.canReach();
             }
         }
+        return false;
     }
 
     public void sevenDaysToSurvive$customGoalStarted(){
@@ -122,8 +140,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     public void sevenDaysToSurvive$customGoalFinished(){
         this.sevenDaysToSurvive$executingCustomGoal = false;
-        this.sevenDaysToSurvive$canReachTarget = false;
-        this.sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
+        //this.sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
     }
 
     public void sevenDaysToSurvive$findReachableTarget(){
@@ -145,11 +162,14 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                 Direction.Axis axis = this.sevenDaysToSurvive$setAxis();
                 Direction.AxisDirection axisDirection = this.sevenDaysToSurvive$setAxisDirection(axis);
 
-                System.out.println("target y: " + targetYPos + " mob y: " + this.getBlockY());
-                System.out.println("||x1|-|x2||+||z1|-|z2||: " + (Math.abs(Math.abs(this.getBlockX()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockX())) + Math.abs(Math.abs(this.getBlockZ()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockZ()))));
-                System.out.println("||y1|-|y2||: " + Math.abs(Math.abs(this.getBlockY()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY())));
+                double absXZ = Math.abs(Math.abs(this.getBlockX()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockX())) + Math.abs(Math.abs(this.getBlockZ()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockZ()));
+                double absY = Math.abs(Math.abs(this.getBlockY()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY()));
 
-                if(Math.abs(Math.abs(this.getBlockX()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockX())) + Math.abs(Math.abs(this.getBlockZ()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockZ())) < Math.abs(Math.abs(this.getBlockY()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY()))){
+                System.out.println("target y: " + targetYPos + " mob y: " + this.getBlockY());
+                System.out.println("||x1|-|x2||+||z1|-|z2||: " + absXZ);
+                System.out.println("||y1|-|y2||: " + absY);
+
+                if(absXZ < absY){
                     if(y < targetYPos) {
                         this.sevenDaysToSurvive$nextBlockPos = new BlockPos(this.getBlockX(), y + 1, this.getBlockZ());
                     } else if (y > targetYPos) {
@@ -159,11 +179,13 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                     }
                 }
                 else {
-                    if(Math.abs(Math.abs(this.getBlockX()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockX())) + Math.abs(Math.abs(this.getBlockZ()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockZ())) == Math.abs(Math.abs(this.getBlockY()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY()))) {
-                        if (this.getBlockY() < this.sevenDaysToSurvive$modGoalTarget.getBlockY()) {
+                    if(absXZ == absY) {
+                        if (this.getBlockY() < targetYPos) {
                             y++;
-                        } else if (this.getBlockY() > this.sevenDaysToSurvive$modGoalTarget.getBlockY()) {
+                            System.out.println("y++");
+                        } else if (this.getBlockY() > targetYPos) {
                             y--;
+                            System.out.println("y--");
                         }
                     }
                     if(axis == Direction.Axis.X){
@@ -239,10 +261,6 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
         return this.sevenDaysToSurvive$nextBlockPos;
     }
 
-    public void setSevenDaysToSurvive$nextBlockPos(BlockPos newNextBlockPos){
-        this.sevenDaysToSurvive$nextBlockPos = newNextBlockPos;
-    }
-
     public LivingEntity sevenDaysToSurvive$getModGoalTarget(){
         return this.sevenDaysToSurvive$modGoalTarget;
     }
@@ -252,15 +270,15 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
         this.sevenDaysToSurvive$nextBlockPos = null;
     }
 
-    public boolean SevenDaysToSurvive$getCanReachTarget(){
-        return this.sevenDaysToSurvive$canReachTarget;
+    public BlockPos SevenDaysToSurvive$getPreviousBlockPos(){
+        return this.sevenDaysToSurvive$previousBlockPos;
     }
 
     public void sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(boolean isTrue){
-        this.isWithinSynapticSealActivityRange = isTrue;
+        this.sevenDaysToSurvive$isWithinSynapticSealActivityRange = isTrue;
     }
 
     public boolean sevenDaysToSurvive$getIsWithinSynapticSealActivityRange(){
-        return isWithinSynapticSealActivityRange;
+        return sevenDaysToSurvive$isWithinSynapticSealActivityRange;
     }
 }
