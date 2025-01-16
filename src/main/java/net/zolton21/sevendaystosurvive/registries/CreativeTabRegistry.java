@@ -14,8 +14,5 @@ public class CreativeTabRegistry {
         if(event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS){
             event.accept(ItemRegistry.SYNAPTIC_SEAL.get());
         }
-        if(event.getTabKey() == CreativeModeTabs.INGREDIENTS){
-            event.accept(ItemRegistry.SYNAPTIC_DUST);
-        }
     }
 }

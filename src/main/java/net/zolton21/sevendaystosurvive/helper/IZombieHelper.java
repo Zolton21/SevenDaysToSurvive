@@ -18,8 +18,6 @@ public interface IZombieHelper {
 
     void sevenDaysToSurvive$customGoalFinished();
 
-    boolean SevenDaysToSurvive$getCanReachTarget();
-
     Path sevenDaysToSurvive$getPathToNextBlockPos();
 
     void sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(boolean isTrue);

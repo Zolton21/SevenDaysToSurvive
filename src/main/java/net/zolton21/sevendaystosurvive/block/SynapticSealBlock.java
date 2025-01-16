@@ -11,6 +11,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -37,27 +38,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SynapticSealBlock extends BaseEntityBlock {
-    public static final int MIN_SYNAPTIC_DUST_COUNT = 0;
-    public static final int MAX_SYNAPTIC_DUST_COUNT = 8;
-    public static final IntegerProperty SYNAPTIC_DUST_COUNT = IntegerProperty.create("synaptic_dust_count", 0, MAX_SYNAPTIC_DUST_COUNT);
+    public static final int MIN_SHARD_COUNT = 0;
+    public static final int MAX_SHARD_COUNT = 4;
+    public static final IntegerProperty ECHO_SHARD_COUNT = IntegerProperty.create("echo_shard_count", 0, MAX_SHARD_COUNT);
     public static final IntegerProperty STATE = IntegerProperty.create("state", 0, 2);
     List<ServerPlayer> protectedPlayers = new ArrayList<>();
     List<Zombie> zombiesWithinRange = new ArrayList<>();
 
     public SynapticSealBlock(Properties pProperties) {
         super(pProperties);
-        this.registerDefaultState(this.defaultBlockState().setValue(SYNAPTIC_DUST_COUNT, 0).setValue(STATE, 0));
+        this.registerDefaultState(this.defaultBlockState().setValue(ECHO_SHARD_COUNT, 0).setValue(STATE, 0));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
         super.createBlockStateDefinition(pBuilder);
-        pBuilder.add(STATE).add(SYNAPTIC_DUST_COUNT);
+        pBuilder.add(STATE).add(ECHO_SHARD_COUNT);
     }
 
     @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
-        return this.defaultBlockState().setValue(SYNAPTIC_DUST_COUNT, 0).setValue(STATE, 0);
+        return this.defaultBlockState().setValue(ECHO_SHARD_COUNT, 0).setValue(STATE, 0);
     }
 
     public RenderShape getRenderShape(BlockState pState) {
@@ -70,7 +71,7 @@ public class SynapticSealBlock extends BaseEntityBlock {
         if(pLevel.isClientSide()){
             double radius = 0.5;
             DustParticleOptions particle = new DustParticleOptions(new Vector3f(0.161F, 0.874F, 0.922F), 1.0F);
-            int particleCount = pState.getValue(SYNAPTIC_DUST_COUNT) * 10;
+            int particleCount = pState.getValue(ECHO_SHARD_COUNT) * 10;
             for (int i = 0; i < particleCount; i++) {
                 double theta = pRandom.nextDouble() * Math.PI;
                 double phi = pRandom.nextDouble() * 2 * Math.PI;
@@ -86,15 +87,15 @@ public class SynapticSealBlock extends BaseEntityBlock {
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         if (!pLevel.isClientSide()){
             ItemStack itemStack = pPlayer.getMainHandItem();
-            int value = pState.getValue(SYNAPTIC_DUST_COUNT);
-            if(itemStack.getItem() == ItemRegistry.SYNAPTIC_DUST.get()){
-                if(value < MAX_SYNAPTIC_DUST_COUNT) {
+            int value = pState.getValue(ECHO_SHARD_COUNT);
+            if(itemStack.getItem() == Items.ECHO_SHARD){
+                if(value < MAX_SHARD_COUNT) {
                     itemStack.shrink(1);
                     value++;
                 }
             }else if(itemStack.isEmpty() && pPlayer.isCrouching()){
-                if(value > MIN_SYNAPTIC_DUST_COUNT) {
-                    pPlayer.addItem(new ItemStack(ItemRegistry.SYNAPTIC_DUST.get()));
+                if(value > MIN_SHARD_COUNT) {
+                    pPlayer.addItem(new ItemStack(Items.ECHO_SHARD));
                     value--;
                 }
             }
@@ -103,25 +104,25 @@ public class SynapticSealBlock extends BaseEntityBlock {
         return InteractionResult.SUCCESS;
     }
 
-    private void updateAndDisplayState(int dustCountValue, Player pPlayer, BlockState state, BlockPos pPos, Level pLevel){
+    private void updateAndDisplayState(int shardCountValue, Player pPlayer, BlockState state, BlockPos pPos, Level pLevel){
         ChatFormatting chatFormatting;
         int range;
-        if(dustCountValue<4) {
+        if(shardCountValue<MAX_SHARD_COUNT/2) {
             range = 0;
-            pLevel.setBlock(pPos, state.setValue(STATE, 0).setValue(SYNAPTIC_DUST_COUNT, dustCountValue), 3);
+            pLevel.setBlock(pPos, state.setValue(STATE, 0).setValue(ECHO_SHARD_COUNT, shardCountValue), 3);
             chatFormatting = ChatFormatting.RED;
         }
-        else if(dustCountValue < 8) {
+        else if(shardCountValue < MAX_SHARD_COUNT) {
             range = 1;
-            pLevel.setBlock(pPos, state.setValue(STATE, 1).setValue(SYNAPTIC_DUST_COUNT, dustCountValue), 3);
+            pLevel.setBlock(pPos, state.setValue(STATE, 1).setValue(ECHO_SHARD_COUNT, shardCountValue), 3);
             chatFormatting = ChatFormatting.YELLOW;
         }
         else{
             range = 2;
-            pLevel.setBlock(pPos, state.setValue(STATE, 2).setValue(SYNAPTIC_DUST_COUNT, dustCountValue), 3);
+            pLevel.setBlock(pPos, state.setValue(STATE, 2).setValue(ECHO_SHARD_COUNT, shardCountValue), 3);
             chatFormatting = ChatFormatting.GREEN;
         }
-        Component text = Component.literal(dustCountValue + "/" + MAX_SYNAPTIC_DUST_COUNT + "   ").withStyle(chatFormatting);
+        Component text = Component.literal(shardCountValue + "/" + MAX_SHARD_COUNT + "   ").withStyle(chatFormatting);
         Component area = Component.literal((1 + 2 * range) + "x" + (1 + 2 * range)).withStyle(chatFormatting);
         pPlayer.displayClientMessage(Component.literal("Charge: ").append(text).append("Safe area: ").append(area).append(" Chunks"), true);
     }
@@ -129,25 +130,20 @@ public class SynapticSealBlock extends BaseEntityBlock {
     @Override
     public void destroy(LevelAccessor pLevel, BlockPos pPos, BlockState pState) {
         if(!pLevel.isClientSide()) {
-            System.out.println("onDestroyed");
             for (Player player : this.protectedPlayers) {
                 if (player != null && player.isAlive()) {
-                    //this.protectedPlayers.remove(player);
                     PlayerHelper.changePlayerProtectionState((ServerPlayer) player, false);
-                    System.out.println("Player : " + player + " is no longer protected");
                 }
             }
             for (Zombie zombie : this.zombiesWithinRange) {
                 if (zombie != null && zombie.isAlive()) {
-                    //this.zombiesWithinRange.remove(zombie);
                     ((IZombieHelper) zombie).sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(false);
-                    System.out.println("Zombie is no longer within synaptic seal activity range");
                 }
             }
 
             super.destroy(pLevel, pPos, pState);
 
-            ItemStack drop = new ItemStack(ItemRegistry.SYNAPTIC_DUST.get(), pState.getValue(SYNAPTIC_DUST_COUNT));
+            ItemStack drop = new ItemStack(Items.ECHO_SHARD, pState.getValue(ECHO_SHARD_COUNT));
             popResource((Level) pLevel, pPos, drop);
         }
     }
@@ -170,7 +166,6 @@ public class SynapticSealBlock extends BaseEntityBlock {
     }
 
     public void updateLists(List<ServerPlayer> list1, List<Zombie> list2){
-        System.out.println("updateLists");
         this.protectedPlayers.clear();
         this.zombiesWithinRange.clear();
         if(!list1.isEmpty()) {
@@ -183,6 +178,6 @@ public class SynapticSealBlock extends BaseEntityBlock {
 
     @Override
     public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
-        return Integer.min(state.getValue(SYNAPTIC_DUST_COUNT) * 2, 15);
+        return Integer.min(state.getValue(ECHO_SHARD_COUNT) * 4, 15);
     }
 }

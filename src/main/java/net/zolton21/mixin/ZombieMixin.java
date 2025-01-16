@@ -67,7 +67,6 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                     if (!this.sevenDaysToSurvive$executingCustomGoal) {
                         if (this.tickCount % 60 == 0) {
                             this.sevenDaysToSurvive$findReachableTarget();
-                            //this.sevenDaysToSurvive$modGoalTarget
                         }
                     }
                 } else {
@@ -103,9 +102,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                 }
 
                 if (this.tickCount % 500 == 0 && this.sevenDaysToSurvive$modGoalTarget != null) {
-                    //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 11");
                     if (this.distanceTo(this.sevenDaysToSurvive$modGoalTarget) > 50) {
-                        //SevenDaysToSurvive.LOGGER.info("Zombie Entity Mixin 12");
                         this.sevenDaysToSurvive$findReachableTarget();
                     }
                 }
@@ -130,7 +127,6 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     public void sevenDaysToSurvive$customGoalFinished(){
         this.sevenDaysToSurvive$executingCustomGoal = false;
-        //this.sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
     }
 
     @Unique

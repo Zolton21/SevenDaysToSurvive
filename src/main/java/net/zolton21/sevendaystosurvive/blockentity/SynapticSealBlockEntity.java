@@ -53,14 +53,13 @@ public class SynapticSealBlockEntity extends BlockEntity implements GeoBlockEnti
         int maxChunkZ = blockChunkZ + activityRange;
 
         int minWorldX = minChunkX * 16;
-        int maxWorldX = (maxChunkX + 1) * 16 - 1; // Exclusive upper bound
+        int maxWorldX = (maxChunkX + 1) * 16 - 1;
         int minWorldZ = minChunkZ * 16;
-        int maxWorldZ = (maxChunkZ + 1) * 16 - 1; // Exclusive upper bound
+        int maxWorldZ = (maxChunkZ + 1) * 16 - 1;
 
         AABB range = new AABB(minWorldX, world.getMinBuildHeight(), minWorldZ,
                 maxWorldX, world.getMaxBuildHeight(), maxWorldZ);
 
-        // Find zombies within the AABB
         return world.getEntitiesOfClass(Zombie.class, range);
     }
 
@@ -93,7 +92,6 @@ public class SynapticSealBlockEntity extends BlockEntity implements GeoBlockEnti
                     if (this.protectedPlayers.stream().noneMatch(p -> p.equals(serverPlayer))) {
                         this.protectedPlayers.add(serverPlayer);
                         PlayerHelper.changePlayerProtectionState(serverPlayer, true);
-                        System.out.println("Player : " + serverPlayer + " is protected");
                     }
                 }
             }else{
@@ -101,7 +99,6 @@ public class SynapticSealBlockEntity extends BlockEntity implements GeoBlockEnti
                     if(serverPlayer != null && serverPlayer.isAlive()) {
                         this.protectedPlayers.remove(serverPlayer);
                         PlayerHelper.changePlayerProtectionState(serverPlayer, false);
-                        System.out.println("Player : " + serverPlayer + " is no longer protected");
                     }
                 }
             }
@@ -112,7 +109,6 @@ public class SynapticSealBlockEntity extends BlockEntity implements GeoBlockEnti
                 if(zombie != null && zombie.isAlive()) {
                     this.zombiesWithinRange.add(zombie);
                     ((IZombieHelper) zombie).sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(true);
-                    System.out.println("Zombie is within synaptic seal activity range");
                 }
             }
         }
@@ -122,7 +118,6 @@ public class SynapticSealBlockEntity extends BlockEntity implements GeoBlockEnti
                 if(zombie != null && zombie.isAlive()) {
                     this.zombiesWithinRange.remove(zombie);
                     ((IZombieHelper) zombie).sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(false);
-                    System.out.println("Zombie is no longer within synaptic seal activity range");
                 }
             }
         }

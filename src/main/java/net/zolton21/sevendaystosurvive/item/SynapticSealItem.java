@@ -29,9 +29,7 @@ public class SynapticSealItem extends BlockItem implements GeoItem {
 
             @Override
             public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                System.out.println("initializeClient 2");
                 if (this.renderer == null) {
-                    System.out.println("initializeClient 3");
                     this.renderer = new GeoItemRenderer<>(new DefaultedBlockGeoModel<>(new ResourceLocation(SevenDaysToSurvive.MOD_ID, "synaptic_seal")));
                 }
                 return this.renderer;

@@ -1,6 +1,8 @@
 package net.zolton21.sevendaystosurvive.utils;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Mob;
@@ -9,17 +11,30 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.zolton21.sevendaystosurvive.config.Config;
 import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
 
-import static net.zolton21.sevendaystosurvive.block.SynapticSealBlock.SYNAPTIC_DUST_COUNT;
+import static net.zolton21.sevendaystosurvive.block.SynapticSealBlock.ECHO_SHARD_COUNT;
 
 public class ModUtils {
+    public static boolean isBlockBreakable(Level level, BlockPos pos){
+        BlockState blockState = level.getBlockState(pos);
+        ResourceLocation BlockId = level.registryAccess().registryOrThrow(Registries.BLOCK).getKey(blockState.getBlock());
+        if(blockState.getDestroySpeed(level, pos) == -1.0F){
+            return false;
+        }
+        if(BlockId != null && Config.Server.UNBREAKABLE_BLOCKS_LIST.get().contains(BlockId.toString())){
+            return false;
+        }
+        return true;
+    }
+
     public static boolean isPlayerWithinRange(BlockPos pos, BlockState state, ServerPlayer player){
-        int chunkActivityRange = state.getValue(SYNAPTIC_DUST_COUNT);
+        int chunkActivityRange = state.getValue(ECHO_SHARD_COUNT);
 
         int blockChunkX = Math.floorDiv(pos.getX(), 16 * chunkActivityRange);
         int blockChunkZ = Math.floorDiv(pos.getZ(), 16 * chunkActivityRange);
-        int minChunkX = blockChunkX - 1; // Adjust range as needed
+        int minChunkX = blockChunkX - 1;
         int maxChunkX = blockChunkX + 1;
         int minChunkZ = blockChunkZ - 1;
         int maxChunkZ = blockChunkZ + 1;
@@ -57,10 +72,6 @@ public class ModUtils {
             return true;
         }else{
             VoxelShape collisionShape = blockState.getCollisionShape(mob.level(), blockPos);
-            //System.out.println("blockState: " + blockState);
-            if(!collisionShape.isEmpty()) {
-                //System.out.println("collisionShape: " + collisionShape.bounds().maxY);
-            }
             if(!collisionShape.isEmpty() && collisionShape.bounds().maxY == 1.0){
                 return true;
             }

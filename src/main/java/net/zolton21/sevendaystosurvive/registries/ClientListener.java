@@ -15,9 +15,4 @@ public final class ClientListener {
             return new SynapticSealBlockRenderer();
         });
     }
-
-    /*@SubscribeEvent
-    public static void registerRenderers(FMLClientSetupEvent event) {
-        ItemBlockRenderTypes.setRenderLayer(ModBlocks.SYNAPTIC_SEAL_BLOCK.get(), RenderType.translucent());
-    }*/
 }

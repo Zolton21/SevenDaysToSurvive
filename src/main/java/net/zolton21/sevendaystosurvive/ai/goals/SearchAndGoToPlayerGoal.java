@@ -52,10 +52,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
                 return false;
             }
 
-            if (ModUtils.isMobStandingOnAFullBlock(this.mob) || ModUtils.hasAFullBlockCollision(this.mob, ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0))) { //Check if mob is standing on a block
-                //((IZombieCustomTarget)this.mob).sevenDaysToSurvive$findReachableTarget();
-                //this.playerTarget = ((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget();
-
+            if (ModUtils.isMobStandingOnAFullBlock(this.mob) || ModUtils.hasAFullBlockCollision(this.mob, ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0))) {
                 if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() != null && ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive()) {
                     if (((IZombieHelper) this.mob).sevenDaysToSurvive$getPathToNextBlockPos() != null) {
                         if (!ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0))) {
@@ -159,9 +156,6 @@ public class SearchAndGoToPlayerGoal extends Goal {
 
     public void start() {
         System.out.println("start executing searchAndGoToPlayerGoal");
-        //System.out.println("current blockpos: " + this.mob.getPosition() + "; nextBlockPos: " + ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos());
-        //SevenDaysToSurvive.LOGGER.info("start executing searchAndGoToPlayerGoal");
-        //SevendaysToSurvive.LOGGER.info("current blockpos: " + this.mob.getPosition() + "; nextBlockPos: " + ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos());
         this.isMoving = false;
         this.notMovingTickCounter = 0;
         ((IZombieHelper) this.mob).sevenDaysToSurvive$customGoalStarted();

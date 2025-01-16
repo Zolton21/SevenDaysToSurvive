@@ -14,9 +14,6 @@ public class ItemRegistry {
     public static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(ForgeRegistries.ITEMS, SevenDaysToSurvive.MOD_ID);
 
-    public static final RegistryObject<Item> SYNAPTIC_DUST =
-            ITEMS.register("synaptic_dust", () -> new Item(new Item.Properties()));
-
     public static final RegistryObject<BlockItem> SYNAPTIC_SEAL =
             ITEMS.register("synaptic_seal", () -> new SynapticSealItem(BlockRegistry.SYNAPTIC_SEAL.get(), new Item.Properties()));
 
