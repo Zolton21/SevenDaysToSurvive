@@ -165,14 +165,15 @@ public class SearchAndGoToPlayerGoal extends Goal {
     public void moveTowardsPlayer() {
         System.out.println("moveTowards run");
         Path path = ((IZombieHelper) this.mob).sevenDaysToSurvive$getPathToNextBlockPos();
-        if(this.notMovingTickCounter <= 20) {
+        if(this.notMovingTickCounter <= 30) {
             if (path != null) {
                 this.mob.getNavigation().moveTo(path, this.speedModifier);
             }
         }else{
             BlockPos nextBP = ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos();
-            this.mob.getLookControl().setLookAt(nextBP.getCenter().add(0, 1, 0));
-
+            if(((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
+                this.mob.getLookControl().setLookAt(((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget());
+            }
             if(nextBP.getX() == this.mob.getBlockX()){
                 if(nextBP.getZ() > this.mob.getBlockZ()){
                     this.mob.setYRot(0);

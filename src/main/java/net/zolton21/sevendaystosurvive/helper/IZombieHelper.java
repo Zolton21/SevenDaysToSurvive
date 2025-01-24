@@ -5,6 +5,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.pathfinder.Path;
 
 public interface IZombieHelper {
+    void setSevenDaysToSurvive$nextBlockPos(BlockPos blockPos);
 
     BlockPos sevenDaysToSurvive$getNextBlockPos();
 

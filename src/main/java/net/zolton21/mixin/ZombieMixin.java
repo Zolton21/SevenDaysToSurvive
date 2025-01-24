@@ -268,4 +268,8 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     public boolean sevenDaysToSurvive$getIsWithinSynapticSealActivityRange(){
         return sevenDaysToSurvive$isWithinSynapticSealActivityRange;
     }
+
+    public void setSevenDaysToSurvive$nextBlockPos(BlockPos blockPos){
+        this.sevenDaysToSurvive$nextBlockPos = blockPos;
+    }
 }
