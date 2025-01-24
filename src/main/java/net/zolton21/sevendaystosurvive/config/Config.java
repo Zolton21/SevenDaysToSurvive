@@ -10,7 +10,7 @@ public class Config {
 
         public static ForgeConfigSpec.ConfigValue<Integer> ZOMBIE_EXTENDED_AI_COOLDOWN;
         public static ForgeConfigSpec.ConfigValue<List<String>> UNBREAKABLE_BLOCKS_LIST;
-
+        public static ForgeConfigSpec.ConfigValue<Integer> PLAYER_DETECTION_RANGE;
 
         public static final ForgeConfigSpec server(){
             ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();

@@ -39,7 +39,7 @@ import java.util.List;
 
 public class SynapticSealBlock extends BaseEntityBlock {
     public static final int MIN_SHARD_COUNT = 0;
-    public static final int MAX_SHARD_COUNT = 4;
+    public static final int MAX_SHARD_COUNT = 8;
     public static final IntegerProperty ECHO_SHARD_COUNT = IntegerProperty.create("echo_shard_count", 0, MAX_SHARD_COUNT);
     public static final IntegerProperty STATE = IntegerProperty.create("state", 0, 2);
     List<ServerPlayer> protectedPlayers = new ArrayList<>();
@@ -71,7 +71,7 @@ public class SynapticSealBlock extends BaseEntityBlock {
         if(pLevel.isClientSide()){
             double radius = 0.5;
             DustParticleOptions particle = new DustParticleOptions(new Vector3f(0.161F, 0.874F, 0.922F), 1.0F);
-            int particleCount = pState.getValue(ECHO_SHARD_COUNT) * 10;
+            int particleCount = pState.getValue(ECHO_SHARD_COUNT) * 5;
             for (int i = 0; i < particleCount; i++) {
                 double theta = pRandom.nextDouble() * Math.PI;
                 double phi = pRandom.nextDouble() * 2 * Math.PI;
@@ -178,6 +178,6 @@ public class SynapticSealBlock extends BaseEntityBlock {
 
     @Override
     public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
-        return Integer.min(state.getValue(ECHO_SHARD_COUNT) * 4, 15);
+        return Integer.min(state.getValue(ECHO_SHARD_COUNT) * 2, 15);
     }
 }

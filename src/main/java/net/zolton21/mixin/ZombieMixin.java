@@ -52,9 +52,9 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     @Inject(method = "addBehaviourGoals()V", at = @At("HEAD"))
     public void applyCustomAI(CallbackInfo ci){
+        this.goalSelector.addGoal(3, new SearchAndGoToPlayerGoal(this, 1.0));
         this.goalSelector.addGoal(3, new DiggingGoal(this, 1.0));
         this.goalSelector.addGoal(3, new BuildTowardsTargetGoal(this, 1.0));
-        this.goalSelector.addGoal(3, new SearchAndGoToPlayerGoal(this, 1.0));
         this.sevenDaysToSurvive$blockBreakingSpeedModifier = 1.0f + new Random().nextFloat();
         System.out.println("blockBreakingSpeedModifier: " + this.sevenDaysToSurvive$blockBreakingSpeedModifier);
     }
@@ -88,7 +88,6 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                             }
                         }
                         if(this.sevenDaysToSurvive$previousBlockPos != this.blockPosition()) {
-                            this.sevenDaysToSurvive$previousBlockPos = this.blockPosition();
                             this.sevenDaysToSurvive$findCustomPath();
                             System.out.println("Zombie blockpos: " + this.blockPosition());
                             System.out.println("nextBlockPos: " + this.sevenDaysToSurvive$getNextBlockPos());
@@ -136,6 +135,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     public void sevenDaysToSurvive$findCustomPath(){
         if(this.sevenDaysToSurvive$modGoalTarget != null){
+            this.sevenDaysToSurvive$previousBlockPos = this.blockPosition();
             if(this.getBlockX() == this.sevenDaysToSurvive$modGoalTarget.getBlockX() && this.getBlockZ() == this.sevenDaysToSurvive$modGoalTarget.getBlockZ()){
                 if (this.getBlockY() > this.sevenDaysToSurvive$modGoalTarget.getBlockY()) {
                     this.sevenDaysToSurvive$nextBlockPos = new BlockPos(this.getBlockX(), this.getBlockY() - 1, this.getBlockZ());
