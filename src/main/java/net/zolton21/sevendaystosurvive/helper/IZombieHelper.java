@@ -29,4 +29,7 @@ public interface IZombieHelper {
 
     BlockPos SevenDaysToSurvive$getPreviousBlockPos();
 
+    void setSevenDaysToSurvive$placedBlockBlockPos(BlockPos blockPos);
+
+    BlockPos getSevenDaysToSurvive$placedBlockBlockPos();
 }

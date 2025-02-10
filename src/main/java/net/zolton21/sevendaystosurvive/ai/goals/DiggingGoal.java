@@ -123,7 +123,7 @@ public class DiggingGoal extends Goal {
                                                 System.out.println("DiggingGoal canUse true 5");
                                                 return true;
                                             }
-                                        } else if (Math.abs(Math.abs(this.mob.getBlockX()) - Math.abs(this.nextBlockPos.getX())) < 2 || Math.abs(Math.abs(this.mob.getBlockZ()) - Math.abs(this.nextBlockPos.getZ())) < 2) {
+                                        } else if (Math.abs(this.mob.getBlockX() - this.nextBlockPos.getX()) < 2 || Math.abs(this.mob.getBlockZ() - this.nextBlockPos.getZ()) < 2) {
                                             if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
                                                 if (ModUtils.isBlockBreakable(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
                                                     System.out.println("DiggingGoal canUse true 6");
@@ -235,7 +235,7 @@ public class DiggingGoal extends Goal {
                                 if(ModUtils.isBlockBreakable(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
                                     return true;
                                 }
-                            } else if (Math.abs(Math.abs(this.mob.getBlockX()) - Math.abs(this.nextBlockPos.getX())) < 2 || Math.abs(Math.abs(this.mob.getBlockZ()) - Math.abs(this.nextBlockPos.getZ())) < 2) {
+                            } else if (Math.abs(this.mob.getBlockX() - this.nextBlockPos.getX()) < 2 || Math.abs(this.mob.getBlockZ() - this.nextBlockPos.getZ()) < 2) {
                                 if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
                                     if (ModUtils.isBlockBreakable(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
                                         return true;

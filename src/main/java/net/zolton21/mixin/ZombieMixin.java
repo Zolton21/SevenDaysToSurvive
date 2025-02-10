@@ -43,6 +43,8 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     private boolean sevenDaysToSurvive$isWithinSynapticSealActivityRange;
     @Unique
     private BlockPos sevenDaysToSurvive$previousBlockPos;
+    @Unique
+    private BlockPos sevenDaysToSurvive$placedBlockBlockPos;
 
     protected ZombieMixin(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -149,12 +151,13 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                 Direction.Axis axis = this.sevenDaysToSurvive$setAxis();
                 Direction.AxisDirection axisDirection = this.sevenDaysToSurvive$setAxisDirection(axis);
 
-                double absXZ = Math.abs(Math.abs(this.getBlockX()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockX())) + Math.abs(Math.abs(this.getBlockZ()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockZ()));
-                double absY = Math.abs(Math.abs(this.getBlockY()) - Math.abs(this.sevenDaysToSurvive$modGoalTarget.getBlockY()));
+                double absXZ = Math.abs(this.getBlockX() - this.sevenDaysToSurvive$modGoalTarget.getBlockX()) + Math.abs(this.getBlockZ() - this.sevenDaysToSurvive$modGoalTarget.getBlockZ());
+                double absY = Math.abs(this.getBlockY() - this.sevenDaysToSurvive$modGoalTarget.getBlockY());
 
-                System.out.println("target y: " + targetYPos + " mob y: " + this.getBlockY());
-                System.out.println("||x1|-|x2||+||z1|-|z2||: " + absXZ);
-                System.out.println("||y1|-|y2||: " + absY);
+                System.out.println("mob pos: " + this.blockPosition());
+                System.out.println("target pos: " + this.sevenDaysToSurvive$getModGoalTarget().blockPosition());
+                System.out.println("|x1-x2|+|z1-z2|: " + absXZ);
+                System.out.println("|y1-y2|: " + absY);
 
                 if(absXZ < absY){
                     if(y < targetYPos) {
@@ -213,7 +216,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     @Unique
     private Direction.Axis sevenDaysToSurvive$setAxis(){
         Direction.Axis axis;
-        if(Math.abs(Math.abs(this.getX()) - Math.abs((int)this.sevenDaysToSurvive$modGoalTarget.getX())) >= Math.abs(Math.abs(this.getZ()) - Math.abs((int)this.sevenDaysToSurvive$modGoalTarget.getZ()))){
+        if(Math.abs(this.getX() - (int)this.sevenDaysToSurvive$modGoalTarget.getX()) >= Math.abs(this.getZ() - (int)this.sevenDaysToSurvive$modGoalTarget.getZ())){
             axis = Direction.Axis.X;
         }else {
             axis = Direction.Axis.Z;
@@ -271,5 +274,13 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     public void setSevenDaysToSurvive$nextBlockPos(BlockPos blockPos){
         this.sevenDaysToSurvive$nextBlockPos = blockPos;
+    }
+
+    public void setSevenDaysToSurvive$placedBlockBlockPos(BlockPos blockPos){
+        this.sevenDaysToSurvive$placedBlockBlockPos = blockPos;
+    }
+
+    public BlockPos getSevenDaysToSurvive$placedBlockBlockPos(){
+        return this.sevenDaysToSurvive$placedBlockBlockPos;
     }
 }

@@ -119,10 +119,12 @@ public class SearchAndGoToPlayerGoal extends Goal {
                 System.out.println("SearchAndGo canContinueToUse false3.1 isStuck");
                 return false;
             }else{
-                if(this.mob.getBlockY() >= ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().getY()) {
-                    if (!this.mob.getNavigation().isDone()) {
-                        System.out.println("SearchAndGo canContinueToUse true path isn't done");
-                        return true;
+                if(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
+                    if (this.mob.getBlockY() == ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getY()) {
+                        if (!this.mob.getNavigation().isDone()) {
+                            System.out.println("SearchAndGo canContinueToUse true path isn't done");
+                            return true;
+                        }
                     }
                 }
             }
@@ -204,30 +206,59 @@ public class SearchAndGoToPlayerGoal extends Goal {
         this.pathToPlayer = this.mob.getNavigation().createPath(((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget(), 0);
     }
 
+
     public void moveTowardsPlayer() {
         System.out.println("moveTowards run");
-        if(this.notMovingTickCounter <= 60 && (this.mob.getBlockY() >= ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().getY())) {
-            System.out.println("move to player");
+        BlockPos placedBlockBP = ((IZombieHelper)this.mob).getSevenDaysToSurvive$placedBlockBlockPos();
+        if(placedBlockBP != null){
+            System.out.println("move if1");
+            BlockPos nextBP = placedBlockBP.offset(0, 1, 0);
+            Path path = this.mob.getNavigation().createPath(nextBP, 0);
+            if(path != null) {
+                this.mob.getNavigation().moveTo(path, this.speedModifier);
+                System.out.println("mob pos: " + this.mob.blockPosition());
+                System.out.println("path target: " + this.mob.getNavigation().getPath().getTarget());
+                System.out.println("path canReach?: " + this.mob.getNavigation().getPath().canReach());
+                System.out.println("path isDone?: " + this.mob.getNavigation().getPath().isDone());
+                if(this.mob.getNavigation().getPath().isDone()){
+                    double distance = this.mob.distanceToSqr(path.getTarget().getCenter());
+                    System.out.println("distance: " + distance);
+                    if(distance > 0.3){
+                        System.out.println("Push mob to complete path");
+                        Vec3 multiplication = nextBP.getCenter().subtract(this.mob.blockPosition().getCenter()).normalize().multiply(0.1, 0.1, 0.1);
+                        this.mob.setDeltaMovement(multiplication);
+                        this.mob.getLookControl().setLookAt(nextBP.getCenter());
+                    }
+                }
+            }
+
+        }else if(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos() == null || (this.notMovingTickCounter <= 30 && this.mob.getBlockY() >= ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().getY())) {
+            System.out.println("move if2");
             if (this.pathToPlayer == null) {
                 this.pathToPlayer = this.mob.getNavigation().createPath(((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget(), 0);
             }else{
                 this.mob.getNavigation().moveTo(this.pathToPlayer, this.speedModifier);
             }
-        }else{//move to the center of nextBP
-            System.out.println("move to nextBP");
+        }else{//force move to the center of nextBP
+            System.out.println("move if3");
             BlockPos nextBP = ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos();
-            Vec3 multiplication = nextBP.getCenter().subtract(this.mob.blockPosition().getCenter()).normalize().multiply(0.2, 0.2, 0.2);
+            Vec3 multiplication = nextBP.getCenter().subtract(this.mob.blockPosition().getCenter()).normalize().multiply(0.1, 0.1, 0.1);
             this.mob.setDeltaMovement(multiplication);
 
             if(((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
                 this.mob.getLookControl().setLookAt(((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget(), 30.0F, 30.0F);
             }
         }
+
     }
 
     public void stop() {
         System.out.println("stop executing SearchAndGoToPlayerGoal");
         this.mob.getNavigation().stop();
         ((IZombieHelper) this.mob).sevenDaysToSurvive$customGoalFinished();
+
+        if(((IZombieHelper) this.mob).getSevenDaysToSurvive$placedBlockBlockPos() != null){
+            ((IZombieHelper) this.mob).setSevenDaysToSurvive$placedBlockBlockPos(null);
+        }
     }
 }
