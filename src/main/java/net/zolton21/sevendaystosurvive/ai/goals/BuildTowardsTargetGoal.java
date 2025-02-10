@@ -92,6 +92,11 @@ public class BuildTowardsTargetGoal extends Goal {
                     x++;
                     z--;
                 }
+                if(!this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()).isAir()){
+                    System.out.println("can use BuildingGoal false (nextblockposition isn't air)");
+                    return false;
+                }
+
                 this.diagonalBlockPos = this.mob.blockPosition().offset(x, 0, z);
                 if (!this.mob.level().getBlockState(this.diagonalBlockPos).getFluidState().isEmpty()) {
                     this.mob.getNavigation().stop();
@@ -151,9 +156,12 @@ public class BuildTowardsTargetGoal extends Goal {
                         }
                     } else if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -2, 0))){
                         System.out.println("can use if 153");
-                        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().getX() != this.mob.getBlockX() || ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().getZ() != this.mob.getBlockZ()) {
-                            System.out.println("can use BuildingGoal false 9");
-                            return false;
+                        if(this.mob.getY() >= ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getY()) {
+                            System.out.println("can use if 155");
+                            if (((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getX() != this.mob.getBlockX() || ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getZ() != this.mob.getBlockZ()) {
+                                System.out.println("can use BuildingGoal false 9");
+                                return false;
+                            }
                         }
                     }
                     if(ModUtils.HasBlockEntityCollision(this.mob.level(), this.pathToNextBlockPos.getTarget())){
