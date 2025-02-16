@@ -3,6 +3,7 @@ package net.zolton21.mixin;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -17,6 +18,7 @@ import net.zolton21.sevendaystosurvive.ai.goals.SearchAndGoToPlayerGoal;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
 import net.zolton21.sevendaystosurvive.utils.ModUtils;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -28,8 +30,12 @@ import java.util.Random;
 @Mixin(Zombie.class)
 public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
+    @Shadow protected abstract void registerGoals();
+
     @Unique
     private boolean sevenDaysToSurvive$executingCustomGoal;
+    @Unique
+    private Path sevenDaysToSurvive$pathToTargetEntity;
     @Unique
     @Nullable
     private LivingEntity sevenDaysToSurvive$modGoalTarget;
@@ -45,6 +51,8 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     private BlockPos sevenDaysToSurvive$previousBlockPos;
     @Unique
     private BlockPos sevenDaysToSurvive$placedBlockBlockPos;
+    @Unique
+    private BlockPos sevenDaysToSurvive$dugNextBlockPos;
 
     protected ZombieMixin(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -57,7 +65,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
         this.goalSelector.addGoal(3, new SearchAndGoToPlayerGoal(this, 1.0));
         this.goalSelector.addGoal(3, new DiggingGoal(this, 1.0));
         this.goalSelector.addGoal(3, new BuildTowardsTargetGoal(this, 1.0));
-        this.sevenDaysToSurvive$blockBreakingSpeedModifier = 1.0f + new Random().nextFloat();
+        this.sevenDaysToSurvive$blockBreakingSpeedModifier = Math.round((1.0f + new Random().nextFloat()) * 10) / 10.0f;
         System.out.println("blockBreakingSpeedModifier: " + this.sevenDaysToSurvive$blockBreakingSpeedModifier);
     }
 
@@ -82,6 +90,10 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                     if (!this.sevenDaysToSurvive$getModGoalTarget().isAlive() || this.sevenDaysToSurvive$getModGoalTarget().isSpectator() || ((ServerPlayer) this.sevenDaysToSurvive$getModGoalTarget()).isCreative()) {
                         this.sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
                     } else {
+                        if(this.sevenDaysToSurvive$pathToTargetEntity == null || this.tickCount % 300 == 0){
+                            this.sevenDaysToSurvive$createPathToTargetEntity();
+                        }
+
                         if (this.tickCount % 40 == 0) {
                             if (!ModUtils.mobHasPlayerTargetAndCanReach(this)) {
                                 if (this.sevenDaysToSurvive$canReachTarget(this.sevenDaysToSurvive$modGoalTarget)) {
@@ -111,6 +123,19 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
         }
     }
 
+    @Inject(method = "readAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("TAIL"))
+    private void onLoad(CompoundTag tag, CallbackInfo ci){
+        if(tag.contains("BlockBreakingSpeedModifier")) {
+            this.sevenDaysToSurvive$blockBreakingSpeedModifier = tag.getFloat("BlockBreakingSpeedModifier");
+            System.out.println("blockBreakingSpeedModifier: " + this.sevenDaysToSurvive$blockBreakingSpeedModifier);
+        }
+    }
+
+    @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
+    private void onSave(CompoundTag tag, CallbackInfo ci){
+        tag.putFloat("BlockBreakingSpeedModifier", this.sevenDaysToSurvive$blockBreakingSpeedModifier);
+    }
+
     @Unique
     private boolean sevenDaysToSurvive$canReachTarget(LivingEntity livingEntity){
         Path path = this.getNavigation().createPath(livingEntity, 0);
@@ -128,6 +153,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     public void sevenDaysToSurvive$customGoalFinished(){
         this.sevenDaysToSurvive$executingCustomGoal = false;
+        this.sevenDaysToSurvive$createPathToTargetEntity();
     }
 
     @Unique
@@ -152,7 +178,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                 Direction.AxisDirection axisDirection = this.sevenDaysToSurvive$setAxisDirection(axis);
 
                 double absXZ = Math.abs(this.getBlockX() - this.sevenDaysToSurvive$modGoalTarget.getBlockX()) + Math.abs(this.getBlockZ() - this.sevenDaysToSurvive$modGoalTarget.getBlockZ());
-                double absY = Math.abs(this.getBlockY() - this.sevenDaysToSurvive$modGoalTarget.getBlockY());
+                double absY = Math.abs(this.getBlockY() - this.sevenDaysToSurvive$modGoalTarget.getBlockY()) + 1;
 
                 System.out.println("mob pos: " + this.blockPosition());
                 System.out.println("target pos: " + this.sevenDaysToSurvive$getModGoalTarget().blockPosition());
@@ -280,7 +306,26 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
         this.sevenDaysToSurvive$placedBlockBlockPos = blockPos;
     }
 
+    public void setSevenDaysToSurvive$dugNextBlockPos(BlockPos blockPos){
+        this.sevenDaysToSurvive$dugNextBlockPos = blockPos;
+    }
+
     public BlockPos getSevenDaysToSurvive$placedBlockBlockPos(){
         return this.sevenDaysToSurvive$placedBlockBlockPos;
+    }
+
+    public BlockPos getSevenDaysToSurvive$dugNextBlockPos(){
+        return this.sevenDaysToSurvive$dugNextBlockPos;
+    }
+
+    public Path getSevenDaysToSurvive$pathToTargetEntity(){
+        return this.sevenDaysToSurvive$pathToTargetEntity;
+    }
+
+    @Unique
+    public void sevenDaysToSurvive$createPathToTargetEntity() {
+        if (this.sevenDaysToSurvive$getModGoalTarget() != null) {
+            this.sevenDaysToSurvive$pathToTargetEntity = this.getNavigation().createPath(sevenDaysToSurvive$getModGoalTarget(), 0);
+        }
     }
 }

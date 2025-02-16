@@ -122,6 +122,7 @@ repositories {
             includeGroup("com.eliotlash.mclib")
         }
     }
+    maven { url "https://www.cursemaven.com" }
     // Put repositories for dependencies here
     // ForgeGradle automatically adds the Forge maven and Maven Central for you
 
@@ -142,6 +143,9 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     implementation fg.deobf("software.bernie.geckolib:geckolib-forge-${minecraft_version}:4.7")
     implementation("com.eliotlash.mclib:mclib:20")
+
+    runtimeOnly fg.deobf("curse.maven:free-cam-557076:4643128")
+    runtimeOnly fg.deobf("curse.maven:cloth-config-348521:5729105")
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}-common-api:${jei_version}")

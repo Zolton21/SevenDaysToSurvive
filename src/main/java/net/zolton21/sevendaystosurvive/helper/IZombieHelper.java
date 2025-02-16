@@ -31,5 +31,11 @@ public interface IZombieHelper {
 
     void setSevenDaysToSurvive$placedBlockBlockPos(BlockPos blockPos);
 
+    void setSevenDaysToSurvive$dugNextBlockPos(BlockPos blockPos);
+
+    BlockPos getSevenDaysToSurvive$dugNextBlockPos();
+
     BlockPos getSevenDaysToSurvive$placedBlockBlockPos();
+
+    Path getSevenDaysToSurvive$pathToTargetEntity();
 }
