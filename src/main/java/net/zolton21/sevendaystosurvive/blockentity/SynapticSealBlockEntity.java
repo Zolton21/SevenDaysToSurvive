@@ -37,15 +37,9 @@ public class SynapticSealBlockEntity extends BlockEntity implements GeoBlockEnti
 
     public List<Zombie> zombiesWithinRange(BlockPos blockPos, BlockState blockState, ServerLevel world) {
         int state = blockState.getValue(STATE);
-        int activityRange = 0;
+        int activityRange = state;
         int blockChunkX = Math.floorDiv(blockPos.getX(), 16);
         int blockChunkZ = Math.floorDiv(blockPos.getZ(), 16);
-        if(state == 2){
-            activityRange = 1;
-        }
-        if(state == 3){
-            activityRange = 2;
-        }
 
         int minChunkX = blockChunkX - activityRange;
         int maxChunkX = blockChunkX + activityRange;

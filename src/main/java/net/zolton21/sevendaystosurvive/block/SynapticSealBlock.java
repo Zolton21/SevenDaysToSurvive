@@ -124,7 +124,7 @@ public class SynapticSealBlock extends BaseEntityBlock {
         }
         Component text = Component.literal(shardCountValue + "/" + MAX_SHARD_COUNT + "   ").withStyle(chatFormatting);
         Component area = Component.literal((1 + 2 * range) + "x" + (1 + 2 * range)).withStyle(chatFormatting);
-        pPlayer.displayClientMessage(Component.literal("Charge: ").append(text).append("Safe area: ").append(area).append(" Chunks"), true);
+        pPlayer.displayClientMessage(Component.translatable("message.sevendaystosurvive.synaptic.seal.charge").append(text).append(Component.translatable("message.sevendaystosurvive.synaptic.seal.safe.area")).append(": ").append(area).append(" ").append(Component.translatable("message.sevendaystosurvive.synaptic.seal.chunks")), true);
     }
 
     @Override

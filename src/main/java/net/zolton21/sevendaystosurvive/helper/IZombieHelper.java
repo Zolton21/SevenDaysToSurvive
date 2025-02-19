@@ -38,4 +38,6 @@ public interface IZombieHelper {
     BlockPos getSevenDaysToSurvive$placedBlockBlockPos();
 
     Path getSevenDaysToSurvive$pathToTargetEntity();
+
+    void sevenDaysToSurvive$createPathToTargetEntity();
 }

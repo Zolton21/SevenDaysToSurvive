@@ -19,6 +19,7 @@ import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
 import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
 import net.zolton21.sevendaystosurvive.utils.ModUtils;
 
+import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -26,15 +27,16 @@ public class BuildTowardsTargetGoal extends Goal {
     protected final double speedModifier;
     private final PathfinderMob mob;
     private Path pathToNextBlockPos;
-    private long tickCounter;
-    private long endJumpTick;
+    private int tickCounter;
+    private int endJumpTick;
     private boolean isJumping;
     private ItemStack heldItem;
-    private long placeBlockTick;
+    private int placeBlockTick;
     private boolean isPlacingBlock;
     private boolean shouldMoveToBlockPos;
     private BlockPos placeBlockBlockPos;
-    private BlockPos diagonalBlockPos;
+    //private BlockPos diagonalBlockPos;
+    private long lastCanUseCheck;
 
     public BuildTowardsTargetGoal(PathfinderMob creature, double speed) {
         this.mob = creature;
@@ -43,6 +45,13 @@ public class BuildTowardsTargetGoal extends Goal {
     }
 
     public boolean canUse() {
+        long i = this.mob.level().getGameTime();
+        if (i - this.lastCanUseCheck < 20L) {
+            return false;
+        } else {
+            this.lastCanUseCheck = i;
+        }
+
         if(((IZombieHelper)this.mob).sevenDaysToSurvive$getIsWithinSynapticSealActivityRange()){
             System.out.println("can use BuildingGoal false 0.1");
             return false;
@@ -55,13 +64,9 @@ public class BuildTowardsTargetGoal extends Goal {
             }
         }
 
-        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
-            if(this.mob.level().getBlockState(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty()) {
-                if (ModUtils.mobHasPlayerTargetAndCanReach(this.mob)) {
-                    System.out.println("can use BuildingGoal false 1");
-                    return false;
-                }
-            }
+        if (ModUtils.mobHasPlayerTargetAndCanReach(this.mob)) {
+            System.out.println("can use BuildingGoal false 1");
+            return false;
         }
 
         if (((IZombieHelper)this.mob).sevenDaysToSurvive$getModGoalTarget() == null) {
@@ -91,12 +96,16 @@ public class BuildTowardsTargetGoal extends Goal {
                     x++;
                     z--;
                 }
-                if(!this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()).isAir()){
-                    System.out.println("can use BuildingGoal false (nextblockposition isn't air)");
-                    return false;
+
+                if(this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty()) {
+                    System.out.println("can use BuildingGoal false (nextblockposition isn't Fluid)");
+                    if (!this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()).isAir()) {
+                        System.out.println("can use BuildingGoal false (nextblockposition isn't air)");
+                        return false;
+                    }
                 }
 
-                this.diagonalBlockPos = this.mob.blockPosition().offset(x, 0, z);
+                /*this.diagonalBlockPos = this.mob.blockPosition().offset(x, 0, z);
                 if (!this.mob.level().getBlockState(this.diagonalBlockPos).getFluidState().isEmpty()) {
                     System.out.println("can use BuildingGoal true liquid blockPos");
                     return true;
@@ -104,8 +113,11 @@ public class BuildTowardsTargetGoal extends Goal {
                 if (!this.mob.level().getBlockState(this.diagonalBlockPos.offset(0, -1, 0)).getFluidState().isEmpty()) {
                     System.out.println("can use BuildingGoal true liquid blockPos y-1");
                     return true;
-                }
-                if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0)) && !ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0)) && !ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos()) && this.mob.level().getBlockState(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty()) {
+                }*/
+                if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0)) &&
+                        !ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0)) &&
+                        !ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos()) &&
+                        this.mob.level().getBlockState(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty()) {
                     System.out.println("can use BuildingGoal false 3");
                     return false;
                 }
@@ -187,13 +199,9 @@ public class BuildTowardsTargetGoal extends Goal {
             }
         }
 
-        if(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
-            if(this.mob.level().getBlockState(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty() && this.mob.level().getBlockState(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0)).getFluidState().isEmpty()) {
-                if (ModUtils.mobHasPlayerTargetAndCanReach(this.mob)) {
-                    System.out.println("cancel 1");
-                    return false;
-                }
-            }
+        if (ModUtils.mobHasPlayerTargetAndCanReach(this.mob)) {
+            System.out.println("cancel 1");
+            return false;
         }
 
         if(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
@@ -221,7 +229,7 @@ public class BuildTowardsTargetGoal extends Goal {
                             x++;
                             z--;
                         }
-                        this.diagonalBlockPos = this.mob.blockPosition().offset(x, 0, z);
+                        /*this.diagonalBlockPos = this.mob.blockPosition().offset(x, 0, z);
                         if (!this.mob.level().getBlockState(this.diagonalBlockPos).getFluidState().isEmpty()) {
                             System.out.println("canContinueToUse true liquid blockPos");
                             return true;
@@ -229,7 +237,7 @@ public class BuildTowardsTargetGoal extends Goal {
                         if (!this.mob.level().getBlockState(this.diagonalBlockPos.offset(0, -1, 0)).getFluidState().isEmpty()) {
                             System.out.println("canContinueToUse liquid blockPos y-1");
                             return true;
-                        }
+                        }*/
 
                         if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0)) && !ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0)) && !ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos()) && this.mob.level().getBlockState(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty()) {
                             System.out.println("cancel 4");
@@ -349,10 +357,16 @@ public class BuildTowardsTargetGoal extends Goal {
                                 this.mobJump(this.tickCounter);
                             }
 
-                            double distance = this.mob.distanceToSqr(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getCenter());
-                            if(distance > 0.38) {
-                                Vec3 multiplication = ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getCenter().subtract(this.mob.blockPosition().getCenter()).normalize().multiply(0.1, 0.1, 0.1);
-                                this.mob.setDeltaMovement(multiplication);
+                            if(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().getX() == this.mob.getBlockX() && ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().getZ() == this.mob.getBlockZ()) {
+                                double distance = this.mob.distanceToSqr(this.mob.blockPosition().getCenter());
+                                if (distance > 0.15) {
+                                    System.out.println("Move to block center (Building goal)");
+                                    double currentX = this.mob.getX();
+                                    double currentZ = this.mob.getZ();
+                                    double offsetX = Math.floor(currentX) + 0.5 - currentX;
+                                    double offsetZ = Math.floor(currentZ) + 0.5 - currentZ;
+                                    this.mob.setDeltaMovement(this.mob.getDeltaMovement().add(offsetX * 0.1, 0, offsetZ * 0.1));
+                                }
                             }
 
                         } else {
@@ -370,7 +384,7 @@ public class BuildTowardsTargetGoal extends Goal {
                                     } else if (!this.mob.level().getBlockState(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty()) {
                                         System.out.println("Start placing block 4");
                                         this.startPlacingBlock(((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos(), true);
-                                    } else if (this.diagonalBlockPos != null) {
+                                    } /*else if (this.diagonalBlockPos != null) {
                                         if (!this.mob.level().getBlockState(this.diagonalBlockPos).getFluidState().isEmpty()) {
                                             System.out.println("Start placing block 5");
                                             this.startPlacingBlock(this.diagonalBlockPos, true);
@@ -378,7 +392,7 @@ public class BuildTowardsTargetGoal extends Goal {
                                             System.out.println("Start placing block 6");
                                             this.startPlacingBlock(this.diagonalBlockPos.offset(0, -1, 0), true);
                                         }
-                                    }
+                                    }*/
                                 }
                             }
                         }
@@ -399,7 +413,7 @@ public class BuildTowardsTargetGoal extends Goal {
         this.mob.getLookControl().setLookAt(Vec3.atCenterOf(blockPos));
     }
 
-    private void mobJump(long currentTick){
+    private void mobJump(int currentTick){
 
         this.isJumping = true;
         int x = this.mob.getBlockX();
