@@ -27,8 +27,10 @@ public class MeleeAttackGoalMixin{
     private long sevenDaysToSurvive$targetHurtTick;
     @Unique
     private long sevenDaysToSurvive$lastCanUseRun;
-    private long lastPathCreation;
-    private Path path;
+    @Unique
+    private long sevenDaysToSurvive$lastPathCreation;
+    @Unique
+    private Path sevenDaysToSurvive$path;
 
     @Inject(method = "canUse()Z", at = @At("HEAD"), cancellable = true)
     public void canUseAdditions(CallbackInfoReturnable<Boolean> cir){
@@ -37,7 +39,7 @@ public class MeleeAttackGoalMixin{
 
         }else {
             this.sevenDaysToSurvive$lastCanUseRun = i;
-            if (!((Object) this instanceof Drowned) && !((Object) this instanceof ZombifiedPiglin)) {
+            if (!(this.mob instanceof Drowned) && !(this.mob instanceof ZombifiedPiglin)) {
                 if (this.mob instanceof Zombie) {
                     if (!((IZombieHelper) this.mob).sevenDaysToSurvive$getIsWithinSynapticSealActivityRange()) {
                         if (this.mob.getTarget() instanceof ServerPlayer player) {
@@ -55,7 +57,7 @@ public class MeleeAttackGoalMixin{
 
     @Inject(method = "canContinueToUse()Z", at = @At("HEAD"), cancellable = true)
     public void canContinueToUseAdditions(CallbackInfoReturnable<Boolean> cir){
-        if (!((Object) this instanceof Drowned) && !((Object) this instanceof ZombifiedPiglin)) {
+        if (!(this.mob instanceof Drowned) && !(this.mob instanceof ZombifiedPiglin)) {
             long i = this.mob.level().getGameTime();
             if (this.mob instanceof Zombie) {
                 if (!((IZombieHelper) this.mob).sevenDaysToSurvive$getIsWithinSynapticSealActivityRange()) {
@@ -73,10 +75,10 @@ public class MeleeAttackGoalMixin{
                                         if (!this.mob.level().getBlockState(nextBp).getFluidState().isEmpty()) {
                                             cir.setReturnValue(false);
                                         }
-                                        if (this.mob.level().getBlockState(nextBp.offset(0, 1, 0)).getFluidState().isEmpty()) {
+                                        if (!this.mob.level().getBlockState(nextBp.offset(0, 1, 0)).getFluidState().isEmpty()) {
                                             cir.setReturnValue(false);
                                         }
-                                        if (this.mob.level().getBlockState(nextBp.offset(0, -1, 0)).getFluidState().isEmpty()) {
+                                        if (!this.mob.level().getBlockState(nextBp.offset(0, -1, 0)).getFluidState().isEmpty()) {
                                             cir.setReturnValue(false);
                                         }
                                     }
@@ -94,18 +96,19 @@ public class MeleeAttackGoalMixin{
     @Unique
     private boolean sevenDaysToSurvive$conditions(ServerPlayer player){
         long i = this.mob.level().getGameTime();
-        if(i - this.lastPathCreation > 20L) {
-            this.path = this.mob.getNavigation().createPath(player, 0);
+        if(i - this.sevenDaysToSurvive$lastPathCreation > 20L) {
+            this.sevenDaysToSurvive$lastPathCreation = i;
+            this.sevenDaysToSurvive$path = this.mob.getNavigation().createPath(player, 0);
         }
-        if (this.path != null) {
+        if (this.sevenDaysToSurvive$path != null) {
             if(this.mob.getTarget() != null) {
-                if (this.path.getTarget().equals(this.mob.getTarget().blockPosition())) {
+                if (this.sevenDaysToSurvive$path.getTarget().equals(this.mob.getTarget().blockPosition())) {
                     BlockPos nextBp = ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos();
                     if(nextBp != null) {
                         if (this.mob.level().getBlockState(nextBp).getFluidState().isEmpty() &&
                                 this.mob.level().getBlockState(nextBp.offset(0, 1, 0)).getFluidState().isEmpty() &&
                                 this.mob.level().getBlockState(nextBp.offset(0, -1, 0)).getFluidState().isEmpty()) {
-                            return this.path.canReach();
+                            return this.sevenDaysToSurvive$path.canReach();
                         }
                     }
                 }
