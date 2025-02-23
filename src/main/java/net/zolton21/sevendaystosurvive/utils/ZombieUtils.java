@@ -143,7 +143,7 @@ public class ZombieUtils {
 
             if (serverLevel != null) {
                 for (ServerPlayer player : serverLevel.players()) {
-                    if (player.level().dimension() != mob.level().dimension()) {
+                    if (player.level().dimension() == mob.level().dimension()) {
                         if (player.distanceTo(mob) < range) {
                             if (player.isAlive() && !player.isSpectator() && !player.isCreative() && !PlayerHelper.isPlayerProtected((ServerPlayer) player)) {
                                 double distance = mob.distanceToSqr(player);

@@ -273,7 +273,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
                 ((IZombieHelper) this.mob).sevenDaysToSurvive$createPathToTargetEntity();
                 this.isMoving = true;
             }
-            if(this.notMovingTickCounter >= 300) {
+            if(this.notMovingTickCounter >= 60) {
                 this.stop();
             }
             if(this.mobBP != this.mob.blockPosition()){

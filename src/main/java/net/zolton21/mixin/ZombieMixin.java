@@ -163,9 +163,6 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                     }
                 }
                 if (this.sevenDaysToSurvive$getModGoalTarget() != null) {
-                    if (this.sevenDaysToSurvive$getModGoalTarget().level().dimension() != this.level().dimension()) {
-                        this.sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
-                    }
                     if (!this.sevenDaysToSurvive$getModGoalTarget().isAlive() || this.sevenDaysToSurvive$getModGoalTarget().isSpectator() || ((ServerPlayer) this.sevenDaysToSurvive$getModGoalTarget()).isCreative()) {
                         this.sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
                     } else {
@@ -255,10 +252,12 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     @Unique
     private boolean sevenDaysToSurvive$canReachTarget(LivingEntity livingEntity) {
-        Path path = this.getNavigation().createPath(livingEntity, 0);
-        if (path != null) {
-            if (livingEntity.blockPosition().equals(path.getTarget())) {
-                return path.canReach();
+        if(this.level().dimension() == this.sevenDaysToSurvive$modGoalTarget.level().dimension()) {
+            Path path = this.getNavigation().createPath(livingEntity, 0);
+            if (path != null) {
+                if (livingEntity.blockPosition().equals(path.getTarget())) {
+                    return path.canReach();
+                }
             }
         }
         return false;
