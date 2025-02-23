@@ -25,16 +25,26 @@ public class MeleeAttackGoalMixin{
     @Shadow private int ticksUntilNextPathRecalculation;
     @Unique
     private long sevenDaysToSurvive$targetHurtTick;
+    @Unique
+    private long sevenDaysToSurvive$lastCanUseRun;
+    private long lastPathCreation;
+    private Path path;
 
     @Inject(method = "canUse()Z", at = @At("HEAD"), cancellable = true)
     public void canUseAdditions(CallbackInfoReturnable<Boolean> cir){
-        if (!((Object) this instanceof Drowned) && !((Object) this instanceof ZombifiedPiglin)) {
-            if (this.mob instanceof Zombie) {
-                if (!((IZombieHelper) this.mob).sevenDaysToSurvive$getIsWithinSynapticSealActivityRange()) {
-                    if (this.mob.getTarget() instanceof ServerPlayer player) {
-                        if (player.isAlive() && !player.isSpectator() && !player.isCreative()) {
-                            if (!this.sevenDaysToSurvive$conditions(player)) {
-                                cir.setReturnValue(false);
+        long i = this.mob.level().getGameTime();
+        if (i - this.sevenDaysToSurvive$lastCanUseRun < 20L) {
+
+        }else {
+            this.sevenDaysToSurvive$lastCanUseRun = i;
+            if (!((Object) this instanceof Drowned) && !((Object) this instanceof ZombifiedPiglin)) {
+                if (this.mob instanceof Zombie) {
+                    if (!((IZombieHelper) this.mob).sevenDaysToSurvive$getIsWithinSynapticSealActivityRange()) {
+                        if (this.mob.getTarget() instanceof ServerPlayer player) {
+                            if (player.isAlive() && !player.isSpectator() && !player.isCreative()) {
+                                if (!this.sevenDaysToSurvive$conditions(player)) {
+                                    cir.setReturnValue(false);
+                                }
                             }
                         }
                     }
@@ -83,16 +93,19 @@ public class MeleeAttackGoalMixin{
 
     @Unique
     private boolean sevenDaysToSurvive$conditions(ServerPlayer player){
-        Path path = this.mob.getNavigation().createPath(player, 0);
-        if (path != null) {
+        long i = this.mob.level().getGameTime();
+        if(i - this.lastPathCreation > 20L) {
+            this.path = this.mob.getNavigation().createPath(player, 0);
+        }
+        if (this.path != null) {
             if(this.mob.getTarget() != null) {
-                if (path.getTarget().equals(this.mob.getTarget().blockPosition())) {
+                if (this.path.getTarget().equals(this.mob.getTarget().blockPosition())) {
                     BlockPos nextBp = ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos();
                     if(nextBp != null) {
                         if (this.mob.level().getBlockState(nextBp).getFluidState().isEmpty() &&
                                 this.mob.level().getBlockState(nextBp.offset(0, 1, 0)).getFluidState().isEmpty() &&
                                 this.mob.level().getBlockState(nextBp.offset(0, -1, 0)).getFluidState().isEmpty()) {
-                            return path.canReach();
+                            return this.path.canReach();
                         }
                     }
                 }

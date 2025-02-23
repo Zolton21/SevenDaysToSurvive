@@ -5,22 +5,18 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.monster.Drowned;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.monster.ZombifiedPiglin;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.Path;
 import net.zolton21.sevendaystosurvive.ai.goals.BuildTowardsTargetGoal;
 import net.zolton21.sevendaystosurvive.ai.goals.DiggingGoal;
-import net.zolton21.sevendaystosurvive.ai.goals.FollowLeaderGoal;
 import net.zolton21.sevendaystosurvive.ai.goals.SearchAndGoToPlayerGoal;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
 import net.zolton21.sevendaystosurvive.utils.ZombieUtils;
@@ -32,8 +28,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 @Mixin(Zombie.class)
@@ -75,27 +69,19 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     private BlockPos sevenDaysToSurvive$dugNextBlockPos;
     @Unique
     private int sevenDaysToSurvive$ticksUntilNextPathRecalculation;
-    @Unique
-    private boolean sevenDaysToSurvive$isLeader;
-    @Unique
-    private long sevenDaysToSurvive$lastLeaderCheck;
-    @Unique
-    @Nullable
-    private Zombie sevenDaysToSurvive$leader;
-    @Unique
-    private List<Zombie> sevenDaysToSurvive$group = new ArrayList<>();
+    private boolean mobHasPlayerTargetAndCanReach;
 
     protected ZombieMixin(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.sevenDaysToSurvive$executingCustomGoal = false;
         this.sevenDaysToSurvive$isWithinSynapticSealActivityRange = false;
         this.sevenDaysToSurvive$ticksUntilNextPathRecalculation = 0;
+        this.mobHasPlayerTargetAndCanReach = false;
     }
 
     @Inject(method = "addBehaviourGoals()V", at = @At("HEAD"))
     public void applyCustomAI(CallbackInfo ci) {
         if (!((Object) this instanceof Drowned) && !((Object) this instanceof ZombifiedPiglin)) {
-            this.goalSelector.addGoal(3, new FollowLeaderGoal(this, 1.0));
             this.goalSelector.addGoal(3, new SearchAndGoToPlayerGoal(this, 1.0));
             this.goalSelector.addGoal(3, new DiggingGoal(this, 1.0));
             this.goalSelector.addGoal(3, new BuildTowardsTargetGoal(this, 1.0));
@@ -114,39 +100,6 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     @Unique
     private void sevenDaysToSurvive$additionalTickLogic(){
         if (this.isAlive()) {
-            if (this.sevenDaysToSurvive$isLeader) {
-                this.setItemInHand(InteractionHand.OFF_HAND, Items.LIME_WOOL.getDefaultInstance());
-            } else {
-                this.setItemInHand(InteractionHand.OFF_HAND, Items.RED_WOOL.getDefaultInstance());
-            }
-
-            if (!this.sevenDaysToSurvive$group.isEmpty()) {//zombie is a leader of a group
-                this.sevenDaysToSurvive$isLeader = true;
-                this.setItemSlot(EquipmentSlot.HEAD, Items.GOLDEN_HELMET.getDefaultInstance());
-            } else {//if zombie isn't leader of a group
-                this.setItemSlot(EquipmentSlot.HEAD, Items.AIR.getDefaultInstance());
-                long i = this.tickCount;
-                if (this.onGround()) {
-                    if (this.sevenDaysToSurvive$leader == null) {
-                        if (i - this.sevenDaysToSurvive$lastLeaderCheck > 20L) {
-                            this.sevenDaysToSurvive$lastLeaderCheck = i;
-                            ZombieUtils.searchReachableZombieLeader(this);
-                        }
-                    } else {
-                        if (i - this.sevenDaysToSurvive$lastLeaderCheck > 300L) {
-                            this.sevenDaysToSurvive$lastLeaderCheck = i;
-                            if (!ZombieUtils.isLeaderWithingRange(this)) {
-                                Zombie zombie = this.getSevenDaysToSurvive$leader();
-                                if (zombie != null) {
-                                    ((IZombieHelper) zombie).sevenDaysToSurvive$removeZombieFromGroup((Zombie) (Object) this);
-                                }
-                                this.sevenDaysToSurvive$isLeader = true;
-                            }
-                        }
-                    }
-                }
-            }
-
             this.sevenDaysToSurvive$ticksUntilNextPathRecalculation--;
             if (this.getNavigation() instanceof GroundPathNavigation) {
                 if (this.getTarget() == null) {
@@ -158,6 +111,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                 } else {
                     if (this.sevenDaysToSurvive$getModGoalTarget() != this.getTarget()) {
                         if (this.getTarget() instanceof ServerPlayer) {
+                            this.mobHasPlayerTargetAndCanReach = ZombieUtils.mobHasPlayerTargetAndCanReach(this);
                             this.sevenDaysToSurvive$modGoalTarget = this.getTarget();
                         }
                     }
@@ -171,7 +125,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                         }
 
                         if (this.tickCount % 40 == 0) {
-                            if (!ZombieUtils.mobHasPlayerTargetAndCanReach(this)) {
+                            if (!this.mobHasPlayerTargetAndCanReach) {
                                 if (this.sevenDaysToSurvive$canReachTarget(this.sevenDaysToSurvive$modGoalTarget)) {
                                     this.setTarget(this.sevenDaysToSurvive$modGoalTarget);
                                 }
@@ -209,7 +163,6 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
             if (tag.contains("BlockBreakingSpeedModifier")) {
                 this.sevenDaysToSurvive$blockBreakingSpeedModifier = tag.getFloat("BlockBreakingSpeedModifier");
             }
-            this.sevenDaysToSurvive$group.clear();
         }
     }
 
@@ -223,31 +176,10 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     @Override
     public void checkDespawn() {
         if (!((Object) this instanceof Drowned) && !((Object) this instanceof ZombifiedPiglin)) {
-            if (this.sevenDaysToSurvive$modGoalTarget == null && this.sevenDaysToSurvive$group.isEmpty()) {
+            if (this.sevenDaysToSurvive$modGoalTarget == null || this.level().getDifficulty() == Difficulty.PEACEFUL) {
                 super.checkDespawn();
             }
         }
-    }
-
-    @Override
-    public void die(DamageSource pDamageSource) {
-        if (!((Object) this instanceof Drowned) && !((Object) this instanceof ZombifiedPiglin)) {
-            if (this.sevenDaysToSurvive$isLeader) {
-                if (!this.sevenDaysToSurvive$group.isEmpty()) {
-                    Zombie zombie = this.sevenDaysToSurvive$group.get(0);
-                    this.sevenDaysToSurvive$group.remove(zombie);
-                    List<Zombie> group_copy = new ArrayList<>(this.sevenDaysToSurvive$group);
-                    ((IZombieHelper) zombie).sevenDaysToSurvive$setAsALeader(group_copy);
-
-                }
-            } else {
-                Zombie zombie = this.getSevenDaysToSurvive$leader();
-                if (zombie != null) {
-                    ((IZombieHelper) zombie).sevenDaysToSurvive$removeZombieFromGroup((Zombie) (Object) this);
-                }
-            }
-        }
-        super.die(pDamageSource);
     }
 
     @Unique
@@ -274,9 +206,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     @Unique
     public void sevenDaysToSurvive$findReachableTarget() {
-        if(this.sevenDaysToSurvive$isLeader) {
-            this.sevenDaysToSurvive$modGoalTarget = ZombieUtils.getNearestUnprotectedSurvivalPlayer(this, 60);
-        }
+        this.sevenDaysToSurvive$modGoalTarget = ZombieUtils.getNearestUnprotectedSurvivalPlayer(this, 60);
     }
 
     public void sevenDaysToSurvive$findCustomPath() {
@@ -450,43 +380,11 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
         if (this.sevenDaysToSurvive$getModGoalTarget() != null) {
             this.sevenDaysToSurvive$pathToTargetEntity = this.getNavigation().createPath(sevenDaysToSurvive$getModGoalTarget(), 0);
         }
-        this.sevenDaysToSurvive$ticksUntilNextPathRecalculation = 300;
+        this.sevenDaysToSurvive$ticksUntilNextPathRecalculation = 200;
     }
 
-    public boolean sevenDaysToSurvive$isLeader() {
-        return this.sevenDaysToSurvive$isLeader;
-    }
-
-    public void sevenDaysToSurvive$setLeaderForZombie(@Nullable Zombie zombie){
-        this.sevenDaysToSurvive$leader = zombie;
-        this.sevenDaysToSurvive$isLeader = false;
-    }
-
-    public void sevenDaysToSurvive$addZombieToGroup(Zombie zombie) {
-        this.sevenDaysToSurvive$group.add(zombie);
-        ((IZombieHelper) zombie).sevenDaysToSurvive$setLeaderForZombie((Zombie) (Object) this);
-    }
-
-    public void sevenDaysToSurvive$removeZombieFromGroup(Zombie zombie) {
-        this.sevenDaysToSurvive$group.remove(zombie);
-        ((IZombieHelper) zombie).sevenDaysToSurvive$setLeaderForZombie(null);
-    }
-
-    public void sevenDaysToSurvive$setAsALeader(List<Zombie> zombieList){
-        this.sevenDaysToSurvive$isLeader = true;
-        this.sevenDaysToSurvive$group.clear();
-        this.sevenDaysToSurvive$group.addAll(zombieList);
-        for(Zombie zombie: zombieList){
-            ((IZombieHelper) zombie).sevenDaysToSurvive$setLeaderForZombie((Zombie) (Object) this);
-        }
-    }
-
-    public void sevenDaysToSurvive$strayAlone(){
-        this.sevenDaysToSurvive$isLeader = true;
-    }
-
-    @Nullable
-    public Zombie getSevenDaysToSurvive$leader(){
-        return this.sevenDaysToSurvive$leader;
+    @Unique
+    public boolean sevenDaysToSurvive$getMobHasPlayerTargetAndCanReach(){
+        return this.mobHasPlayerTargetAndCanReach;
     }
 }

@@ -64,7 +64,7 @@ public class DiggingGoal extends Goal {
             }
         }
 
-        if (ZombieUtils.mobHasPlayerTargetAndCanReach(this.mob)) {
+        if (((IZombieHelper)this.mob).sevenDaysToSurvive$getMobHasPlayerTargetAndCanReach()) {
             System.out.println("DiggingGoal canUse false 3");
             return false;
         }
@@ -74,11 +74,6 @@ public class DiggingGoal extends Goal {
             return false;
         } else if (!((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive() || (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget()).isSpectator() || ((ServerPlayer) ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget()).isCreative()) {
             System.out.println("DiggingGoal canUse false 5");
-            return false;
-        }
-
-        if(((IZombieHelper)this.mob).getSevenDaysToSurvive$leader() != null){
-            System.out.println("can use DiggingGoal false (Zombie Has A Leader)");
             return false;
         }
 
@@ -199,7 +194,7 @@ public class DiggingGoal extends Goal {
             }
         }
 
-        if (ZombieUtils.mobHasPlayerTargetAndCanReach(this.mob)) {
+        if (((IZombieHelper)this.mob).sevenDaysToSurvive$getMobHasPlayerTargetAndCanReach()) {
             System.out.println("Digging goal cancel3");
             return false;
         }
@@ -209,11 +204,6 @@ public class DiggingGoal extends Goal {
             return false;
         } else if (!((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive() || (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget()).isSpectator() || ((ServerPlayer) ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget()).isCreative()) {
             System.out.println("BuildingGoal cancel 2.2");
-            return false;
-        }
-
-        if(((IZombieHelper)this.mob).getSevenDaysToSurvive$leader() != null){
-            System.out.println("can use BuildingGoal cancel (Zombie Has A Leader)");
             return false;
         }
 

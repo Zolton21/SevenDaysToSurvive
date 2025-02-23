@@ -42,17 +42,5 @@ public interface IZombieHelper {
 
     void sevenDaysToSurvive$createPathToTargetEntity();
 
-    boolean sevenDaysToSurvive$isLeader();
-
-    void sevenDaysToSurvive$setLeaderForZombie(Zombie zombie);
-
-    void sevenDaysToSurvive$addZombieToGroup(Zombie zombie);
-
-    void sevenDaysToSurvive$removeZombieFromGroup(Zombie zombie);
-
-    void sevenDaysToSurvive$setAsALeader(List<Zombie> zombieList);
-
-    void sevenDaysToSurvive$strayAlone();
-
-    Zombie getSevenDaysToSurvive$leader();
+    boolean sevenDaysToSurvive$getMobHasPlayerTargetAndCanReach();
 }

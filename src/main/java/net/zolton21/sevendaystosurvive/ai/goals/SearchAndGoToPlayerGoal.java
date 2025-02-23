@@ -31,6 +31,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
     private boolean isMoving;
     private int notMovingTickCounter;
     private BlockPos mobBP;
+    private boolean runnedOnce;
 
     public SearchAndGoToPlayerGoal(PathfinderMob creature, double speed) {
         this.mob = creature;
@@ -63,7 +64,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
             }
         }
 
-        if (ZombieUtils.mobHasPlayerTargetAndCanReach(this.mob)) {
+        if (((IZombieHelper)this.mob).sevenDaysToSurvive$getMobHasPlayerTargetAndCanReach()) {
             System.out.println("SearchAndGo canUse false3");
             return false;
         }
@@ -73,11 +74,6 @@ public class SearchAndGoToPlayerGoal extends Goal {
             return false;
         } else if (!((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive() || (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget()).isSpectator() || ((ServerPlayer) ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget()).isCreative()) {
             System.out.println("SearchAndGo canUse false 5");
-            return false;
-        }
-
-        if(((IZombieHelper)this.mob).getSevenDaysToSurvive$leader() != null){
-            System.out.println("can use SearchAndGo false (Zombie Has A Leader)");
             return false;
         }
 
@@ -155,7 +151,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
             }
         }
 
-        if (ZombieUtils.mobHasPlayerTargetAndCanReach(this.mob)) {
+        if (((IZombieHelper)this.mob).sevenDaysToSurvive$getMobHasPlayerTargetAndCanReach()) {
             System.out.println("SearchAndGo canContinueToUse false3");
             return false;
         }
@@ -165,11 +161,6 @@ public class SearchAndGoToPlayerGoal extends Goal {
             return false;
         } else if (!((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive() || (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget()).isSpectator() || ((ServerPlayer) ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget()).isCreative()) {
             System.out.println("BuildingGoal cancel 2.2");
-            return false;
-        }
-
-        if(((IZombieHelper)this.mob).getSevenDaysToSurvive$leader() != null){
-            System.out.println("can use BuildingGoal cancel (Zombie Has A Leader)");
             return false;
         }
 
@@ -246,7 +237,10 @@ public class SearchAndGoToPlayerGoal extends Goal {
     }
 
     public void tick() {
-        this.pathToPlayer = ((IZombieHelper)this.mob).getSevenDaysToSurvive$pathToTargetEntity();
+        if(this.pathToPlayer != ((IZombieHelper)this.mob).getSevenDaysToSurvive$pathToTargetEntity()){
+            this.pathToPlayer = ((IZombieHelper)this.mob).getSevenDaysToSurvive$pathToTargetEntity();
+            this.runnedOnce = false;
+        }
         this.tickCounter++;
 
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
@@ -269,8 +263,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
         }else {
             this.notMovingTickCounter++;
             if(this.notMovingTickCounter >= 30){
-                //this.mob.getJumpControl().jump();
-                ((IZombieHelper) this.mob).sevenDaysToSurvive$createPathToTargetEntity();
+                //((IZombieHelper) this.mob).sevenDaysToSurvive$createPathToTargetEntity();
                 this.isMoving = true;
             }
             if(this.notMovingTickCounter >= 60) {
@@ -304,6 +297,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
         System.out.println("start executing searchAndGoToPlayerGoal");
         ((IZombieHelper) this.mob).sevenDaysToSurvive$customGoalStarted();
         this.mob.getNavigation().stop();
+        this.runnedOnce = false;
         this.tickCounter = 0;
         this.pathToPlayer = ((IZombieHelper)this.mob).getSevenDaysToSurvive$pathToTargetEntity();
         this.heldItem = this.mob.getItemInHand(InteractionHand.MAIN_HAND);
@@ -345,12 +339,23 @@ public class SearchAndGoToPlayerGoal extends Goal {
             }
 
         }else{
-            System.out.println("move if2");
-            if(this.pathToPlayer != null) {
-                this.mob.getNavigation().moveTo(this.pathToPlayer, this.speedModifier);
+            if(this.pathToPlayer != null && this.notMovingTickCounter <= 40) {
+                System.out.println("move if2");
+                this.runOnce();
+                //this.mob.getNavigation().moveTo(this.pathToPlayer, this.speedModifier);
+            }else{
+                System.out.println("move if3");
+                this.mob.getNavigation().moveTo(((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget(), this.speedModifier);
             }
         }
 
+    }
+
+    private void runOnce(){
+        if(!this.runnedOnce) {
+            this.mob.getNavigation().moveTo(this.pathToPlayer, this.speedModifier);
+            this.runnedOnce = true;
+        }
     }
 
     public void stop() {

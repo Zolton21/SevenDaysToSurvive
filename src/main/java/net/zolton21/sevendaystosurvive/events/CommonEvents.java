@@ -16,7 +16,7 @@ public class CommonEvents {
         Player player = event.getEntity();
         if(player.level() instanceof ServerLevel serverLevel){
             long time = serverLevel.getDayTime() % 24000;
-            long daysPassed = serverLevel.getDayTime() / 24000;
+            long daysPassed = serverLevel.getDayTime() / 24000 + 1;
             System.out.println("time: " + time);
             System.out.println("daysPassed: " + daysPassed);
             if(daysPassed % 7 == 0){
