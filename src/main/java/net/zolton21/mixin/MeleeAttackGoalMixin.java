@@ -20,8 +20,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MeleeAttackGoalMixin{
 
     @Shadow @Final protected PathfinderMob mob;
-
     @Shadow private int ticksUntilNextPathRecalculation;
+    @Unique
+    private long sevenDaysToSurvive$targetHurtTick;
 
     @Inject(method = "canUse()Z", at = @At("HEAD"), cancellable = true)
     public void canUseAdditions(CallbackInfoReturnable<Boolean> cir){
@@ -40,27 +41,33 @@ public class MeleeAttackGoalMixin{
 
     @Inject(method = "canContinueToUse()Z", at = @At("HEAD"), cancellable = true)
     public void canContinueToUseAdditions(CallbackInfoReturnable<Boolean> cir){
+        long i = this.mob.level().getGameTime();
         if(this.mob instanceof Zombie ) {
             if (!((IZombieHelper) this.mob).sevenDaysToSurvive$getIsWithinSynapticSealActivityRange()) {
                 LivingEntity target = this.mob.getTarget();
                 if (target instanceof ServerPlayer) {
-                    if (this.ticksUntilNextPathRecalculation <= 0) {
-                        Path path = this.mob.getNavigation().createPath(target, 0);
-                        if (path != null && path.canReach() && path.getTarget().equals(target.blockPosition())) {
-                            BlockPos nextBp = ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos();
-                            if(nextBp != null) {
-                                if (!this.mob.level().getBlockState(nextBp).getFluidState().isEmpty()){
-                                    cir.setReturnValue(false);
+                    if(((ServerPlayer) target).isHurt()){
+                        this.sevenDaysToSurvive$targetHurtTick = i;
+                    }
+                    if(i - this.sevenDaysToSurvive$targetHurtTick > 20L) {
+                        if (this.ticksUntilNextPathRecalculation <= 0) {
+                            Path path = this.mob.getNavigation().createPath(target, 0);
+                            if (path != null && path.canReach() && path.getTarget().equals(target.blockPosition())) {
+                                BlockPos nextBp = ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos();
+                                if (nextBp != null) {
+                                    if (!this.mob.level().getBlockState(nextBp).getFluidState().isEmpty()) {
+                                        cir.setReturnValue(false);
+                                    }
+                                    if (this.mob.level().getBlockState(nextBp.offset(0, 1, 0)).getFluidState().isEmpty()) {
+                                        cir.setReturnValue(false);
+                                    }
+                                    if (this.mob.level().getBlockState(nextBp.offset(0, -1, 0)).getFluidState().isEmpty()) {
+                                        cir.setReturnValue(false);
+                                    }
                                 }
-                                if(this.mob.level().getBlockState(nextBp.offset(0, 1, 0)).getFluidState().isEmpty()){
-                                    cir.setReturnValue(false);
-                                }
-                                if(this.mob.level().getBlockState(nextBp.offset(0, -1, 0)).getFluidState().isEmpty()) {
-                                    cir.setReturnValue(false);
-                                }
+                            } else {
+                                cir.setReturnValue(false);
                             }
-                        } else {
-                            cir.setReturnValue(false);
                         }
                     }
                 }

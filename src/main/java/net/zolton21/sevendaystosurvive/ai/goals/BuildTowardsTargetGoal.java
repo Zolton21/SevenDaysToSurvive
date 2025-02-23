@@ -17,7 +17,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
 import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
-import net.zolton21.sevendaystosurvive.utils.ModUtils;
+import net.zolton21.sevendaystosurvive.utils.ZombieUtils;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -33,7 +33,6 @@ public class BuildTowardsTargetGoal extends Goal {
     private int placeBlockTick;
     private boolean isPlacingBlock;
     private BlockPos placeBlockBlockPos;
-    //private BlockPos diagonalBlockPos;
     private long lastCanUseCheck;
 
     public BuildTowardsTargetGoal(PathfinderMob creature, double speed) {
@@ -62,13 +61,21 @@ public class BuildTowardsTargetGoal extends Goal {
             }
         }
 
-        if (ModUtils.mobHasPlayerTargetAndCanReach(this.mob)) {
+        if (ZombieUtils.mobHasPlayerTargetAndCanReach(this.mob)) {
             System.out.println("can use BuildingGoal false 1");
             return false;
         }
 
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() == null) {
-            System.out.println("can use BuildingGoal false 2");
+            System.out.println("BuildingGoal canUse false 2.1");
+            return false;
+        } else if (!((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive() || (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget()).isSpectator() || ((ServerPlayer) ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget()).isCreative()) {
+            System.out.println("BuildingGoal canUse false 2.2");
+            return false;
+        }
+
+        if(((IZombieHelper)this.mob).getSevenDaysToSurvive$leader() != null){
+            System.out.println("can use BuildingGoal false (Zombie Has A Leader)");
             return false;
         }
 
@@ -79,7 +86,7 @@ public class BuildTowardsTargetGoal extends Goal {
             }
         }
 
-        if (ModUtils.isMobStandingOnAFullBlock(this.mob)) {
+        if (ZombieUtils.isMobStandingOnAFullBlock(this.mob)) {
             if (((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
                 if (!this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0)).getFluidState().isEmpty()) {
                     System.out.println("can use BuildingGoal true liquid nextBlockPos 0, -1, 0");
@@ -94,18 +101,9 @@ public class BuildTowardsTargetGoal extends Goal {
                     }
                 }
 
-                /*this.diagonalBlockPos = this.mob.blockPosition().offset(x, 0, z);
-                if (!this.mob.level().getBlockState(this.diagonalBlockPos).getFluidState().isEmpty()) {
-                    System.out.println("can use BuildingGoal true liquid blockPos");
-                    return true;
-                }
-                if (!this.mob.level().getBlockState(this.diagonalBlockPos.offset(0, -1, 0)).getFluidState().isEmpty()) {
-                    System.out.println("can use BuildingGoal true liquid blockPos y-1");
-                    return true;
-                }*/
-                if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0)) &&
-                        !ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0)) &&
-                        !ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()) &&
+                if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0)) &&
+                        !ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0)) &&
+                        !ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()) &&
                         this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty()) {
                     System.out.println("can use BuildingGoal false 3");
                     return false;
@@ -120,12 +118,12 @@ public class BuildTowardsTargetGoal extends Goal {
                 }
                 if (this.mob.getBlockX() == ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getX() && this.mob.getBlockZ() == ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getZ()) {
                     if (((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getY() > this.mob.getBlockY()) {
-                        if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0))) {
+                        if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0))) {
                             System.out.println("can use BuildingGoal false 4");
                             return false;
                         }
                     } else if (((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getY() < this.mob.getBlockY()) {
-                        if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos())) {
+                        if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos())) {
                             System.out.println("can use BuildingGoal false 5");
                             return false;
                         }
@@ -133,26 +131,26 @@ public class BuildTowardsTargetGoal extends Goal {
                 }
                 this.pathToNextBlockPos = ((IZombieHelper) this.mob).sevenDaysToSurvive$getPathToNextBlockPos();
                 if (this.pathToNextBlockPos != null) {
-                    if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0))) {
+                    if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0))) {
                         System.out.println("can use if 134");
                         double nextPosY = ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getY();
                         double mobY = this.mob.getBlockY();
-                        if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0))) {
+                        if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0))) {
                             System.out.println("can use BuildingGoal false 6");
                             return false;
                         }
                         if (nextPosY > mobY) {
-                            if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
+                            if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
                                 System.out.println("can use BuildingGoal false 7");
                                 return false;
                             }
                         } else if (nextPosY < mobY) {
-                            if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 2, 0))) {
+                            if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 2, 0))) {
                                 System.out.println("can use BuildingGoal false 8");
                                 return false;
                             }
                         }
-                    } else if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -2, 0))) {
+                    } else if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -2, 0))) {
                         System.out.println("can use if 153");
                         if (this.mob.getY() >= ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getY()) {
                             System.out.println("can use if 155");
@@ -188,8 +186,21 @@ public class BuildTowardsTargetGoal extends Goal {
             }
         }
 
-        if (ModUtils.mobHasPlayerTargetAndCanReach(this.mob)) {
+        if (ZombieUtils.mobHasPlayerTargetAndCanReach(this.mob)) {
             System.out.println("cancel 1");
+            return false;
+        }
+
+        if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() == null) {
+            System.out.println("BuildingGoal cancel 2.1");
+            return false;
+        } else if (!((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive() || (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget()).isSpectator() || ((ServerPlayer) ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget()).isCreative()) {
+            System.out.println("BuildingGoal cancel 2.2");
+            return false;
+        }
+
+        if(((IZombieHelper)this.mob).getSevenDaysToSurvive$leader() != null){
+            System.out.println("can use BuildingGoal cancel (Zombie Has A Leader)");
             return false;
         }
 
@@ -209,7 +220,7 @@ public class BuildTowardsTargetGoal extends Goal {
                             return true;
                         }
 
-                        if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0)) && !ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0)) && !ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()) && this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty()) {
+                        if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0)) && !ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0)) && !ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()) && this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty()) {
                             System.out.println("cancel 4");
                             return false;
                         }
@@ -218,13 +229,13 @@ public class BuildTowardsTargetGoal extends Goal {
                     if (this.mob.getBlockX() == ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getX() && this.mob.getBlockZ() == ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getZ()) {
                         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getY() > this.mob.getBlockY()) {
                             if (!this.isJumping) {
-                                if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0))) {
+                                if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0))) {
                                     System.out.println("cancel 5");
                                     return false;
                                 }
                             }
                         } else if (((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getY() < this.mob.getBlockY()) {
-                            if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos())) {
+                            if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos())) {
                                 if (!this.isJumping) {
                                     System.out.println("cancel 6");
                                     return false;
@@ -234,20 +245,20 @@ public class BuildTowardsTargetGoal extends Goal {
                     } else {
                         this.pathToNextBlockPos = ((IZombieHelper) this.mob).sevenDaysToSurvive$getPathToNextBlockPos();
                         if (this.pathToNextBlockPos != null) {
-                            if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0))) {
+                            if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0))) {
                                 double nextPosY = ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getY();
                                 double mobY = this.mob.getBlockY();
-                                if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0))) {
+                                if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0))) {
                                     System.out.println("cancel 7");
                                     return false;
                                 }
                                 if (nextPosY > mobY) {
-                                    if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
+                                    if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
                                         System.out.println("cancel 8");
                                         return false;
                                     }
                                 } else if (nextPosY < mobY) {
-                                    if (ModUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 2, 0))) {
+                                    if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 2, 0))) {
                                         System.out.println("cancel 9");
                                         return false;
                                     }
@@ -315,7 +326,7 @@ public class BuildTowardsTargetGoal extends Goal {
                             this.startPlacingBlock(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0));
                         }
                     } else {
-                        if (ModUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition())) {
+                        if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition())) {
                             this.mobJump(this.tickCounter);
                         }
                         if (this.mob.blockPosition().getX() == ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getX() && this.mob.blockPosition().getY() < ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getY() && this.mob.blockPosition().getZ() == ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getZ()) {
@@ -323,7 +334,7 @@ public class BuildTowardsTargetGoal extends Goal {
                             BlockPos blockPos;
                             for (int i = 0; i < 3; i++) {
                                 blockPos = new BlockPos(this.mob.getBlockX(), this.mob.getBlockY() + i, this.mob.getBlockZ());
-                                if (ModUtils.HasBlockEntityCollision(this.mob.level(), blockPos)) {
+                                if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), blockPos)) {
                                     canPlaceBlock = false;
                                     break;
                                 }
@@ -353,7 +364,7 @@ public class BuildTowardsTargetGoal extends Goal {
                                     BlockPos blockPos = new BlockPos(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0));
                                     System.out.println(this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()));
                                     System.out.println(this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty());
-                                    if (!ModUtils.HasBlockEntityCollision(this.mob.level(), blockPos)) {
+                                    if (!ZombieUtils.HasBlockEntityCollision(this.mob.level(), blockPos)) {
                                         System.out.println("Start placing block 3");
                                         this.startPlacingBlock(blockPos);
                                     } else if (!this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty()) {
@@ -393,7 +404,7 @@ public class BuildTowardsTargetGoal extends Goal {
         int x = this.mob.getBlockX();
         int y = this.mob.getBlockY() + 3;
         int z = this.mob.getBlockZ();
-        if (ModUtils.HasBlockEntityCollision(this.mob.level(), new BlockPos(x, y, z))) {
+        if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), new BlockPos(x, y, z))) {
             this.endJumpTick = currentTick + 2;
         } else {
             this.endJumpTick = currentTick + 4;
@@ -414,7 +425,7 @@ public class BuildTowardsTargetGoal extends Goal {
         System.out.println("next blockPos: " + ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos());
         System.out.println("place block blockPos: " + blockPos);
         ((IZombieHelper) this.mob).setSevenDaysToSurvive$placedBlockBlockPos(blockPos);
-        if (!ModUtils.HasBlockEntityCollision(this.mob.level(), blockPos)) {
+        if (!ZombieUtils.HasBlockEntityCollision(this.mob.level(), blockPos)) {
             this.mob.level().setBlock(blockPos, Blocks.COBBLESTONE.defaultBlockState(), 3);
             this.mob.swing(InteractionHand.MAIN_HAND);
             this.mob.level().playSound(null, blockPos, SoundEvents.STONE_PLACE, this.mob.getSoundSource(), 1.0F, 1.0F);

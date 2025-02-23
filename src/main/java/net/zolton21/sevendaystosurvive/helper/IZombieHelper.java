@@ -2,7 +2,10 @@ package net.zolton21.sevendaystosurvive.helper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.level.pathfinder.Path;
+
+import java.util.List;
 
 public interface IZombieHelper {
     void setSevenDaysToSurvive$nextBlockPos(BlockPos blockPos);
@@ -27,8 +30,6 @@ public interface IZombieHelper {
 
     void sevenDaysToSurvive$findCustomPath();
 
-    BlockPos SevenDaysToSurvive$getPreviousBlockPos();
-
     void setSevenDaysToSurvive$placedBlockBlockPos(BlockPos blockPos);
 
     void setSevenDaysToSurvive$dugNextBlockPos(BlockPos blockPos);
@@ -40,4 +41,18 @@ public interface IZombieHelper {
     Path getSevenDaysToSurvive$pathToTargetEntity();
 
     void sevenDaysToSurvive$createPathToTargetEntity();
+
+    boolean sevenDaysToSurvive$isLeader();
+
+    void sevenDaysToSurvive$setLeaderForZombie(Zombie zombie);
+
+    void sevenDaysToSurvive$addZombieToGroup(Zombie zombie);
+
+    void sevenDaysToSurvive$removeZombieFromGroup(Zombie zombie);
+
+    void sevenDaysToSurvive$setAsALeader(List<Zombie> zombieList);
+
+    void sevenDaysToSurvive$strayAlone();
+
+    Zombie getSevenDaysToSurvive$leader();
 }
