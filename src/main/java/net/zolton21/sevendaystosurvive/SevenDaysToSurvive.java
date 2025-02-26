@@ -31,7 +31,7 @@ public class SevenDaysToSurvive{
         eventBus.addListener(this::setup);
         MinecraftForge.EVENT_BUS.register(this);
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.Server.CONFIG);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.Server.CONFIG);
     }
 
     private void setup(final FMLCommonSetupEvent event)

@@ -5,6 +5,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -77,7 +78,7 @@ public class ZombieUtils {
             if (serverLevel != null) {
                 for (ServerPlayer player : serverLevel.players()) {
                     if (player.level().dimension() == mob.level().dimension()) {
-                        if (player.distanceTo(mob) < range) {
+                        if (player.distanceTo(mob) <= range) {
                             if (player.isAlive() && !player.isSpectator() && !player.isCreative() && !PlayerHelper.isPlayerProtected((ServerPlayer) player)) {
                                 double distance = mob.distanceToSqr(player);
                                 if (distance < closestDistance) {
@@ -91,5 +92,18 @@ public class ZombieUtils {
             }
         }
         return nearestPlayer;
+    }
+
+    public static boolean isOblivionNight(Level level) {
+        if(level instanceof ServerLevel serverLevel) {
+            long time = serverLevel.getDayTime() % 24000;
+            long daysPassed = serverLevel.getDayTime() / 24000 + 1;
+            if (daysPassed % Config.Server.OBLIVION_NIGHT_FREQUENCY.get() == 0) {
+                if (12010 < time && time < 23991) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

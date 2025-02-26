@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
@@ -15,9 +16,12 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.Path;
+import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.zolton21.sevendaystosurvive.ai.goals.BuildTowardsTargetGoal;
 import net.zolton21.sevendaystosurvive.ai.goals.DiggingGoal;
 import net.zolton21.sevendaystosurvive.ai.goals.SearchAndGoToPlayerGoal;
+import net.zolton21.sevendaystosurvive.config.Config;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
 import net.zolton21.sevendaystosurvive.utils.ZombieUtils;
 import org.spongepowered.asm.mixin.Mixin;
@@ -70,6 +74,9 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     @Unique
     private int sevenDaysToSurvive$ticksUntilNextPathRecalculation;
     private boolean mobHasPlayerTargetAndCanReach;
+    private long ticksUntilNextCustomPathSearch;
+    @Nullable
+    private BlockPos breakingBlockBP;
 
     protected ZombieMixin(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -82,9 +89,9 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     @Inject(method = "addBehaviourGoals()V", at = @At("HEAD"))
     public void applyCustomAI(CallbackInfo ci) {
         if (!((Object) this instanceof Drowned) && !((Object) this instanceof ZombifiedPiglin)) {
-            this.goalSelector.addGoal(3, new SearchAndGoToPlayerGoal(this, 1.0));
             this.goalSelector.addGoal(3, new DiggingGoal(this, 1.0));
             this.goalSelector.addGoal(3, new BuildTowardsTargetGoal(this, 1.0));
+            this.goalSelector.addGoal(3, new SearchAndGoToPlayerGoal(this, 1.0));
             this.sevenDaysToSurvive$blockBreakingSpeedModifier = Math.round((1.0f + new Random().nextFloat()) * 10) / 10.0f;
             System.out.println("blockBreakingSpeedModifier: " + this.sevenDaysToSurvive$blockBreakingSpeedModifier);
         }
@@ -123,7 +130,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                         if (this.sevenDaysToSurvive$pathToTargetEntity == null || this.sevenDaysToSurvive$ticksUntilNextPathRecalculation <= 0) {
                             this.sevenDaysToSurvive$createPathToTargetEntity();
                         }
-
+                        long i = this.level().getGameTime();
                         if (this.tickCount % 40 == 0) {
                             if (!this.mobHasPlayerTargetAndCanReach) {
                                 if (this.sevenDaysToSurvive$canReachTarget(this.sevenDaysToSurvive$modGoalTarget)) {
@@ -140,20 +147,24 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                                     this.sevenDaysToSurvive$pathToNextBlockPos = this.getNavigation().createPath(this.sevenDaysToSurvive$getNextBlockPos(), 0);
                                 }
                             }
-                        } else if (this.sevenDaysToSurvive$ticksUntilNextPathRecalculation % 60 == 0) {
+                        } else if (i - this.ticksUntilNextCustomPathSearch > 60) {
+                            this.ticksUntilNextCustomPathSearch = i;
                             this.sevenDaysToSurvive$findCustomPath();
-                            System.out.println("Zombie blockpos: " + this.blockPosition());
-                            System.out.println("nextBlockPos: " + this.sevenDaysToSurvive$getNextBlockPos());
                         }
                     }
                 }
 
                 if (this.tickCount % 500 == 0 && this.sevenDaysToSurvive$modGoalTarget != null) {
-                    if (this.distanceTo(this.sevenDaysToSurvive$modGoalTarget) > 50) {
-                        this.sevenDaysToSurvive$findReachableTarget();
-                    }
+                    this.sevenDaysToSurvive$findReachableTarget();
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    private void onEntityChangeDimension(EntityTravelToDimensionEvent event){
+        if(event.getEntity() == this.sevenDaysToSurvive$modGoalTarget){
+            this.sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
         }
     }
 
@@ -175,9 +186,11 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     @Override
     public void checkDespawn() {
-        if (!((Object) this instanceof Drowned) && !((Object) this instanceof ZombifiedPiglin)) {
-            if (this.sevenDaysToSurvive$modGoalTarget == null || this.level().getDifficulty() == Difficulty.PEACEFUL) {
-                super.checkDespawn();
+        if(!this.hasCustomName()) {
+            if (!((Object) this instanceof Drowned) && !((Object) this instanceof ZombifiedPiglin)) {
+                if (this.sevenDaysToSurvive$modGoalTarget == null || this.level().getDifficulty() == Difficulty.PEACEFUL) {
+                    super.checkDespawn();
+                }
             }
         }
     }
@@ -206,7 +219,8 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     @Unique
     public void sevenDaysToSurvive$findReachableTarget() {
-        this.sevenDaysToSurvive$modGoalTarget = ZombieUtils.getNearestUnprotectedSurvivalPlayer(this, 60);
+        int range = ZombieUtils.isOblivionNight(this.level()) ? Config.Server.PLAYER_DETECTION_RANGE_OBLIVION_NIGHT.get() : Config.Server.PLAYER_DETECTION_RANGE.get();
+        this.sevenDaysToSurvive$modGoalTarget = ZombieUtils.getNearestUnprotectedSurvivalPlayer(this, range);
     }
 
     public void sevenDaysToSurvive$findCustomPath() {
@@ -338,6 +352,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
         this.sevenDaysToSurvive$placedBlockBlockPos = null;
         this.sevenDaysToSurvive$pathToTargetEntity = null;
         this.sevenDaysToSurvive$pathToNextBlockPos = null;
+        this.sevenDaysToSurvive$ticksUntilNextPathRecalculation = 0;
     }
 
     public void sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(boolean isTrue) {
@@ -386,5 +401,19 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     @Unique
     public boolean sevenDaysToSurvive$getMobHasPlayerTargetAndCanReach(){
         return this.mobHasPlayerTargetAndCanReach;
+    }
+
+    public void setBreakingBlockBP(@Nullable BlockPos blockPos){
+        this.breakingBlockBP = blockPos;
+    }
+
+    @Override
+    public void die(DamageSource pDamageSource) {
+        if(this.breakingBlockBP != null) {
+            if(!this.level().getBlockState(this.breakingBlockBP).isAir()) {
+                this.level().destroyBlockProgress(this.getId(), this.breakingBlockBP, -1);
+            }
+        }
+        super.die(pDamageSource);
     }
 }

@@ -23,8 +23,6 @@ public class DiggingGoal extends Goal {
     private final PathfinderMob mob;
     private ItemStack heldItem;
     @Nullable
-    private Path pathToNextBlockPos;
-    @Nullable
     private BlockPos nextBlockPos;
     private int tickCounter;
     private boolean isBreakingBlock;
@@ -78,10 +76,6 @@ public class DiggingGoal extends Goal {
         }
 
         if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) {
-            if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() == null) {
-                System.out.println("DiggingGoal canUse false 6");
-                return false;
-            }
             this.nextBlockPos = ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos();
             if (this.nextBlockPos != null) {
                 if (this.mob.level().getBlockState(this.nextBlockPos).getFluidState().isEmpty()) {
@@ -99,70 +93,69 @@ public class DiggingGoal extends Goal {
                         }
                     } else {
                         System.out.println("Digging goal if4");
-                        this.pathToNextBlockPos = ((IZombieHelper) this.mob).sevenDaysToSurvive$getPathToNextBlockPos();
-                        if (this.pathToNextBlockPos != null) {
-                            System.out.println("Digging goal if5");
-                            double nextPosY = this.nextBlockPos.getY();
-                            double mobY = this.mob.getBlockY();
-                            if (nextPosY == mobY) {
-                                System.out.println("Digging goal if6");
-                                if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)) {
-                                    if (ZombieUtils.isBlockBreakable(this.mob.level(), this.nextBlockPos)) {
-                                        System.out.println("DiggingGoal canUse true 1");
-                                        return true;
-                                    }
-                                }
-                                if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
-                                    if (ZombieUtils.isBlockBreakable(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
-                                        System.out.println("DiggingGoal canUse true 2");
-                                        return true;
-                                    }
-                                }
-                            } else if (nextPosY > mobY) {
+                        System.out.println("Digging goal if5");
+                        double nextPosY = this.nextBlockPos.getY();
+                        double mobY = this.mob.getBlockY();
+                        if (nextPosY == mobY) {
+                            System.out.println("Digging goal if6");
+                            if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)) {
                                 System.out.println("Digging goal if7");
-                                if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)) {
-                                    if (ZombieUtils.isBlockBreakable(this.mob.level(), this.nextBlockPos)) {
-                                        System.out.println("DiggingGoal canUse true 3");
-                                        return true;
-                                    }
+                                if (ZombieUtils.isBlockBreakable(this.mob.level(), this.nextBlockPos)) {
+                                    System.out.println("Digging goal if8");
+                                    System.out.println("DiggingGoal canUse true 1");
+                                    return true;
                                 }
+                            }
+                            if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
+                                if (ZombieUtils.isBlockBreakable(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
+                                    System.out.println("DiggingGoal canUse true 2");
+                                    return true;
+                                }
+                            }
+                        } else if (nextPosY > mobY) {
+                            System.out.println("Digging goal if7");
+                            if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)) {
+                                if (ZombieUtils.isBlockBreakable(this.mob.level(), this.nextBlockPos)) {
+                                    System.out.println("DiggingGoal canUse true 3");
+                                    return true;
+                                }
+                            }
+                            if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
+                                if (ZombieUtils.isBlockBreakable(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
+                                    System.out.println("DiggingGoal canUse true 4");
+                                    return true;
+                                }
+                            } else if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
+                                if (ZombieUtils.isBlockBreakable(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
+                                    System.out.println("DiggingGoal canUse true 5");
+                                    return true;
+                                }
+                            } else if (Math.abs(this.mob.getBlockX() - this.nextBlockPos.getX()) < 2 || Math.abs(this.mob.getBlockZ() - this.nextBlockPos.getZ()) < 2) {
                                 if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
                                     if (ZombieUtils.isBlockBreakable(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
-                                        System.out.println("DiggingGoal canUse true 4");
-                                        return true;
-                                    }
-                                } else if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
-                                    if (ZombieUtils.isBlockBreakable(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
-                                        System.out.println("DiggingGoal canUse true 5");
-                                        return true;
-                                    }
-                                } else if (Math.abs(this.mob.getBlockX() - this.nextBlockPos.getX()) < 2 || Math.abs(this.mob.getBlockZ() - this.nextBlockPos.getZ()) < 2) {
-                                    if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
-                                        if (ZombieUtils.isBlockBreakable(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
-                                            System.out.println("DiggingGoal canUse true 6");
-                                            return true;
-                                        }
-                                    }
-                                }
-                            } else {
-                                System.out.println("Digging goal if8");
-                                if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)) {
-                                    if (ZombieUtils.isBlockBreakable(this.mob.level(), this.nextBlockPos)) {
-                                        System.out.println("DiggingGoal canUse true 7");
+                                        System.out.println("DiggingGoal canUse true 6");
                                         return true;
                                     }
                                 }
-                                if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
-                                    if (ZombieUtils.isBlockBreakable(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
-                                        System.out.println("DiggingGoal canUse true 8");
-                                        return true;
-                                    }
+                            }
+                        } else {
+                            System.out.println("Digging goal if8");
+                            if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)) {
+                                if (ZombieUtils.isBlockBreakable(this.mob.level(), this.nextBlockPos)) {
+                                    System.out.println("DiggingGoal canUse true 7");
+                                    return true;
                                 }
-                                if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 2, 0))) {
-                                    if (ZombieUtils.isBlockBreakable(this.mob.level(), this.nextBlockPos.offset(0, 2, 0))) {
-                                        System.out.println("DiggingGoal canUse true 9");
-                                        return true;
-                                    }
+                            }
+                            if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
+                                if (ZombieUtils.isBlockBreakable(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
+                                    System.out.println("DiggingGoal canUse true 8");
+                                    return true;
+                                }
+                            }
+                            if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 2, 0))) {
+                                if (ZombieUtils.isBlockBreakable(this.mob.level(), this.nextBlockPos.offset(0, 2, 0))) {
+                                    System.out.println("DiggingGoal canUse true 9");
+                                    return true;
                                 }
                             }
                         }
@@ -227,8 +220,7 @@ public class DiggingGoal extends Goal {
                         }
                     }
                 } else {
-                    this.pathToNextBlockPos = ((IZombieHelper) this.mob).sevenDaysToSurvive$getPathToNextBlockPos();
-                    if (this.pathToNextBlockPos != null) {
+                    //if (this.pathToNextBlockPos != null) {
                         double nextPosY = this.nextBlockPos.getY();
                         double mobY = this.mob.getBlockY();
                         if (nextPosY == mobY) {
@@ -288,7 +280,7 @@ public class DiggingGoal extends Goal {
                                     return true;
                                 }
                             }
-                        }
+                        //}
                     }
                 }
 
@@ -322,6 +314,7 @@ public class DiggingGoal extends Goal {
 
     public void stop() {
         System.out.println("stop executing DiggingGoal");
+
         if (this.breakBlockBlockPos != null) {
             this.mob.level().destroyBlockProgress(this.mob.getId(), this.breakBlockBlockPos, -1);
         }
@@ -385,6 +378,7 @@ public class DiggingGoal extends Goal {
 
         if (!this.isBreakingBlock && this.tickCounter % 10 == 0) {
             if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
+
                 if (!ZombieUtils.isMobStandingOnAFullBlock(this.mob)) {
                     if (!ZombieUtils.hasAFullBlockCollision(this.mob, this.mob.blockPosition())) {
                         startBreakingBlock(this.tickCounter, this.mob.blockPosition());
@@ -392,9 +386,7 @@ public class DiggingGoal extends Goal {
                         startBreakingBlock(this.tickCounter, this.mob.blockPosition().offset(0, -1, 0));
                     }
                 }
-            }
 
-            if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
                 if (this.nextBlockPos != null) {
                     if (this.nextBlockPos.getX() == this.mob.getBlockX() && this.nextBlockPos.getZ() == this.mob.getBlockZ()) {
                         if (this.mob.getBlockY() > this.nextBlockPos.getY()) {
@@ -437,6 +429,7 @@ public class DiggingGoal extends Goal {
     }
 
     private void startBreakingBlock(int currentTick, BlockPos blockPos) {
+        ((IZombieHelper)this.mob).setBreakingBlockBP(blockPos);
         this.isBreakingBlock = true;
 
         float blockHardness = this.mob.level().getBlockState(blockPos).getDestroySpeed(this.mob.level(), blockPos);
@@ -484,6 +477,10 @@ public class DiggingGoal extends Goal {
         this.mob.setYRot((float) yaw);
 
         this.mob.getLookControl().setLookAt(Vec3.atCenterOf(blockPos));
+    }
+
+    public BlockPos diggingBlock(){
+        return this.breakBlockBlockPos;
     }
 
 }

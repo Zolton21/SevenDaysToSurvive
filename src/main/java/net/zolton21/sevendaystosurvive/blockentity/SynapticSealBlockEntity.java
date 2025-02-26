@@ -11,9 +11,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.zolton21.sevendaystosurvive.block.SynapticSealBlock;
+import net.zolton21.sevendaystosurvive.config.Config;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
 import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
 import net.zolton21.sevendaystosurvive.registries.BlockEntityRegistry;
+import net.zolton21.sevendaystosurvive.utils.ZombieUtils;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.*;
@@ -79,52 +81,57 @@ public class SynapticSealBlockEntity extends BlockEntity implements GeoBlockEnti
     }
 
     public void tick(Level pLevel1, BlockPos pPos, BlockState pState1) {
-        for(Player player : pLevel1.players()) {
-            if(player != null) {
-                ServerPlayer serverPlayer = (ServerPlayer) player;
-                if (this.isEntityWithinRange(pPos, pState1, serverPlayer)) {
-                    if (serverPlayer.isAlive()) {
-                        if (this.protectedPlayers.stream().noneMatch(p -> p.equals(serverPlayer))) {
-                            this.protectedPlayers.add(serverPlayer);
-                            PlayerHelper.changePlayerProtectionState(serverPlayer, true);
-                        }
-                    }
-                } else {
-                    if (this.protectedPlayers.stream().anyMatch(p -> p.equals(serverPlayer))) {
+        if(ZombieUtils.isOblivionNight(this.getLevel()) && !Config.Server.OBLIVION_NIGHT_SYNAPTIC_SEAL_WORKS.get()) {
+
+        }else{
+
+            for (Player player : pLevel1.players()) {
+                if (player != null) {
+                    ServerPlayer serverPlayer = (ServerPlayer) player;
+                    if (this.isEntityWithinRange(pPos, pState1, serverPlayer)) {
                         if (serverPlayer.isAlive()) {
-                            this.protectedPlayers.remove(serverPlayer);
-                            PlayerHelper.changePlayerProtectionState(serverPlayer, false);
+                            if (this.protectedPlayers.stream().noneMatch(p -> p.equals(serverPlayer))) {
+                                this.protectedPlayers.add(serverPlayer);
+                                PlayerHelper.changePlayerProtectionState(serverPlayer, true);
+                            }
+                        }
+                    } else {
+                        if (this.protectedPlayers.stream().anyMatch(p -> p.equals(serverPlayer))) {
+                            if (serverPlayer.isAlive()) {
+                                this.protectedPlayers.remove(serverPlayer);
+                                PlayerHelper.changePlayerProtectionState(serverPlayer, false);
+                            }
                         }
                     }
                 }
             }
-        }
 
-        for(Zombie zombie : zombiesWithinRange(pPos, pState1, (ServerLevel) pLevel1)){
-            if(zombie != null) {
-                if (this.zombiesWithinRange.stream().noneMatch(z -> z.equals(zombie))) {
-                    if (zombie.isAlive()) {
-                        this.zombiesWithinRange.add(zombie);
-                        ((IZombieHelper) zombie).sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(true);
+            for (Zombie zombie : zombiesWithinRange(pPos, pState1, (ServerLevel) pLevel1)) {
+                if (zombie != null) {
+                    if (this.zombiesWithinRange.stream().noneMatch(z -> z.equals(zombie))) {
+                        if (zombie.isAlive()) {
+                            this.zombiesWithinRange.add(zombie);
+                            ((IZombieHelper) zombie).sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(true);
+                        }
                     }
                 }
             }
-        }
 
-        for(Zombie zombie : this.zombiesWithinRange){
-            if(zombie != null) {
-                if (zombiesWithinRange(pPos, pState1, (ServerLevel) pLevel1).stream().noneMatch(z -> z.equals(zombie))) {
-                    if (zombie.isAlive()) {
-                        this.zombiesWithinRange.remove(zombie);
-                        ((IZombieHelper) zombie).sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(false);
+            for (Zombie zombie : this.zombiesWithinRange) {
+                if (zombie != null) {
+                    if (zombiesWithinRange(pPos, pState1, (ServerLevel) pLevel1).stream().noneMatch(z -> z.equals(zombie))) {
+                        if (zombie.isAlive()) {
+                            this.zombiesWithinRange.remove(zombie);
+                            ((IZombieHelper) zombie).sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(false);
+                        }
                     }
                 }
             }
-        }
 
-        Block block = this.getBlockState().getBlock();
-        if(block instanceof SynapticSealBlock){
-            ((SynapticSealBlock) block).updateLists(this.protectedPlayers, this.zombiesWithinRange);
+            Block block = this.getBlockState().getBlock();
+            if (block instanceof SynapticSealBlock) {
+                ((SynapticSealBlock) block).updateLists(this.protectedPlayers, this.zombiesWithinRange);
+            }
         }
     }
 

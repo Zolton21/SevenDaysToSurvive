@@ -43,4 +43,6 @@ public interface IZombieHelper {
     void sevenDaysToSurvive$createPathToTargetEntity();
 
     boolean sevenDaysToSurvive$getMobHasPlayerTargetAndCanReach();
+
+    void setBreakingBlockBP(BlockPos blockPos);
 }
