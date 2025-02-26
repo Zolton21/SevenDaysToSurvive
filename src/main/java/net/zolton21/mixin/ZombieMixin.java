@@ -309,7 +309,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     @Unique
     private Direction.AxisDirection sevenDaysToSurvive$setAxisDirection(Direction.Axis direction) {
-        Direction.AxisDirection axisDirection = Direction.AxisDirection.NEGATIVE;
+        Direction.AxisDirection axisDirection;
         if (direction == Direction.Axis.X) {
             if ((int) this.sevenDaysToSurvive$modGoalTarget.getX() - this.getX() > 0) {
                 axisDirection = Direction.AxisDirection.POSITIVE;
