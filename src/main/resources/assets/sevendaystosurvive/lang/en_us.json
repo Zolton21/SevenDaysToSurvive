@@ -3,5 +3,6 @@
   "message.sevendaystosurvive.synaptic.seal.charge": "Charge",
   "message.sevendaystosurvive.synaptic.seal.safe.area": "Safe area",
   "message.sevendaystosurvive.synaptic.seal.chunks": "Chunks",
-  "message.sevendaystosurvive.doomnight.sleep.problem": "Can't Sleep During Doomnight"
+  "message.sevendaystosurvive.oblivion.night.sleep.problem": "Can't Sleep During Oblivion Night",
+  "message.sevendaystosurvive.oblivion.night.beginning": "Beware, Oblivion Night is beginning!"
 }

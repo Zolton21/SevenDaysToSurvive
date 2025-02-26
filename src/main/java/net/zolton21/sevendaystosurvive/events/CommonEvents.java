@@ -1,11 +1,13 @@
 package net.zolton21.sevendaystosurvive.events;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -26,7 +28,7 @@ public class CommonEvents {
         Player player = event.getEntity();
         if (ZombieUtils.isOblivionNight(player.level())) {
             event.setResult(Player.BedSleepingProblem.OTHER_PROBLEM);
-            player.displayClientMessage(Component.literal("Can't Sleep During Doomnight"), true);
+            player.displayClientMessage(Component.translatable("message.sevendaystosurvive.oblivion.night.sleep.problem"), true);
         }
     }
 
@@ -42,6 +44,19 @@ public class CommonEvents {
         for(Monster monster : monsters){
             if(monster instanceof Zombie zombie){
                 ((IZombieHelper)zombie).sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerTick(TickEvent.PlayerTickEvent event){
+        if(ZombieUtils.isOblivionNight(event.player.level())) {
+            if (event.player.level().isClientSide()) {
+                long time = event.player.level().getDayTime();
+                if(time >= 12000 && time <= 12200){
+                    Component text = Component.translatable("message.sevendaystosurvive.oblivion.night.beginning").withStyle(ChatFormatting.DARK_RED);
+                    event.player.displayClientMessage(text, true);
+                }
             }
         }
     }
