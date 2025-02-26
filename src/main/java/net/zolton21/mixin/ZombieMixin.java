@@ -88,7 +88,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     @Inject(method = "addBehaviourGoals()V", at = @At("HEAD"))
     public void applyCustomAI(CallbackInfo ci) {
-        if (!((Object) this instanceof Drowned) && !((Object) this instanceof ZombifiedPiglin)) {
+        if (this.getType() == EntityType.ZOMBIE || this.getType() == EntityType.HUSK) {
             this.goalSelector.addGoal(3, new DiggingGoal(this, 1.0));
             this.goalSelector.addGoal(3, new BuildTowardsTargetGoal(this, 1.0));
             this.goalSelector.addGoal(3, new SearchAndGoToPlayerGoal(this, 1.0));
@@ -99,7 +99,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     @Inject(method = "tick()V", at = @At("HEAD"))
     public void tickInject(CallbackInfo ci) {
-        if (!((Object) this instanceof Drowned) && !((Object) this instanceof ZombifiedPiglin)) {
+        if (this.getType() == EntityType.ZOMBIE || this.getType() == EntityType.HUSK) {
             this.sevenDaysToSurvive$additionalTickLogic();
         }
     }
@@ -170,7 +170,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     @Inject(method = "readAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("TAIL"))
     private void onLoad(CompoundTag tag, CallbackInfo ci) {
-        if (!((Object) this instanceof Drowned) && !((Object) this instanceof ZombifiedPiglin)) {
+        if (this.getType() == EntityType.ZOMBIE || this.getType() == EntityType.HUSK) {
             if (tag.contains("BlockBreakingSpeedModifier")) {
                 this.sevenDaysToSurvive$blockBreakingSpeedModifier = tag.getFloat("BlockBreakingSpeedModifier");
             }
@@ -179,7 +179,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
     private void onSave(CompoundTag tag, CallbackInfo ci){
-        if (!((Object) this instanceof Drowned) && !((Object) this instanceof ZombifiedPiglin)) {
+        if (this.getType() == EntityType.ZOMBIE || this.getType() == EntityType.HUSK) {
             tag.putFloat("BlockBreakingSpeedModifier", this.sevenDaysToSurvive$blockBreakingSpeedModifier);
         }
     }
@@ -187,7 +187,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     @Override
     public void checkDespawn() {
         if(!this.hasCustomName()) {
-            if (!((Object) this instanceof Drowned) && !((Object) this instanceof ZombifiedPiglin)) {
+            if (this.getType() == EntityType.ZOMBIE || this.getType() == EntityType.HUSK) {
                 if (this.sevenDaysToSurvive$modGoalTarget == null || this.level().getDifficulty() == Difficulty.PEACEFUL) {
                     super.checkDespawn();
                 }
