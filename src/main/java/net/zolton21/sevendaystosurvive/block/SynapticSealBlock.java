@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -43,7 +44,7 @@ public class SynapticSealBlock extends BaseEntityBlock {
     public static final IntegerProperty ECHO_SHARD_COUNT = IntegerProperty.create("echo_shard_count", 0, MAX_SHARD_COUNT);
     public static final IntegerProperty STATE = IntegerProperty.create("state", 0, 2);
     List<ServerPlayer> protectedPlayers = new ArrayList<>();
-    List<Zombie> zombiesWithinRange = new ArrayList<>();
+    List<Monster> zombiesWithinRange = new ArrayList<>();
 
     public SynapticSealBlock(Properties pProperties) {
         super(pProperties);
@@ -135,7 +136,7 @@ public class SynapticSealBlock extends BaseEntityBlock {
                     PlayerHelper.changePlayerProtectionState((ServerPlayer) player, false);
                 }
             }
-            for (Zombie zombie : this.zombiesWithinRange) {
+            for (Monster zombie : this.zombiesWithinRange) {
                 if (zombie != null && zombie.isAlive()) {
                     ((IZombieHelper) zombie).sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(false);
                 }
@@ -165,7 +166,7 @@ public class SynapticSealBlock extends BaseEntityBlock {
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1, pPos, pState1));
     }
 
-    public void updateLists(List<ServerPlayer> list1, List<Zombie> list2){
+    public void updateLists(List<ServerPlayer> list1, List<Monster> list2){
         this.protectedPlayers.clear();
         this.zombiesWithinRange.clear();
         if(!list1.isEmpty()) {

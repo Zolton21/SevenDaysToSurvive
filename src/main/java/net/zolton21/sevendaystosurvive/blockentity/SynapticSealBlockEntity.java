@@ -3,6 +3,9 @@ package net.zolton21.sevendaystosurvive.blockentity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.monster.Husk;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -22,6 +25,7 @@ import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -31,15 +35,14 @@ public class SynapticSealBlockEntity extends BlockEntity implements GeoBlockEnti
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     List<ServerPlayer> protectedPlayers = new CopyOnWriteArrayList<>();
-    List<Zombie> zombiesWithinRange = new CopyOnWriteArrayList<>();
+    List<Monster> zombiesWithinRange = new CopyOnWriteArrayList<>();
 
     public SynapticSealBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(BlockEntityRegistry.SYNAPTIC_SEAL.get(), pPos, pBlockState);
     }
 
-    public List<Zombie> zombiesWithinRange(BlockPos blockPos, BlockState blockState, ServerLevel world) {
-        int state = blockState.getValue(STATE);
-        int activityRange = state;
+    public List<Monster> zombiesWithinRange(BlockPos blockPos, BlockState blockState, ServerLevel world) {
+        int activityRange = blockState.getValue(STATE);
         int blockChunkX = Math.floorDiv(blockPos.getX(), 16);
         int blockChunkZ = Math.floorDiv(blockPos.getZ(), 16);
 
@@ -55,8 +58,11 @@ public class SynapticSealBlockEntity extends BlockEntity implements GeoBlockEnti
 
         AABB range = new AABB(minWorldX, world.getMinBuildHeight(), minWorldZ,
                 maxWorldX, world.getMaxBuildHeight(), maxWorldZ);
+        List<Monster> monsters = new ArrayList<>();
+        monsters.addAll(world.getEntitiesOfClass(Zombie.class, range));
+        monsters.addAll(world.getEntitiesOfClass(Husk.class, range));
 
-        return world.getEntitiesOfClass(Zombie.class, range);
+        return monsters;
     }
 
     public boolean isEntityWithinRange(BlockPos blockPos, BlockState blockState, ServerPlayer player){
@@ -106,23 +112,27 @@ public class SynapticSealBlockEntity extends BlockEntity implements GeoBlockEnti
                 }
             }
 
-            for (Zombie zombie : zombiesWithinRange(pPos, pState1, (ServerLevel) pLevel1)) {
+            for (Monster zombie : zombiesWithinRange(pPos, pState1, (ServerLevel) pLevel1)) {
                 if (zombie != null) {
-                    if (this.zombiesWithinRange.stream().noneMatch(z -> z.equals(zombie))) {
-                        if (zombie.isAlive()) {
-                            this.zombiesWithinRange.add(zombie);
-                            ((IZombieHelper) zombie).sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(true);
+                    if(zombie.getType() == EntityType.ZOMBIE || zombie.getType() == EntityType.HUSK) {
+                        if (this.zombiesWithinRange.stream().noneMatch(z -> z.equals(zombie))) {
+                            if (zombie.isAlive()) {
+                                this.zombiesWithinRange.add(zombie);
+                                ((IZombieHelper) zombie).sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(true);
+                            }
                         }
                     }
                 }
             }
 
-            for (Zombie zombie : this.zombiesWithinRange) {
+            for (Monster zombie : this.zombiesWithinRange) {
                 if (zombie != null) {
-                    if (zombiesWithinRange(pPos, pState1, (ServerLevel) pLevel1).stream().noneMatch(z -> z.equals(zombie))) {
-                        if (zombie.isAlive()) {
-                            this.zombiesWithinRange.remove(zombie);
-                            ((IZombieHelper) zombie).sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(false);
+                    if(zombie.getType() == EntityType.ZOMBIE || zombie.getType() == EntityType.HUSK) {
+                        if (zombiesWithinRange(pPos, pState1, (ServerLevel) pLevel1).stream().noneMatch(z -> z.equals(zombie))) {
+                            if (zombie.isAlive()) {
+                                this.zombiesWithinRange.remove(zombie);
+                                ((IZombieHelper) zombie).sevenDaysToSurvive$setIsWithinSynapticSealActivityRange(false);
+                            }
                         }
                     }
                 }

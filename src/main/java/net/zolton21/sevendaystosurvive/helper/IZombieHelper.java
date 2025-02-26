@@ -2,10 +2,7 @@ package net.zolton21.sevendaystosurvive.helper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.level.pathfinder.Path;
-
-import java.util.List;
 
 public interface IZombieHelper {
     void setSevenDaysToSurvive$nextBlockPos(BlockPos blockPos);
@@ -44,5 +41,5 @@ public interface IZombieHelper {
 
     boolean sevenDaysToSurvive$getMobHasPlayerTargetAndCanReach();
 
-    void setBreakingBlockBP(BlockPos blockPos);
+    void sevenDaysToSurvive$setBreakingBlockBP(BlockPos blockPos);
 }

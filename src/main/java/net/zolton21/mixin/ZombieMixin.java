@@ -1,6 +1,5 @@
 package net.zolton21.mixin;
 
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -10,14 +9,10 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
-import net.minecraft.world.entity.monster.Drowned;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.Path;
-import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.zolton21.sevendaystosurvive.ai.goals.BuildTowardsTargetGoal;
 import net.zolton21.sevendaystosurvive.ai.goals.DiggingGoal;
 import net.zolton21.sevendaystosurvive.ai.goals.SearchAndGoToPlayerGoal;
@@ -40,9 +35,11 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     @Shadow
     protected abstract void registerGoals();
 
-    @Shadow public abstract int getExperienceReward();
+    @Shadow
+    public abstract int getExperienceReward();
 
-    @Shadow public abstract void tick();
+    @Shadow
+    public abstract void tick();
 
     @Unique
     private boolean sevenDaysToSurvive$executingCustomGoal;
@@ -73,17 +70,20 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     private BlockPos sevenDaysToSurvive$dugNextBlockPos;
     @Unique
     private int sevenDaysToSurvive$ticksUntilNextPathRecalculation;
-    private boolean mobHasPlayerTargetAndCanReach;
-    private long ticksUntilNextCustomPathSearch;
+    @Unique
+    private boolean sevenDaysToSurvive$mobHasPlayerTargetAndCanReach;
+    @Unique
+    private long sevenDaysToSurvive$ticksUntilNextCustomPathSearch;
+    @Unique
     @Nullable
-    private BlockPos breakingBlockBP;
+    private BlockPos sevenDaysToSurvive$breakingBlockBP;
 
     protected ZombieMixin(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.sevenDaysToSurvive$executingCustomGoal = false;
         this.sevenDaysToSurvive$isWithinSynapticSealActivityRange = false;
         this.sevenDaysToSurvive$ticksUntilNextPathRecalculation = 0;
-        this.mobHasPlayerTargetAndCanReach = false;
+        this.sevenDaysToSurvive$mobHasPlayerTargetAndCanReach = false;
     }
 
     @Inject(method = "addBehaviourGoals()V", at = @At("HEAD"))
@@ -105,7 +105,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     }
 
     @Unique
-    private void sevenDaysToSurvive$additionalTickLogic(){
+    private void sevenDaysToSurvive$additionalTickLogic() {
         if (this.isAlive()) {
             this.sevenDaysToSurvive$ticksUntilNextPathRecalculation--;
             if (this.getNavigation() instanceof GroundPathNavigation) {
@@ -118,7 +118,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                 } else {
                     if (this.sevenDaysToSurvive$getModGoalTarget() != this.getTarget()) {
                         if (this.getTarget() instanceof ServerPlayer) {
-                            this.mobHasPlayerTargetAndCanReach = ZombieUtils.mobHasPlayerTargetAndCanReach(this);
+                            this.sevenDaysToSurvive$mobHasPlayerTargetAndCanReach = ZombieUtils.mobHasPlayerTargetAndCanReach(this);
                             this.sevenDaysToSurvive$modGoalTarget = this.getTarget();
                         }
                     }
@@ -132,7 +132,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                         }
                         long i = this.level().getGameTime();
                         if (this.tickCount % 40 == 0) {
-                            if (!this.mobHasPlayerTargetAndCanReach) {
+                            if (!this.sevenDaysToSurvive$mobHasPlayerTargetAndCanReach) {
                                 if (this.sevenDaysToSurvive$canReachTarget(this.sevenDaysToSurvive$modGoalTarget)) {
                                     this.setTarget(this.sevenDaysToSurvive$modGoalTarget);
                                 }
@@ -147,8 +147,8 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                                     this.sevenDaysToSurvive$pathToNextBlockPos = this.getNavigation().createPath(this.sevenDaysToSurvive$getNextBlockPos(), 0);
                                 }
                             }
-                        } else if (i - this.ticksUntilNextCustomPathSearch > 60) {
-                            this.ticksUntilNextCustomPathSearch = i;
+                        } else if (i - this.sevenDaysToSurvive$ticksUntilNextCustomPathSearch > 60) {
+                            this.sevenDaysToSurvive$ticksUntilNextCustomPathSearch = i;
                             this.sevenDaysToSurvive$findCustomPath();
                         }
                     }
@@ -158,13 +158,6 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
                     this.sevenDaysToSurvive$findReachableTarget();
                 }
             }
-        }
-    }
-
-    @SubscribeEvent
-    private void onEntityChangeDimension(EntityTravelToDimensionEvent event){
-        if(event.getEntity() == this.sevenDaysToSurvive$modGoalTarget){
-            this.sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
         }
     }
 
@@ -178,7 +171,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
-    private void onSave(CompoundTag tag, CallbackInfo ci){
+    private void onSave(CompoundTag tag, CallbackInfo ci) {
         if (this.getType() == EntityType.ZOMBIE || this.getType() == EntityType.HUSK) {
             tag.putFloat("BlockBreakingSpeedModifier", this.sevenDaysToSurvive$blockBreakingSpeedModifier);
         }
@@ -186,7 +179,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     @Override
     public void checkDespawn() {
-        if(!this.hasCustomName()) {
+        if (!this.hasCustomName()) {
             if (this.getType() == EntityType.ZOMBIE || this.getType() == EntityType.HUSK) {
                 if (this.sevenDaysToSurvive$modGoalTarget == null || this.level().getDifficulty() == Difficulty.PEACEFUL) {
                     super.checkDespawn();
@@ -197,11 +190,13 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     @Unique
     private boolean sevenDaysToSurvive$canReachTarget(LivingEntity livingEntity) {
-        if(this.level().dimension() == this.sevenDaysToSurvive$modGoalTarget.level().dimension()) {
-            Path path = this.getNavigation().createPath(livingEntity, 0);
-            if (path != null) {
-                if (livingEntity.blockPosition().equals(path.getTarget())) {
-                    return path.canReach();
+        if (this.sevenDaysToSurvive$modGoalTarget != null) {
+            if (this.level().dimension() == this.sevenDaysToSurvive$modGoalTarget.level().dimension()) {
+                Path path = this.getNavigation().createPath(livingEntity, 0);
+                if (path != null) {
+                    if (livingEntity.blockPosition().equals(path.getTarget())) {
+                        return path.canReach();
+                    }
                 }
             }
         }
@@ -314,7 +309,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     @Unique
     private Direction.AxisDirection sevenDaysToSurvive$setAxisDirection(Direction.Axis direction) {
-        Direction.AxisDirection axisDirection;
+        Direction.AxisDirection axisDirection = Direction.AxisDirection.NEGATIVE;
         if (direction == Direction.Axis.X) {
             if ((int) this.sevenDaysToSurvive$modGoalTarget.getX() - this.getX() > 0) {
                 axisDirection = Direction.AxisDirection.POSITIVE;
@@ -363,15 +358,15 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
         return sevenDaysToSurvive$isWithinSynapticSealActivityRange;
     }
 
-    public void setSevenDaysToSurvive$nextBlockPos(BlockPos blockPos) {
+    public void setSevenDaysToSurvive$nextBlockPos(@Nullable BlockPos blockPos) {
         this.sevenDaysToSurvive$nextBlockPos = blockPos;
     }
 
-    public void setSevenDaysToSurvive$placedBlockBlockPos(BlockPos blockPos) {
+    public void setSevenDaysToSurvive$placedBlockBlockPos(@Nullable BlockPos blockPos) {
         this.sevenDaysToSurvive$placedBlockBlockPos = blockPos;
     }
 
-    public void setSevenDaysToSurvive$dugNextBlockPos(BlockPos blockPos) {
+    public void setSevenDaysToSurvive$dugNextBlockPos(@Nullable BlockPos blockPos) {
         this.sevenDaysToSurvive$dugNextBlockPos = blockPos;
     }
 
@@ -399,19 +394,19 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
     }
 
     @Unique
-    public boolean sevenDaysToSurvive$getMobHasPlayerTargetAndCanReach(){
-        return this.mobHasPlayerTargetAndCanReach;
+    public boolean sevenDaysToSurvive$getMobHasPlayerTargetAndCanReach() {
+        return this.sevenDaysToSurvive$mobHasPlayerTargetAndCanReach;
     }
 
-    public void setBreakingBlockBP(@Nullable BlockPos blockPos){
-        this.breakingBlockBP = blockPos;
+    public void sevenDaysToSurvive$setBreakingBlockBP(@Nullable BlockPos blockPos) {
+        this.sevenDaysToSurvive$breakingBlockBP = blockPos;
     }
 
     @Override
     public void die(DamageSource pDamageSource) {
-        if(this.breakingBlockBP != null) {
-            if(!this.level().getBlockState(this.breakingBlockBP).isAir()) {
-                this.level().destroyBlockProgress(this.getId(), this.breakingBlockBP, -1);
+        if (this.sevenDaysToSurvive$breakingBlockBP != null) {
+            if (!this.level().getBlockState(this.sevenDaysToSurvive$breakingBlockBP).isAir()) {
+                this.level().destroyBlockProgress(this.getId(), this.sevenDaysToSurvive$breakingBlockBP, -1);
             }
         }
         super.die(pDamageSource);

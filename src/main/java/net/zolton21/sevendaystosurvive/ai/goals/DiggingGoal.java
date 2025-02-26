@@ -8,7 +8,6 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
 import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
@@ -429,7 +428,7 @@ public class DiggingGoal extends Goal {
     }
 
     private void startBreakingBlock(int currentTick, BlockPos blockPos) {
-        ((IZombieHelper)this.mob).setBreakingBlockBP(blockPos);
+        ((IZombieHelper)this.mob).sevenDaysToSurvive$setBreakingBlockBP(blockPos);
         this.isBreakingBlock = true;
 
         float blockHardness = this.mob.level().getBlockState(blockPos).getDestroySpeed(this.mob.level(), blockPos);
