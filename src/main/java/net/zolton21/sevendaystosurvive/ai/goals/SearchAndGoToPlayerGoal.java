@@ -52,41 +52,33 @@ public class SearchAndGoToPlayerGoal extends Goal {
         }
 
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getIsWithinSynapticSealActivityRange()) {
-            System.out.println("SearchAndGo canUse false1");
             return false;
         }
 
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
             if (PlayerHelper.isPlayerProtected((ServerPlayer) ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget())) {
-                System.out.println("SearchAndGo canUse false2");
                 return false;
             }
         }
 
         if (((IZombieHelper)this.mob).sevenDaysToSurvive$getMobHasPlayerTargetAndCanReach()) {
-            System.out.println("SearchAndGo canUse false3");
             return false;
         }
 
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() == null) {
-            System.out.println("SearchAndGo canUse false 4");
             return false;
         } else if (!((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive() || (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget()).isSpectator() || ((ServerPlayer) ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget()).isCreative()) {
-            System.out.println("SearchAndGo canUse false 5");
             return false;
         }
 
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
             if (!this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty()) {
-                System.out.println("SearchAndGo canUse false4.1");
                 return false;
             }
             if (!this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0)).getFluidState().isEmpty()){
-                System.out.println("SearchAndGo canUse false4.2");
                 return false;
             }
             if (!this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0)).getFluidState().isEmpty()){
-                System.out.println("SearchAndGo canUse false4.3");
                 return false;
             }
 
@@ -95,46 +87,37 @@ public class SearchAndGoToPlayerGoal extends Goal {
                         if (!ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0))) {
                             if(this.mob.blockPosition().getY() >= ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getY()) {
                                 if(!ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -2, 0))) {
-                                    System.out.println("SearchAndGo canUse false5.1");
                                     return false;
                                 }
                             }else{
-                                System.out.println("SearchAndGo canUse false5.2");
                                 return false;
                             }
                         }
                         if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0))) {
-                            System.out.println("SearchAndGo canUse false6");
                             return false;
                         }
                         if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos())) {
-                            System.out.println("SearchAndGo canUse false7");
                             return false;
                         }
                         if (this.mob.blockPosition().getY() < ((IZombieHelper)this.mob).sevenDaysToSurvive$getNextBlockPos().getY()){
                             if(ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))){
-                                System.out.println("SearchAndGo canUse false8");
                                 return false;
                             }
                         }
-                    System.out.println("SearchAndGo canUse true");
                     return true;
                 }
             }
         }
-        System.out.println("SearchAndGo canUse false8");
         return false;
     }
 
     public boolean canContinueToUse() {
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getIsWithinSynapticSealActivityRange()) {
-            System.out.println("SearchAndGo canContinueToUse false1");
             return false;
         }
 
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
             if (PlayerHelper.isPlayerProtected((ServerPlayer) ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget())) {
-                System.out.println("SearchAndGo canContinueToUse false2");
                 return false;
             }
         }
@@ -143,36 +126,29 @@ public class SearchAndGoToPlayerGoal extends Goal {
             double attackDistance = this.mob.getPerceivedTargetDistanceSquareForMeleeAttack(((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget());
             double d0 = this.getAttackReachSqr(((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget());
             if (attackDistance <= d0){
-                System.out.println("SearchAndGo canContinueToUse true1");
                 return true;
             }
         }
 
         if (((IZombieHelper)this.mob).sevenDaysToSurvive$getMobHasPlayerTargetAndCanReach()) {
-            System.out.println("SearchAndGo canContinueToUse false3");
             return false;
         }
 
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() == null) {
-            System.out.println("SearchAndGo cancel 2.1");
             return false;
         } else if (!((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive() || (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget()).isSpectator() || ((ServerPlayer) ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget()).isCreative()) {
-            System.out.println("SearchAndGo cancel 2.2");
             return false;
         }
 
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() != null && ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive()) {
             if (((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
                 if (!this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty()) {
-                    System.out.println("SearchAndGo cancel false4.1");
                     return false;
                 }
                 if (!this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0)).getFluidState().isEmpty()){
-                    System.out.println("SearchAndGo cancel false4.2");
                     return false;
                 }
                 if (!this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0)).getFluidState().isEmpty()){
-                    System.out.println("SearchAndGo cancel false4.3");
                     return false;
                 }
             }
@@ -180,13 +156,11 @@ public class SearchAndGoToPlayerGoal extends Goal {
 
         if(this.mob.getNavigation().getPath() != null){
             if(this.mob.getNavigation().isStuck()){
-                System.out.println("SearchAndGo canContinueToUse false isStuck");
                 return false;
             }else{
                 if(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
                     if (this.mob.getBlockY() == ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getY()) {
                         if (!this.mob.getNavigation().isDone()) {
-                            System.out.println("SearchAndGo canContinueToUse true path isn't done");
                             return true;
                         }
                     }
@@ -200,36 +174,27 @@ public class SearchAndGoToPlayerGoal extends Goal {
                     if (this.mob.blockPosition().getY() >= ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getY()) {
                         if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, -1, 0))) {
                             if (!ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -2, 0))) {
-                                System.out.println("SearchAndGo canContinueToUse false5.1");
                                 return false;
                             }
                         }
                     } else {
-                        System.out.println("SearchAndGo canContinueToUse false5.2");
-                        System.out.println("mob blockpos: " + this.mob.blockPosition());
-                        System.out.println("next blockpos: " + ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos());
                         return false;
                     }
                 }
                 if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, 1, 0))) {
-                    System.out.println("SearchAndGo canContinueToUse false6");
                     return false;
                 }
                 if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos())) {
-                    System.out.println("SearchAndGo canContinueToUse false7");
                     return false;
                 }
                 if (this.mob.blockPosition().getY() < ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getY()) {
                     if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.mob.blockPosition().offset(0, 2, 0))) {
-                        System.out.println("SearchAndGo canContinueToUse false8");
                         return false;
                     }
                 }
             }
-            System.out.println("SearchAndGo canContinueToUse true2");
             return true;
         }
-        System.out.println("SearchAndGo canContinueToUse false9");
         return false;
     }
 
@@ -284,7 +249,6 @@ public class SearchAndGoToPlayerGoal extends Goal {
     }
 
     public void start() {
-        System.out.println("start executing searchAndGoToPlayerGoal");
         ((IZombieHelper) this.mob).sevenDaysToSurvive$customGoalStarted();
         this.mob.getNavigation().stop();
         this.runnedOnce = false;
@@ -301,10 +265,8 @@ public class SearchAndGoToPlayerGoal extends Goal {
 
 
     public void moveTowardsPlayer() {
-        System.out.println("moveTowards run");
         if((((IZombieHelper)this.mob).getSevenDaysToSurvive$placedBlockBlockPos() != null && !this.mob.level().getBlockState(((IZombieHelper)this.mob).getSevenDaysToSurvive$placedBlockBlockPos()).isAir()) ||
                 (((IZombieHelper) this.mob).getSevenDaysToSurvive$dugNextBlockPos() != null && this.mob.level().getBlockState(((IZombieHelper) this.mob).getSevenDaysToSurvive$dugNextBlockPos()).isAir())){
-            System.out.println("move if1");
             BlockPos nextBP;
 
             if(((IZombieHelper)this.mob).getSevenDaysToSurvive$placedBlockBlockPos() != null) {
@@ -320,7 +282,6 @@ public class SearchAndGoToPlayerGoal extends Goal {
                     if (this.mob.getNavigation().getPath().isDone()) {
                         double distance = this.mob.distanceToSqr(path.getTarget().getCenter());
                         if (distance > 0.15) {
-                            System.out.println("Push mob to complete path");
                             Vec3 multiplication = nextBP.getCenter().subtract(this.mob.blockPosition().getCenter()).normalize().multiply(0.1, 0.1, 0.1);
                             this.mob.setDeltaMovement(multiplication);
                             this.mob.getLookControl().setLookAt(nextBP.getCenter());
@@ -336,14 +297,11 @@ public class SearchAndGoToPlayerGoal extends Goal {
             this.modGoalTarget = ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget();
             if(this.pathToPlayer != null && this.notMovingTickCounter <= 40) {
                 if(this.pathToPlayer.canReach()){
-                    System.out.println("move if2");
                     this.mob.getNavigation().moveTo(this.modGoalTarget, this.speedModifier);
                 }else {
-                    System.out.println("move if3");
                     this.runOnce();
                 }
             }else{
-                System.out.println("move if4");
                 this.mob.getNavigation().moveTo(this.modGoalTarget, this.speedModifier);
             }
         }
@@ -358,7 +316,6 @@ public class SearchAndGoToPlayerGoal extends Goal {
     }
 
     public void stop() {
-        System.out.println("stop executing SearchAndGoToPlayerGoal");
         this.mob.getNavigation().stop();
 
         if(this.mob instanceof Zombie zombie){
