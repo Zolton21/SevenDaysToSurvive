@@ -254,7 +254,6 @@ public class SearchAndGoToPlayerGoal extends Goal {
         this.runnedOnce = false;
         this.pathToPlayer = ((IZombieHelper)this.mob).getSevenDaysToSurvive$pathToTargetEntity();
         this.heldItem = this.mob.getItemInHand(InteractionHand.MAIN_HAND);
-        this.mob.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.YELLOW_WOOL));
         this.isMoving = true;
         this.notMovingTickCounter = 0;
         this.mobBP = this.mob.blockPosition();
@@ -330,6 +329,5 @@ public class SearchAndGoToPlayerGoal extends Goal {
         if(((IZombieHelper) this.mob).getSevenDaysToSurvive$dugNextBlockPos() != null){
             ((IZombieHelper) this.mob).setSevenDaysToSurvive$dugNextBlockPos(null);
         }
-        this.mob.setItemInHand(InteractionHand.MAIN_HAND, this.heldItem);
     }
 }
