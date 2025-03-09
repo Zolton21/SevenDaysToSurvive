@@ -6,6 +6,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.pathfinder.Path;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
 import org.spongepowered.asm.mixin.Final;
@@ -59,6 +60,15 @@ public class MeleeAttackGoalMixin {
             if (this.mob instanceof Zombie) {
                 if (!((IZombieHelper) this.mob).sevenDaysToSurvive$getIsWithinSynapticSealActivityRange()) {
                     if (this.mob.getTarget() instanceof ServerPlayer serverPlayer) {
+
+
+                        BlockPos nextBP = this.sevenDaysToSurvive$findNextBP();
+                        if(this.mob.onGround()) {
+                            if(this.mob.level().getBlockState(this.mob.blockPosition().offset(0, -1, 0)).getBlock() instanceof TrapDoorBlock ||
+                                    this.mob.level().getBlockState(nextBP.offset(0, -1, 0)).getBlock() instanceof TrapDoorBlock) {
+                                cir.setReturnValue(false);
+                            }
+                        }
                         if (i - this.sevenDaysToSurvive$lastPathCreation > 60L) {
                             this.sevenDaysToSurvive$path = this.mob.getNavigation().createPath(serverPlayer, 0);
                         }
@@ -87,6 +97,12 @@ public class MeleeAttackGoalMixin {
     @Unique
     private boolean sevenDaysToSurvive$conditions(ServerPlayer player) {
         long i = this.mob.level().getGameTime();
+        BlockPos nextBP = this.sevenDaysToSurvive$findNextBP();
+        if(this.mob.level().getBlockState(this.mob.blockPosition().offset(0, -1, 0)).getBlock() instanceof TrapDoorBlock ||
+                this.mob.level().getBlockState(nextBP.offset(0, -1, 0)).getBlock() instanceof TrapDoorBlock) {
+            return false;
+        }
+
         if (i - this.sevenDaysToSurvive$lastPathCreation > 20L) {
             this.sevenDaysToSurvive$lastPathCreation = i;
             this.sevenDaysToSurvive$path = this.mob.getNavigation().createPath(player, 0);
@@ -104,5 +120,10 @@ public class MeleeAttackGoalMixin {
             }
         }
         return false;
+    }
+
+    @Unique
+    private BlockPos sevenDaysToSurvive$findNextBP(){
+        return this.mob.blockPosition().relative(this.mob.getDirection());
     }
 }

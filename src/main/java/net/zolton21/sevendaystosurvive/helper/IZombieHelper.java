@@ -25,8 +25,6 @@ public interface IZombieHelper {
 
     boolean sevenDaysToSurvive$getIsWithinSynapticSealActivityRange();
 
-    void sevenDaysToSurvive$findCustomPath();
-
     void setSevenDaysToSurvive$placedBlockBlockPos(BlockPos blockPos);
 
     void setSevenDaysToSurvive$dugNextBlockPos(BlockPos blockPos);
@@ -42,4 +40,6 @@ public interface IZombieHelper {
     boolean sevenDaysToSurvive$getMobHasPlayerTargetAndCanReach();
 
     void sevenDaysToSurvive$setBreakingBlockBP(BlockPos blockPos);
+
+    long sevenDaysToSurvive$getNoMovementSinceTick();
 }

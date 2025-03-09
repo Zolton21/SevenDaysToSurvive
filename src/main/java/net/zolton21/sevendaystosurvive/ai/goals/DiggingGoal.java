@@ -8,6 +8,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.phys.Vec3;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
 import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
@@ -73,6 +74,12 @@ public class DiggingGoal extends Goal {
             this.nextBlockPos = ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos();
             if (this.nextBlockPos != null) {
                 if (this.mob.level().getBlockState(this.nextBlockPos).getFluidState().isEmpty()) {
+                    if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, -1, 0)).getBlock() instanceof TrapDoorBlock){
+                        return true;
+                    }
+                    if(this.mob.level().getBlockState(this.mob.blockPosition().offset(0, -1, 0)).getBlock() instanceof TrapDoorBlock){
+                        return true;
+                    }
                     if (this.mob.getBlockX() == this.nextBlockPos.getX() && this.mob.getBlockZ() == this.nextBlockPos.getZ()) {
                         if (this.mob.getY() < this.nextBlockPos.getY()) {
                             if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
@@ -172,6 +179,13 @@ public class DiggingGoal extends Goal {
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
             this.nextBlockPos = ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos();
             if (this.nextBlockPos != null) {
+                if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, -1, 0)).getBlock() instanceof TrapDoorBlock){
+                    return true;
+                }
+                if(this.mob.level().getBlockState(this.mob.blockPosition().offset(0, -1, 0)).getBlock() instanceof TrapDoorBlock){
+                    return true;
+                }
+
                 if (this.mob.getBlockX() == this.nextBlockPos.getX() && this.mob.getBlockZ() == this.nextBlockPos.getZ()) {
                     if (this.mob.getBlockY() < this.nextBlockPos.getY()) {
                         if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos.offset(0, 1, 0))) {
@@ -339,6 +353,13 @@ public class DiggingGoal extends Goal {
                 }
 
                 if (this.nextBlockPos != null) {
+                    if(this.mob.level().getBlockState(this.nextBlockPos.offset(0, -1, 0)).getBlock() instanceof TrapDoorBlock){
+                        this.startBreakingBlock(this.tickCounter, this.nextBlockPos.offset(0, -1, 0));
+                    }
+                    if(this.mob.level().getBlockState(this.mob.blockPosition().offset(0, -1, 0)).getBlock() instanceof TrapDoorBlock){
+                        this.startBreakingBlock(this.tickCounter, this.mob.blockPosition().offset(0, -1, 0));
+                    }
+
                     if (this.nextBlockPos.getX() == this.mob.getBlockX() && this.nextBlockPos.getZ() == this.mob.getBlockZ()) {
                         if (this.mob.getBlockY() > this.nextBlockPos.getY()) {
                             if (ZombieUtils.HasBlockEntityCollision(this.mob.level(), this.nextBlockPos)) {
@@ -427,9 +448,4 @@ public class DiggingGoal extends Goal {
 
         this.mob.getLookControl().setLookAt(Vec3.atCenterOf(blockPos));
     }
-
-    public BlockPos diggingBlock() {
-        return this.breakBlockBlockPos;
-    }
-
 }

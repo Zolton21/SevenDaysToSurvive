@@ -10,6 +10,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
@@ -32,10 +33,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
     private int notMovingTickCounter;
     private BlockPos mobBP;
     private boolean runnedOnce;
-    private Path pathToNextBlockPos;
     private LivingEntity modGoalTarget;
-    private long runOnceTick;
-    private long tickCounter;
 
     public SearchAndGoToPlayerGoal(PathfinderMob creature, double speed) {
         this.mob = creature;
@@ -72,6 +70,10 @@ public class SearchAndGoToPlayerGoal extends Goal {
         }
 
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
+            if(this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0)).getBlock() instanceof TrapDoorBlock) {
+                return false;
+            }
+
             if (!this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty()) {
                 return false;
             }
@@ -142,6 +144,9 @@ public class SearchAndGoToPlayerGoal extends Goal {
 
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() != null && ((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget().isAlive()) {
             if (((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
+                if(this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().offset(0, -1, 0)).getBlock() instanceof TrapDoorBlock) {
+                    return false;
+                }
                 if (!this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty()) {
                     return false;
                 }

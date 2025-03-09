@@ -69,6 +69,14 @@ public class BuildTowardsTargetGoal extends Goal {
             return false;
         }
 
+        if(this.mob.onGround()) {
+            if(this.mob.level().getBlockState(this.mob.blockPosition().offset(0, -1, 0)).isAir()) {
+                if (i - ((IZombieHelper) this.mob).sevenDaysToSurvive$getNoMovementSinceTick() >= 200) {
+                    return true;
+                }
+            }
+        }
+
         if (this.mob.level().getBlockState(this.mob.blockPosition()).getFluidState().isEmpty()) {
             if (!this.mob.level().getBlockState(this.mob.blockPosition().offset(0, -1, 0)).getFluidState().isEmpty()) {
                 return true;
@@ -161,6 +169,14 @@ public class BuildTowardsTargetGoal extends Goal {
             return false;
         }
 
+        if(this.mob.onGround()) {
+            if(this.mob.level().getBlockState(this.mob.blockPosition().offset(0, -1, 0)).isAir()) {
+                if (this.mob.level().getGameTime() - ((IZombieHelper) this.mob).sevenDaysToSurvive$getNoMovementSinceTick() >= 200) {
+                    return true;
+                }
+            }
+        }
+
         if (this.mob.level().getBlockState(this.mob.blockPosition()).getFluidState().isEmpty()) {
             if (!this.mob.level().getBlockState(this.mob.blockPosition().offset(0, -1, 0)).getFluidState().isEmpty()) {
                 return true;
@@ -246,11 +262,20 @@ public class BuildTowardsTargetGoal extends Goal {
 
         if (!this.isPlacingBlock && this.tickCounter % 10 == 0) {
             if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
+                if(this.mob.onGround()) {
+                    if(this.mob.level().getBlockState(this.mob.blockPosition().offset(0, -1, 0)).isAir()) {
+                        if (this.mob.level().getGameTime() - ((IZombieHelper) this.mob).sevenDaysToSurvive$getNoMovementSinceTick() >= 200) {
+                            this.startPlacingBlock(this.mob.blockPosition().offset(0, -1, 0));
+                        }
+                    }
+                }
+                
                 if (this.mob.level().getBlockState(this.mob.blockPosition()).getFluidState().isEmpty()) {
                     if (!this.mob.level().getBlockState(this.mob.blockPosition().offset(0, -1, 0)).getFluidState().isEmpty()) {
                         this.startPlacingBlock(this.mob.blockPosition().offset(0, -1, 0));
                     }
                 }
+
                 if (((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos() != null) {
                     if (!this.mob.level().getBlockState(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos()).getFluidState().isEmpty()) {
                         if (Math.abs(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getX() - this.mob.getBlockX()) < 3 || Math.abs(((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos().getZ() - this.mob.getBlockZ()) < 3) {
@@ -338,11 +363,13 @@ public class BuildTowardsTargetGoal extends Goal {
     }
 
     private void placeBlock(BlockPos blockPos) {
-        ((IZombieHelper) this.mob).setSevenDaysToSurvive$placedBlockBlockPos(blockPos);
-        if (!ZombieUtils.HasBlockEntityCollision(this.mob.level(), blockPos)) {
-            this.mob.level().setBlock(blockPos, Blocks.COBBLESTONE.defaultBlockState(), 3);
-            this.mob.swing(InteractionHand.MAIN_HAND);
-            this.mob.level().playSound(null, blockPos, SoundEvents.STONE_PLACE, this.mob.getSoundSource(), 1.0F, 1.0F);
+        if(this.mob.distanceToSqr(blockPos.getCenter()) <= 4) {
+            ((IZombieHelper) this.mob).setSevenDaysToSurvive$placedBlockBlockPos(blockPos);
+            if (!ZombieUtils.HasBlockEntityCollision(this.mob.level(), blockPos)) {
+                this.mob.level().setBlock(blockPos, Blocks.COBBLESTONE.defaultBlockState(), 3);
+                this.mob.swing(InteractionHand.MAIN_HAND);
+                this.mob.level().playSound(null, blockPos, SoundEvents.STONE_PLACE, this.mob.getSoundSource(), 1.0F, 1.0F);
+            }
         }
         GroundPathNavigation GroundPathNavigation = (GroundPathNavigation) this.mob.getNavigation();
         this.pathToNextBlockPos = GroundPathNavigation.createPath(blockPos.offset(0, 1, 0), 0);
