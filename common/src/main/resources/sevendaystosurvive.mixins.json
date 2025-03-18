@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.zolton21.sevendaystosurvive.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MeleeAttackGoalMixin",
+    "ModCommonEntityDataSaverMixin",
+    "ZombieMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

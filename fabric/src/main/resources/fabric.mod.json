@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "architecturytemplate",
+  "version": "${version}",
+  "name": "ArchitecturyTemplate",
+  "description": "",
+  "authors": [
+    "Zolton21"
+  ],
+  "contact": {
+    "homepage": ""
+  },
+  "license": "MIT",
+  "icon": "logo1.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.zolton21.sevendaystosurvive.fabric.SevenDaysToSurviveFabric"
+    ],
+    "client": [
+      "net.zolton21.sevendaystosurvive.fabric.SevenDaysToSurviveFabricClient"
+    ]
+  },
+  "mixins": [
+    "sevendaystosurvive.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.10",
+    "minecraft": "~1.20.1",
+    "java": ">=17",
+    "architectury": ">=9.2.14",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
