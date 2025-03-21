@@ -33,7 +33,7 @@ public class ModForgeEvents {
 
     @SubscribeEvent
     public static void onEntityChangeDimension(EntityTravelToDimensionEvent event){
-        int range = ZombieUtils.isOblivionNight(event.getEntity().level()) ? CommonConfig.PLAYER_DETECTION_RANGE_OBLIVION_NIGHT : CommonConfig.PLAYER_DETECTION_RANGE;
+        int range = ZombieUtils.isOblivionNight(event.getEntity().level()) ? CommonConfig.Server.PLAYER_DETECTION_RANGE_OBLIVION_NIGHT.get() : CommonConfig.Server.PLAYER_DETECTION_RANGE.get();
         AABB AABBrange = new AABB(range, range, range, -range, -range, -range);
 
         List<Monster> monsters = new ArrayList<>();
@@ -50,12 +50,10 @@ public class ModForgeEvents {
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event){
         if(ZombieUtils.isOblivionNight(event.player.level())) {
-            if (event.player.level().isClientSide()) {
-                long time = event.player.level().getDayTime();
-                if(time >= 12000 && time <= 12200){
-                    Component text = Component.translatable("message.sevendaystosurvive.oblivion.night.beginning").withStyle(ChatFormatting.DARK_RED);
-                    event.player.displayClientMessage(text, true);
-                }
+            long time = event.player.level().getDayTime() % 24000;
+            if(time >= 12000 && time <= 12200) {
+                Component text = Component.translatable("message.sevendaystosurvive.oblivion.night.beginning").withStyle(ChatFormatting.DARK_RED);
+                event.player.displayClientMessage(text, true);
             }
         }
     }

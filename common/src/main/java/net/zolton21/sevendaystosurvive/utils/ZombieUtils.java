@@ -22,8 +22,10 @@ public class ZombieUtils {
         if (blockState.getDestroySpeed(level, pos) == -1.0F) {
             return false;
         }
-        if (BlockId != null && CommonConfig.UNBREAKABLE_BLOCKS_LIST.contains(BlockId.toString())) {
-            return false;
+        if (BlockId != null) {
+            if (CommonConfig.Server.UNBREAKABLE_BLOCKS_LIST.get().contains(BlockId.toString())) {
+                return false;
+            }
         }
         return true;
     }
@@ -98,7 +100,8 @@ public class ZombieUtils {
         if(level instanceof ServerLevel serverLevel) {
             long time = serverLevel.getDayTime() % 24000;
             long daysPassed = serverLevel.getDayTime() / 24000 + 1;
-            if (daysPassed % CommonConfig.OBLIVION_NIGHT_FREQUENCY == 0) {
+
+            if (daysPassed % CommonConfig.Server.OBLIVION_NIGHT_FREQUENCY.get() == 0) {
                 if (12010 < time && time < 23991) {
                     return true;
                 }

@@ -88,7 +88,7 @@ public class FabricSynapticSealBlockEntity extends BlockEntity implements GeoBlo
     }
 
     public void tick(Level pLevel1, BlockPos pPos, BlockState pState1) {
-        if(ZombieUtils.isOblivionNight(this.getLevel()) && !CommonConfig.OBLIVION_NIGHT_SYNAPTIC_SEAL_WORKS) {
+        if(ZombieUtils.isOblivionNight(this.getLevel()) && !CommonConfig.Server.OBLIVION_NIGHT_SYNAPTIC_SEAL_WORKS.get()) {
 
         }else{
 

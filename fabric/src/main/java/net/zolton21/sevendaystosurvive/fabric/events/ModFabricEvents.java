@@ -46,23 +46,20 @@ public class ModFabricEvents {
                     onPlayerChangeDimension(player, lastDimension, currentDimension);
                     lastKnownDimensions.put(player, currentDimension);
                 }
-            }
-        });
 
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            LocalPlayer player = client.player;
-            if(player != null && ZombieUtils.isOblivionNight(player.level())){
-                long time = player.level().getDayTime();
-                if(time >= 12000 && time <= 12200) {
-                    Component text = Component.translatable("message.sevendaystosurvive.oblivion.night.beginning").withStyle(ChatFormatting.DARK_RED);
-                    player.displayClientMessage(text, true);
+                if(ZombieUtils.isOblivionNight(player.level())){
+                    long time = player.level().getDayTime() % 24000;
+                    if(time >= 12000 && time <= 12200) {
+                        Component text = Component.translatable("message.sevendaystosurvive.oblivion.night.beginning").withStyle(ChatFormatting.DARK_RED);
+                        player.displayClientMessage(text, true);
+                    }
                 }
             }
         });
     }
 
     private static void onPlayerChangeDimension(ServerPlayer player, Level from, Level to) {
-        int range = ZombieUtils.isOblivionNight(player.level()) ? CommonConfig.PLAYER_DETECTION_RANGE_OBLIVION_NIGHT : CommonConfig.PLAYER_DETECTION_RANGE;
+        int range = ZombieUtils.isOblivionNight(player.level()) ? CommonConfig.Server.PLAYER_DETECTION_RANGE_OBLIVION_NIGHT.get() : CommonConfig.Server.PLAYER_DETECTION_RANGE.get();
 
         AABB AABBrange = new AABB(-range, -range, -range, range, range, range);
         List<Monster> monsters = player.level().getEntitiesOfClass(Monster.class, AABBrange);

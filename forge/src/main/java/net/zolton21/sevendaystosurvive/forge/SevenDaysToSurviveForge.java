@@ -1,12 +1,13 @@
 package net.zolton21.sevendaystosurvive.forge;
 
 import dev.architectury.platform.forge.EventBuses;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.zolton21.sevendaystosurvive.SevenDaysToSurvive;
+import net.zolton21.sevendaystosurvive.config.CommonConfig;
 import net.zolton21.sevendaystosurvive.forge.registry.ForgeBlockEntityRegistry;
 import net.zolton21.sevendaystosurvive.forge.registry.ForgeBlockRegistry;
 import net.zolton21.sevendaystosurvive.forge.registry.ForgeItemRegistry;
@@ -20,6 +21,7 @@ public final class SevenDaysToSurviveForge {
         ForgeBlockEntityRegistry.register();
         ForgeItemRegistry.register();
 
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfig.Server.CONFIG);
         SevenDaysToSurvive.init();
     }
 

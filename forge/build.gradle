@@ -31,14 +31,7 @@ configurations {
 }
 
 repositories {
-    maven {
-        name = 'GeckoLib'
-        url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
-        content {
-            includeGroupByRegex("software\\.bernie.*")
-            includeGroup("com.eliotlash.mclib")
-        }
-    }
+
 }
 
 dependencies {
@@ -49,6 +42,8 @@ dependencies {
     modImplementation("software.bernie.geckolib:geckolib-forge-$rootProject.minecraft_version:$rootProject.geckolib_version")
     modImplementation("com.eliotlash.mclib:mclib:20")
     forgeRuntimeLibrary("com.eliotlash.mclib:mclib:20")
+
+    modRuntimeOnly "mezz.jei:jei-1.20.1-forge:15.20.0.106"
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionForge')

@@ -1,5 +1,6 @@
 package net.zolton21.sevendaystosurvive.mixin;
 
+import dev.architectury.platform.Platform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -221,7 +222,7 @@ public abstract class ZombieMixin extends Monster implements IZombieHelper {
 
     @Unique
     public void sevenDaysToSurvive$findReachableTarget() {
-        int range = ZombieUtils.isOblivionNight(this.level()) ? CommonConfig.PLAYER_DETECTION_RANGE_OBLIVION_NIGHT : CommonConfig.PLAYER_DETECTION_RANGE;
+        int range = ZombieUtils.isOblivionNight(this.level()) ? CommonConfig.Server.PLAYER_DETECTION_RANGE_OBLIVION_NIGHT.get() : CommonConfig.Server.PLAYER_DETECTION_RANGE.get();
         this.sevenDaysToSurvive$modGoalTarget = ZombieUtils.getNearestUnprotectedSurvivalPlayer(this, range);
     }
 
