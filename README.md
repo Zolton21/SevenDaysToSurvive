@@ -1,4 +1,4 @@
-<p align="center"><img src="src/main/resources/logo.png" alt="Logo" width="800"></p>
+<p align="center"><img src="common/src/main/resources/logo.png" alt="Logo" width="800"></p>
 <h1 align="center">
     <a href="https://www.curseforge.com/minecraft/mc-mods/seven-days-to-survive/files"><img src="https://cf.way2muchnoise.eu/versions/1209650.svg" alt="Supported Versions"></a>
     <a href="https://www.curseforge.com/minecraft/mc-mods/seven-days-to-survive"><img src="https://cf.way2muchnoise.eu/full_1209650_downloads.svg" alt="CurseForge"></a>
