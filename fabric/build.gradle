@@ -56,7 +56,8 @@ def replaceProperties = [
         mod_description:mod_description,
         issue_tracker_url:issue_tracker_url,
         mod_license:mod_license,
-        geckolib_version:geckolib_version
+        geckolib_version:geckolib_version,
+        forge_config_api_version:forge_config_api_version
 ]
 
 processResources {
