@@ -76,8 +76,15 @@ public class MeleeAttackGoalMixin {
                             BlockPos nextBp = ((IZombieHelper) this.mob).sevenDaysToSurvive$getNextBlockPos();
                             if (nextBp != null) {
                                 if (!this.mob.level().getBlockState(nextBp).getFluidState().isEmpty()) {
-                                    cir.setReturnValue(false);
+                                    if (!this.mob.level().getBlockState(this.mob.blockPosition()).getFluidState().isEmpty()) {
+                                        if(!this.mob.level().getBlockState(this.mob.blockPosition()).getFluidState().isSource()) {
+                                            if(this.mob.level().getBlockState(nextBp).getFluidState().isSource()){
+                                                cir.setReturnValue(false);
+                                            }
+                                        }
+                                    }
                                 }
+
                                 if (!this.mob.level().getBlockState(nextBp.offset(0, 1, 0)).getFluidState().isEmpty()) {
                                     cir.setReturnValue(false);
                                 }
@@ -115,6 +122,12 @@ public class MeleeAttackGoalMixin {
                             this.mob.level().getBlockState(nextBp.offset(0, 1, 0)).getFluidState().isEmpty() &&
                             this.mob.level().getBlockState(nextBp.offset(0, -1, 0)).getFluidState().isEmpty()) {
                         return this.sevenDaysToSurvive$path.canReach();
+                    } else if (!this.mob.level().getBlockState(nextBp).getFluidState().isEmpty()) {
+                        if (!this.mob.level().getBlockState(this.mob.blockPosition()).getFluidState().isEmpty()) {
+                            if(this.mob.level().getBlockState(this.mob.blockPosition()).getFluidState().isSource()) {
+                                return this.sevenDaysToSurvive$path.canReach();
+                            }
+                        }
                     }
                 }
             }

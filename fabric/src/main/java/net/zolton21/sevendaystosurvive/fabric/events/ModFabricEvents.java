@@ -1,15 +1,20 @@
 package net.zolton21.sevendaystosurvive.fabric.events;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -56,6 +61,36 @@ public class ModFabricEvents {
                 }
             }
         });
+
+        ServerEntityEvents.ENTITY_LOAD.register(((entity, serverLevel) -> {
+            if(ZombieUtils.isOblivionNight(entity.level())) {
+                if (entity.getType() == EntityType.ZOMBIE || entity.getType() == EntityType.HUSK) {
+                    if(entity instanceof Zombie zombieTypeEntity){
+                        if(!zombieTypeEntity.isBaby()) {
+                            if (zombieTypeEntity.getAttribute(Attributes.MOVEMENT_SPEED) != null) {
+                                if (zombieTypeEntity.getAttribute(Attributes.MOVEMENT_SPEED).getModifier(ZombieUtils.speedBoostModifier.getId()) == null) {
+                                    zombieTypeEntity.getAttribute(Attributes.MOVEMENT_SPEED).addPermanentModifier(ZombieUtils.speedBoostModifier);
+
+                                    ItemStack[] randomSet = ZombieUtils.getWeaponAndArmorSet();
+
+                                    zombieTypeEntity.setItemSlot(EquipmentSlot.HEAD, randomSet[0]);
+                                    zombieTypeEntity.setItemSlot(EquipmentSlot.CHEST, randomSet[1]);
+                                    zombieTypeEntity.setItemSlot(EquipmentSlot.LEGS, randomSet[2]);
+                                    zombieTypeEntity.setItemSlot(EquipmentSlot.FEET, randomSet[3]);
+                                    zombieTypeEntity.setItemSlot(EquipmentSlot.MAINHAND, randomSet[4]);
+
+                                    zombieTypeEntity.setDropChance(EquipmentSlot.MAINHAND, 0.0f);
+                                    zombieTypeEntity.setDropChance(EquipmentSlot.HEAD, 0.0f);
+                                    zombieTypeEntity.setDropChance(EquipmentSlot.CHEST, 0.0f);
+                                    zombieTypeEntity.setDropChance(EquipmentSlot.LEGS, 0.0f);
+                                    zombieTypeEntity.setDropChance(EquipmentSlot.FEET, 0.0f);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }));
     }
 
     private static void onPlayerChangeDimension(ServerPlayer player, Level from, Level to) {

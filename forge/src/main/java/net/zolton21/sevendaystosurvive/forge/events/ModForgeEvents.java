@@ -2,12 +2,18 @@ package net.zolton21.sevendaystosurvive.forge.events;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -43,6 +49,38 @@ public class ModForgeEvents {
         for(Monster monster : monsters){
             if(monster instanceof Zombie zombie){
                 ((IZombieHelper)zombie).sevenDaysToSurvive$resetModGoalTargetAndNextBlockPos();
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onZombieSpawn(EntityJoinLevelEvent event){
+        Entity mobEntity = event.getEntity();
+        if(ZombieUtils.isOblivionNight(mobEntity.level())) {
+            if (mobEntity.getType() == EntityType.ZOMBIE || mobEntity.getType() == EntityType.HUSK) {
+                if(mobEntity instanceof Zombie zombieTypeEntity){
+                    if(!zombieTypeEntity.isBaby()) {
+                        if (zombieTypeEntity.getAttribute(Attributes.MOVEMENT_SPEED) != null) {
+                            if(zombieTypeEntity.getAttribute(Attributes.MOVEMENT_SPEED).getModifier(ZombieUtils.speedBoostModifier.getId()) == null) {
+                                zombieTypeEntity.getAttribute(Attributes.MOVEMENT_SPEED).addPermanentModifier(ZombieUtils.speedBoostModifier);
+
+                                ItemStack[] randomSet = ZombieUtils.getWeaponAndArmorSet();
+
+                                zombieTypeEntity.setItemSlot(EquipmentSlot.HEAD, randomSet[0]);
+                                zombieTypeEntity.setItemSlot(EquipmentSlot.CHEST, randomSet[1]);
+                                zombieTypeEntity.setItemSlot(EquipmentSlot.LEGS, randomSet[2]);
+                                zombieTypeEntity.setItemSlot(EquipmentSlot.FEET, randomSet[3]);
+                                zombieTypeEntity.setItemSlot(EquipmentSlot.MAINHAND, randomSet[4]);
+
+                                zombieTypeEntity.setDropChance(EquipmentSlot.MAINHAND, 0.0f);
+                                zombieTypeEntity.setDropChance(EquipmentSlot.HEAD, 0.0f);
+                                zombieTypeEntity.setDropChance(EquipmentSlot.CHEST, 0.0f);
+                                zombieTypeEntity.setDropChance(EquipmentSlot.LEGS, 0.0f);
+                                zombieTypeEntity.setDropChance(EquipmentSlot.FEET, 0.0f);
+                            }
+                        }
+                    }
+                }
             }
         }
     }

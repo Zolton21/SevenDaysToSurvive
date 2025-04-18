@@ -31,7 +31,7 @@
     "architectury": ">=9.2.14",
     "fabric-api": "*",
     "forgeconfigapiport": ">=8.0.2",
-    "geckolib": ">=4.7"
+    "geckolib": ">=4.4.9"
   },
   "suggests": {
     "another-mod": "*"

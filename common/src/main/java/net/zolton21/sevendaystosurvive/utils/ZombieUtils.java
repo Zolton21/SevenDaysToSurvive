@@ -1,12 +1,14 @@
 package net.zolton21.sevendaystosurvive.utils;
 
-import dev.architectury.platform.Platform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
@@ -14,8 +16,14 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.zolton21.sevendaystosurvive.config.CommonConfig;
 import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Random;
+import java.util.UUID;
 
 public class ZombieUtils {
+    public static final AttributeModifier speedBoostModifier = new AttributeModifier(UUID.fromString("e3689d2f-12c9-4af2-94bb-db025908da17"), "SpeedBoostModifier", 0.13F, AttributeModifier.Operation.ADDITION);
+
     public static boolean isBlockBreakable(Level level, BlockPos pos) {
         BlockState blockState = level.getBlockState(pos);
         ResourceLocation BlockId = level.registryAccess().registryOrThrow(Registries.BLOCK).getKey(blockState.getBlock());
@@ -108,5 +116,33 @@ public class ZombieUtils {
             }
         }
         return false;
+    }
+
+    public static ItemStack @NotNull [] getWeaponAndArmorSet() {
+        ItemStack[][] armorSets = new ItemStack[][]{
+                {
+                        new ItemStack(Items.LEATHER_HELMET),
+                        new ItemStack(Items.LEATHER_CHESTPLATE),
+                        new ItemStack(Items.LEATHER_LEGGINGS),
+                        new ItemStack(Items.LEATHER_BOOTS),
+                        new ItemStack(Items.STONE_SWORD)
+                },
+                {
+                        new ItemStack(Items.CHAINMAIL_HELMET),
+                        new ItemStack(Items.CHAINMAIL_CHESTPLATE),
+                        new ItemStack(Items.CHAINMAIL_LEGGINGS),
+                        new ItemStack(Items.CHAINMAIL_BOOTS),
+                        new ItemStack(Items.IRON_SWORD)
+                },
+                {
+                        new ItemStack(Items.IRON_HELMET),
+                        new ItemStack(Items.IRON_CHESTPLATE),
+                        new ItemStack(Items.IRON_LEGGINGS),
+                        new ItemStack(Items.IRON_BOOTS),
+                        new ItemStack(Items.IRON_SWORD)
+                }
+        };
+        Random random = new Random();
+        return armorSets[random.nextInt(armorSets.length)];
     }
 }
