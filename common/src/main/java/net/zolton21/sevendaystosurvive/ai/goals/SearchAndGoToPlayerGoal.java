@@ -8,10 +8,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
+import net.zolton21.sevendaystosurvive.config.CommonConfig;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
 import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
 import net.zolton21.sevendaystosurvive.utils.ZombieUtils;
@@ -24,14 +24,13 @@ public class SearchAndGoToPlayerGoal extends Goal {
     protected final double speedModifier;
     private final PathfinderMob mob;
     private int ticksUntilNextAttack;
-    private ItemStack heldItem;
     @Nullable
     private Path pathToPlayer;
     private long lastCanUseCheck;
     private boolean isMoving;
     private int notMovingTickCounter;
     private BlockPos mobBP;
-    private boolean runnedOnce;
+    private boolean ranOnce;
     private LivingEntity modGoalTarget;
 
     public SearchAndGoToPlayerGoal(PathfinderMob creature, double speed) {
@@ -46,6 +45,12 @@ public class SearchAndGoToPlayerGoal extends Goal {
             return false;
         } else {
             this.lastCanUseCheck = i;
+        }
+
+        if(CommonConfig.Server.ZOMBIES_BUILD_AND_DIG_ONLY_ON_OBLIVION_NIGHT.get()){
+            if(!ZombieUtils.isOblivionNight(this.mob.level())){
+                return false;
+            }
         }
 
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getIsWithinSynapticSealActivityRange()) {
@@ -115,6 +120,12 @@ public class SearchAndGoToPlayerGoal extends Goal {
     public boolean canContinueToUse() {
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getIsWithinSynapticSealActivityRange()) {
             return false;
+        }
+
+        if(CommonConfig.Server.ZOMBIES_BUILD_AND_DIG_ONLY_ON_OBLIVION_NIGHT.get()){
+            if(!ZombieUtils.isOblivionNight(this.mob.level())){
+                return false;
+            }
         }
 
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
@@ -205,7 +216,7 @@ public class SearchAndGoToPlayerGoal extends Goal {
     public void tick() {
         if(this.pathToPlayer != ((IZombieHelper)this.mob).getSevenDaysToSurvive$pathToTargetEntity()){
             this.pathToPlayer = ((IZombieHelper)this.mob).getSevenDaysToSurvive$pathToTargetEntity();
-            this.runnedOnce = false;
+            this.ranOnce = false;
         }
 
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
@@ -255,9 +266,8 @@ public class SearchAndGoToPlayerGoal extends Goal {
     public void start() {
         ((IZombieHelper) this.mob).sevenDaysToSurvive$customGoalStarted();
         this.mob.getNavigation().stop();
-        this.runnedOnce = false;
+        this.ranOnce = false;
         this.pathToPlayer = ((IZombieHelper)this.mob).getSevenDaysToSurvive$pathToTargetEntity();
-        this.heldItem = this.mob.getItemInHand(InteractionHand.MAIN_HAND);
         this.isMoving = true;
         this.notMovingTickCounter = 0;
         this.mobBP = this.mob.blockPosition();
@@ -312,9 +322,9 @@ public class SearchAndGoToPlayerGoal extends Goal {
     }
 
     private void runOnce(){
-        if(!this.runnedOnce) {
+        if(!this.ranOnce) {
             this.mob.getNavigation().moveTo(this.pathToPlayer, this.speedModifier);
-            this.runnedOnce = true;
+            this.ranOnce = true;
         }
     }
 

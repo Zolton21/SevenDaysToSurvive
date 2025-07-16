@@ -13,6 +13,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.zolton21.sevendaystosurvive.config.CommonConfig;
 import net.zolton21.sevendaystosurvive.helper.IZombieHelper;
 import net.zolton21.sevendaystosurvive.helper.PlayerHelper;
 import net.zolton21.sevendaystosurvive.utils.ZombieUtils;
@@ -44,6 +45,12 @@ public class BuildTowardsTargetGoal extends Goal {
             return false;
         } else {
             this.lastCanUseCheck = i;
+        }
+
+        if(CommonConfig.Server.ZOMBIES_BUILD_AND_DIG_ONLY_ON_OBLIVION_NIGHT.get()){
+            if(!ZombieUtils.isOblivionNight(this.mob.level())){
+                return false;
+            }
         }
 
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getIsWithinSynapticSealActivityRange()) {
@@ -147,6 +154,12 @@ public class BuildTowardsTargetGoal extends Goal {
     public boolean canContinueToUse() {
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getIsWithinSynapticSealActivityRange()) {
             return false;
+        }
+
+        if(CommonConfig.Server.ZOMBIES_BUILD_AND_DIG_ONLY_ON_OBLIVION_NIGHT.get()){
+            if(!ZombieUtils.isOblivionNight(this.mob.level())){
+                return false;
+            }
         }
 
         if (((IZombieHelper) this.mob).sevenDaysToSurvive$getModGoalTarget() != null) {
